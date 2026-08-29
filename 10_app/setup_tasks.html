@@ -1,0 +1,81 @@
+<div class="r-meta">
+  <span>Prepared 2026-08-29</span>
+  <span>One-time setup on the left of your mind, the per-episode loop on the right. Today's plan at the bottom.</span>
+</div>
+
+<div class="callout">
+  <strong>How this splits.</strong> Everything below is either <em>setup</em> (do once, never again) or <em>steady state</em> (the loop you run every episode). The trap is letting setup tasks masquerade as recurring work. Music, hosting, and gear are one afternoon each — then they're done forever.
+</div>
+
+<h3>Setup · one-time tasks</h3>
+
+<h4>S1 — Show identity (blocks everything else)</h4>
+<p>Before hosting or music can finish, you need three artifacts: a <strong>show name</strong>, a <strong>one-paragraph description</strong>, and <strong>cover art</strong> (3000×3000 JPG/PNG — required by Apple). The research report's positioning section is the raw material for the description. Decide the name with Jeremy on the next call — it's the one thing that's annoying to change later.</p>
+
+<h4>S2 — Music: the pitch</h4>
+<p>Two viable routes, both fast:</p>
+<table>
+  <thead><tr><th>Route</th><th>How</th><th>Cost</th><th>Trade-off</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>AI-generate (recommended)</strong></td>
+      <td>Suno, paid tier — prompt for a theme, generate 5–10 candidates, pick 3 finalists, vote with Jeremy on the call. Prompt direction that fits the show: <em>"confident mid-tempo instrumental, analog synth + drum machine, control-room energy, clean intro sting that resolves in 15 seconds, no vocals."</em></td>
+      <td>~$10/mo (one month is enough)</td>
+      <td>Paid tier includes commercial-use rights; music is unique to you. Verify the current license terms at signup — AI-music licensing is the one thing that shifts.</td>
+    </tr>
+    <tr>
+      <td><strong>Royalty-free library</strong></td>
+      <td><a href="https://pixabay.com/music/search/podcast%20intro/" target="_blank" rel="noopener">Pixabay Music</a> (190k+ tracks, free, no attribution, commercial OK) or <a href="https://uppbeat.io/music/category/intro" target="_blank" rel="noopener">Uppbeat</a> (free tier with credit). Epidemic Sound (~$18/mo) only if you later want a big cleared catalog.</td>
+      <td>Free</td>
+      <td>Zero cost, zero risk — but other podcasts can use the same track.</td>
+    </tr>
+  </tbody>
+</table>
+<p><strong>Deliverables either way:</strong> a 15–30s <em>intro sting</em>, a ~20s <em>outro</em>, and a ~5s <em>transition stinger</em> (for segment changes — this is what makes "Since Last We Spoke" and "Canary Corner" feel like real segments). <strong>Hand-off:</strong> drop the files in <code>10_app/podcast_assets/music/</code> — <a href="file:///Users/turnertomlinson/CommandCenter/Jeremy%20Podcast%20test/10_app/podcast_assets/music/">open the folder</a>. Once files land there, I wire them into the flow.</p>
+
+<h4>S3 — Hosting &amp; distribution (how a podcast actually gets posted)</h4>
+<p>The mechanics, once, plainly: <strong>you never upload to Spotify or Apple directly.</strong> You upload the MP3 to a <em>host</em>; the host maintains an <em>RSS feed</em> (a machine-readable list of your episodes); Apple, Spotify, YouTube, and every other app just read that feed. Publish once at the host → it appears everywhere. Directories take 24 hours–10 days to approve a new show the first time, so submit before you need it.</p>
+<table>
+  <thead><tr><th>Host</th><th>Cost</th><th>Why / why not</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Spotify for Creators</strong> (was Anchor)</td><td>Free, unlimited</td><td>The zero-friction start. Auto-distributes to Spotify; submit the RSS to Apple/YouTube yourself.</td></tr>
+    <tr><td><strong>RSS.com</strong> (free plan)</td><td>Free, unlimited episodes</td><td>One-click submission to Apple + Spotify + Amazon; a more neutral home than Spotify's own host.</td></tr>
+    <tr><td><strong>Transistor</strong></td><td>~$19/mo</td><td>The upgrade path: full API — which matters to you specifically, because the auto-generated flow (n8n) can publish episodes programmatically. Not needed for episode 1.</td></tr>
+  </tbody>
+</table>
+<p><strong>Recommendation:</strong> start on RSS.com free (one-click directory submissions, easy to migrate away from later — RSS feeds redirect). Move to Transistor when the n8n flow is ready to auto-publish. Setup order: create host account → upload cover art + description → submit to directories → paste the RSS link into the flow board.</p>
+
+<h4>S4 — Recording stack</h4>
+<p>Covered in full in the <strong>Audio Strategy</strong> card. The setup half: create a free <a href="https://riverside.com/" target="_blank" rel="noopener">Riverside</a> account (2 hrs/mo of separate-track recording — enough for one episode) and do a 5-minute test call with Jeremy before the real one.</p>
+
+<h4>S5 — First-episode decisions</h4>
+<ul>
+  <li><strong>Is the Aug 15 recording episode 1 or the practice tape?</strong> Honest recommendation: practice tape — phone-call audio will set the wrong quality bar. Mine it for clips and quotes instead; record episode 1 properly.</li>
+  <li><strong>Cadence:</strong> biweekly, matching your call rhythm. Consistency beats frequency for directories and listeners alike.</li>
+  <li><strong>Trailer (optional):</strong> a 2-min cut of the best Aug 15 moments makes a good "episode 0" while directories approve the feed.</li>
+</ul>
+
+<h3>Steady state · the per-episode loop</h3>
+<table>
+  <thead><tr><th>#</th><th>Step</th><th>Who/what</th><th>Auto-flow future</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>Shared prep note: 3–4 "Since Last We Spoke" bullets each + the Main Thread question, agreed by text</td><td>You + Jeremy, days before</td><td>Flow generates the news bullets draft</td></tr>
+    <tr><td>2</td><td>Record: Riverside call, double-ender discipline (see Audio Strategy)</td><td>Both, ~70 min</td><td>—</td></tr>
+    <tr><td>3</td><td>Drop transcript in the inbox (<code>10_app/transcript_inbox/</code>)</td><td>You, 1 min</td><td>Plaud auto-flow could deliver it</td></tr>
+    <tr><td>4</td><td>Process: title candidates, chapters/segment marks, show notes, aphorism bank, clip list</td><td>The flow board — this is the pipeline we're building</td><td>Fully automated, n8n-linked</td></tr>
+    <tr><td>5</td><td>Mix &amp; assemble: sync tracks, trim, add intro/outro/stingers from <code>podcast_assets/music/</code></td><td>You (or an editor step in the flow)</td><td>Partially automatable</td></tr>
+    <tr><td>6</td><td>Upload MP3 + notes to host → publishes everywhere via RSS</td><td>You, 10 min</td><td>Transistor API via n8n</td></tr>
+    <tr><td>7</td><td>Promote: clips from the bank, one post each</td><td>Both</td><td>Flow drafts the posts</td></tr>
+  </tbody>
+</table>
+
+<h3>Today: setup for the first step-by-step processing run</h3>
+<div class="callout">
+  <p><strong>The suggested plan for this session's processing walk-through:</strong></p>
+  <ol>
+    <li><strong>Drop the Aug 15 transcript into the inbox</strong> — copy <code>20260815-call-with-turner-and-jeremy-ai-workforce-musing.md</code> from your Desktop into <code>10_app/transcript_inbox/</code>. The flow board's Processing block will light green and confirm it sees it.</li>
+    <li><strong>Define "processed" for v1</strong> — agree the outputs before running: episode title candidates (3), segment/chapter boundaries mapped to the run of show, show-notes draft, aphorism bank, clip list (top 5 moments).</li>
+    <li><strong>Walk the flow board left to right</strong> — Generate → Processing — and as each processing step works, add it as its own block so the board becomes the real map of the pipeline (these blocks are the future n8n link-out points).</li>
+    <li><strong>Skip music and hosting today</strong> — they're parallel setup tracks, not blockers. Nothing in the processing run depends on them.</li>
+  </ol>
+</div>

@@ -7,42 +7,42 @@
 <style>
   /* ============ TOKENS ============ */
   :root{
-    --ground:#F7F3EC; --panel:#FFFFFF; --panel-2:#FBF7EF;
-    --ink:#26221B; --ink-soft:#6A6154; --ink-faint:#968B7A;
-    --line:#E6DECF; --line-strong:#D6CBB6;
-    --accent:#EE4D2E; --accent-ink:#FFFFFF; --brass:#A9791F;
-    --good:#2F8F5B; --warn:#C6892A; --blue:#3B6EA5;
-    --shadow:0 1px 2px rgba(40,32,20,.05), 0 8px 24px rgba(40,32,20,.06);
-    --radius:12px;
+    --ground:#F3F4F6; --panel:#FFFFFF; --panel-2:#ECEEF1;
+    --ink:#1B1F26; --ink-soft:#5A6472; --ink-faint:#8A93A1;
+    --line:#E1E4E9; --line-strong:#C9CFD7;
+    --accent:#E0462A; --accent-ink:#FFFFFF; --brass:#8A6D1F;
+    --good:#25835A; --warn:#B07C22; --blue:#33619C;
+    --shadow:0 1px 2px rgba(20,25,35,.05), 0 4px 14px rgba(20,25,35,.05);
+    --radius:8px;
     --mono:ui-monospace,"SF Mono","Cascadia Code",Menlo,Consolas,monospace;
     --sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
     --grid: color-mix(in srgb,var(--line) 60%,transparent);
   }
   @media (prefers-color-scheme:dark){
     :root{
-      --ground:#17140F; --panel:#211C15; --panel-2:#1B1710;
-      --ink:#ECE4D6; --ink-soft:#A79C89; --ink-faint:#6F6555;
-      --line:#302A20; --line-strong:#3D3527;
-      --accent:#F5643F; --accent-ink:#1A1109; --brass:#CFA24E;
-      --good:#4FB07A; --warn:#DBA43C; --blue:#6E9BCB;
-      --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.35);
+      --ground:#13161B; --panel:#1B1F26; --panel-2:#161A20;
+      --ink:#E5E8EC; --ink-soft:#9AA3B0; --ink-faint:#68717E;
+      --line:#272C34; --line-strong:#353C46;
+      --accent:#F05B3E; --accent-ink:#14100E; --brass:#C4A24A;
+      --good:#43A87A; --warn:#CE9A34; --blue:#6C95C8;
+      --shadow:0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.3);
     }
   }
   :root[data-theme="light"]{
-    --ground:#F7F3EC; --panel:#FFFFFF; --panel-2:#FBF7EF;
-    --ink:#26221B; --ink-soft:#6A6154; --ink-faint:#968B7A;
-    --line:#E6DECF; --line-strong:#D6CBB6;
-    --accent:#EE4D2E; --accent-ink:#FFFFFF; --brass:#A9791F;
-    --good:#2F8F5B; --warn:#C6892A; --blue:#3B6EA5;
-    --shadow:0 1px 2px rgba(40,32,20,.05), 0 8px 24px rgba(40,32,20,.06);
+    --ground:#F3F4F6; --panel:#FFFFFF; --panel-2:#ECEEF1;
+    --ink:#1B1F26; --ink-soft:#5A6472; --ink-faint:#8A93A1;
+    --line:#E1E4E9; --line-strong:#C9CFD7;
+    --accent:#E0462A; --accent-ink:#FFFFFF; --brass:#8A6D1F;
+    --good:#25835A; --warn:#B07C22; --blue:#33619C;
+    --shadow:0 1px 2px rgba(20,25,35,.05), 0 4px 14px rgba(20,25,35,.05);
   }
   :root[data-theme="dark"]{
-    --ground:#17140F; --panel:#211C15; --panel-2:#1B1710;
-    --ink:#ECE4D6; --ink-soft:#A79C89; --ink-faint:#6F6555;
-    --line:#302A20; --line-strong:#3D3527;
-    --accent:#F5643F; --accent-ink:#1A1109; --brass:#CFA24E;
-    --good:#4FB07A; --warn:#DBA43C; --blue:#6E9BCB;
-    --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.35);
+    --ground:#13161B; --panel:#1B1F26; --panel-2:#161A20;
+    --ink:#E5E8EC; --ink-soft:#9AA3B0; --ink-faint:#68717E;
+    --line:#272C34; --line-strong:#353C46;
+    --accent:#F05B3E; --accent-ink:#14100E; --brass:#C4A24A;
+    --good:#43A87A; --warn:#CE9A34; --blue:#6C95C8;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.3);
   }
 
   *{box-sizing:border-box}
@@ -60,15 +60,15 @@
 
   /* ---- shared top bar ---- */
   .bar{
-    display:flex; align-items:center; gap:14px;
-    padding:13px clamp(14px,3vw,24px); flex:none;
+    display:flex; align-items:center; gap:12px;
+    padding:8px clamp(12px,2.5vw,18px); flex:none;
     background:var(--panel); border-bottom:1px solid var(--line);
   }
   .tally{
-    display:inline-flex; align-items:center; gap:9px;
-    font-family:var(--mono); font-size:11px; letter-spacing:.12em;
+    display:inline-flex; align-items:center; gap:7px;
+    font-family:var(--mono); font-size:10px; letter-spacing:.1em;
     text-transform:uppercase; color:var(--ink-soft);
-    padding:5px 11px 5px 9px; border:1px solid var(--line-strong);
+    padding:3px 9px 3px 7px; border:1px solid var(--line-strong);
     border-radius:100px; background:var(--panel-2);
   }
   .dot{width:9px; height:9px; border-radius:50%; background:var(--accent);
@@ -79,14 +79,14 @@
     100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--accent) 0%,transparent)}
   }
   @media (prefers-reduced-motion:reduce){ .dot{animation:none} }
-  .title{display:flex; flex-direction:column; gap:2px; margin-right:auto; min-width:0}
-  .title h1{margin:0; font-size:16px; font-weight:640; letter-spacing:-.01em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
-  .title .sub{font-family:var(--mono); font-size:11px; color:var(--ink-faint); letter-spacing:.04em}
-  .clock{font-family:var(--mono); font-size:12px; color:var(--ink-soft); font-variant-numeric:tabular-nums}
+  .title{display:flex; align-items:baseline; gap:8px; margin-right:auto; min-width:0}
+  .title h1{margin:0; font-size:13.5px; font-weight:640; letter-spacing:-.01em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .title .sub{font-family:var(--mono); font-size:10px; color:var(--ink-faint); letter-spacing:.04em; white-space:nowrap}
+  .clock{font-family:var(--mono); font-size:11px; color:var(--ink-soft); font-variant-numeric:tabular-nums}
   .icon-btn{
     appearance:none; border:1px solid var(--line-strong); background:var(--panel-2);
-    color:var(--ink-soft); height:32px; min-width:32px; padding:0 9px; border-radius:8px;
-    cursor:pointer; font-size:13px; display:inline-flex; align-items:center; gap:6px; justify-content:center;
+    color:var(--ink-soft); height:26px; min-width:26px; padding:0 8px; border-radius:6px;
+    cursor:pointer; font-size:12px; display:inline-flex; align-items:center; gap:5px; justify-content:center;
     transition:border-color .15s, color .15s;
   }
   .icon-btn:hover{border-color:var(--accent); color:var(--accent)}
@@ -94,51 +94,48 @@
   .icon-btn.solid{background:var(--accent); border-color:var(--accent); color:var(--accent-ink)}
   .icon-btn.solid:hover{filter:brightness(1.06); color:var(--accent-ink)}
 
-  /* ============ HOME ============ */
-  .home-body{flex:1; overflow-y:auto; padding:clamp(20px,4vw,40px)}
-  .home-inner{max-width:760px; margin:0 auto}
-  .lede{margin:0 4px 22px}
-  .lede h2{margin:0 0 5px; font-family:var(--mono); font-size:12px; font-weight:600;
-    text-transform:uppercase; letter-spacing:.16em; color:var(--ink-soft)}
-  .lede p{margin:0; font-size:13.5px; color:var(--ink-faint); max-width:56ch}
+  /* ============ HOME (compact) ============ */
+  .home-body{flex:1; overflow-y:auto; padding:clamp(10px,2vw,16px)}
+  .home-inner{max-width:860px; margin:0 auto}
 
-  .cards{display:grid; gap:16px; grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+  .cards{display:grid; gap:8px; grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}
   .card{
     text-align:left; cursor:pointer; appearance:none;
     background:var(--panel); border:1px solid var(--line); border-radius:var(--radius);
-    box-shadow:var(--shadow); padding:22px 22px 20px; color:var(--ink);
-    display:flex; flex-direction:column; gap:12px; min-height:172px;
-    transition:transform .16s cubic-bezier(.32,.72,.35,1), border-color .16s, box-shadow .16s;
+    box-shadow:var(--shadow); padding:11px 13px; color:var(--ink);
+    display:flex; align-items:flex-start; gap:10px;
+    transition:border-color .13s, background .13s;
   }
-  .card:hover{transform:translateY(-3px); border-color:var(--line-strong);
-    box-shadow:0 4px 8px rgba(40,32,20,.06), 0 16px 40px rgba(40,32,20,.12)}
-  .card:focus-visible{outline:2px solid var(--accent); outline-offset:3px}
+  .card:hover{border-color:var(--accent); background:color-mix(in srgb,var(--accent) 3%,var(--panel))}
+  .card:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
   .card .ico{
-    width:42px; height:42px; border-radius:11px; display:grid; place-items:center;
-    font-size:20px; background:var(--panel-2); border:1px solid var(--line);
+    width:26px; height:26px; border-radius:6px; display:grid; place-items:center; flex:none;
+    font-size:13px; background:var(--panel-2); border:1px solid var(--line); margin-top:1px;
   }
   .card.a .ico{color:var(--brass)}
   .card.b .ico{color:var(--accent)}
-  .card h3{margin:0; font-size:17px; font-weight:640; letter-spacing:-.015em; text-wrap:balance}
-  .card p{margin:0; font-size:13px; color:var(--ink-soft); line-height:1.5; flex:1}
-  .card .go{font-family:var(--mono); font-size:11px; letter-spacing:.06em; text-transform:uppercase;
-    color:var(--ink-faint); display:inline-flex; align-items:center; gap:7px}
+  .card.c .ico{color:var(--blue)}
+  .card.d .ico{color:var(--good)}
+  .card .ctxt{display:flex; flex-direction:column; gap:2px; min-width:0; flex:1}
+  .card h3{margin:0; font-size:13px; font-weight:630; letter-spacing:-.01em}
+  .card p{margin:0; font-size:11.5px; color:var(--ink-soft); line-height:1.45}
+  .card .go{font-family:var(--mono); font-size:11px; color:var(--ink-faint); flex:none; margin-top:2px}
   .card:hover .go{color:var(--accent)}
 
   /* ============ SUB-VIEW HEADER ============ */
   .sub-head{
-    display:flex; align-items:center; gap:12px; flex:none;
-    padding:12px clamp(14px,3vw,20px); background:var(--panel); border-bottom:1px solid var(--line);
+    display:flex; align-items:center; gap:10px; flex:none;
+    padding:7px clamp(12px,2.5vw,16px); background:var(--panel); border-bottom:1px solid var(--line);
   }
-  .sub-head h2{margin:0; font-size:15px; font-weight:620; letter-spacing:-.01em}
-  .sub-head .eyebrow{font-family:var(--mono); font-size:10px; letter-spacing:.13em;
+  .sub-head h2{margin:0; font-size:13px; font-weight:630; letter-spacing:-.01em}
+  .sub-head .eyebrow{font-family:var(--mono); font-size:9.5px; letter-spacing:.12em;
     text-transform:uppercase; color:var(--accent)}
-  .sub-head .htxt{display:flex; flex-direction:column; gap:1px; margin-right:auto}
-  .back{gap:7px}
+  .sub-head .htxt{display:flex; align-items:baseline; gap:8px; margin-right:auto}
+  .back{gap:6px}
 
-  /* ============ RESEARCH VIEW ============ */
-  .research-body{flex:1; overflow-y:auto; padding:clamp(22px,4vw,40px)}
-  .doc{max-width:680px; margin:0 auto}
+  /* ============ DOC VIEWS ============ */
+  .research-body{flex:1; overflow-y:auto; padding:clamp(14px,2.5vw,24px)}
+  .doc{max-width:700px; margin:0 auto}
   .doc .empty{
     border:1px dashed var(--line-strong); border-radius:var(--radius);
     background:var(--panel-2); padding:22px; margin-bottom:26px;
@@ -179,6 +176,11 @@
   .doc a{color:var(--blue)}
   .doc ul.src{font-size:12px; color:var(--ink-soft)}
   .doc ul.src li{margin-bottom:5px}
+  .doc h4{font-size:13.5px; font-weight:640; margin:20px 0 8px; letter-spacing:-.01em}
+  .doc code{font-family:var(--mono); font-size:11.5px; background:var(--panel-2);
+    border:1px solid var(--line); border-radius:4px; padding:1px 5px}
+  .doc .callout ol, .doc .callout p{margin-bottom:8px}
+  .doc .callout ol{padding-left:20px}
 
   /* ============ FLOW CANVAS ============ */
   .flow-tools{display:flex; align-items:center; gap:10px; margin-left:auto; flex-wrap:wrap}
@@ -278,22 +280,38 @@
   </div>
   <div class="home-body">
     <div class="home-inner">
-      <div class="lede">
-        <h2>Control Center</h2>
-        <p>Two workspaces. Plan the shape of the show, then manage the flow that builds each episode.</p>
-      </div>
       <div class="cards">
         <button class="card a" id="go-research">
           <span class="ico">◪</span>
-          <h3>Research &amp; Content Plan</h3>
-          <p>The structural research report: reference shows analyzed, the AI podcast landscape mapped, and a proposed run of show built from your Aug 15 call.</p>
-          <span class="go">Open report →</span>
+          <div class="ctxt">
+            <h3>Research &amp; Content Plan</h3>
+            <p>Reference shows, AI landscape, proposed run of show + hot topics. Published for Jeremy.</p>
+          </div>
+          <span class="go">→</span>
         </button>
         <button class="card b" id="go-flow">
           <span class="ico">❖</span>
-          <h3>Manage the Flow</h3>
-          <p>A Freeform-style board for the auto-generation pipeline. Add blocks, drop in links, wire out to n8n. Starts at “Generate Podcast.”</p>
-          <span class="go">Open board →</span>
+          <div class="ctxt">
+            <h3>Manage the Flow</h3>
+            <p>Freeform board for the auto-generation pipeline. Transcript inbox is live here.</p>
+          </div>
+          <span class="go">→</span>
+        </button>
+        <button class="card c" id="go-setup">
+          <span class="ico">☰</span>
+          <div class="ctxt">
+            <h3>Setup vs Steady State</h3>
+            <p>One-time setup (music, hosting, publishing) vs per-episode tasks. Ends with today's plan.</p>
+          </div>
+          <span class="go">→</span>
+        </button>
+        <button class="card d" id="go-audio">
+          <span class="ico">〜</span>
+          <div class="ctxt">
+            <h3>Audio Strategy</h3>
+            <p>How to get the best sound from your side, and make sure both ends are captured.</p>
+          </div>
+          <span class="go">→</span>
         </button>
       </div>
     </div>
@@ -312,6 +330,38 @@
   <div class="research-body">
     <div class="doc" id="research-doc">
       <div class="empty"><span class="tag">loading report…</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SETUP VS STEADY STATE ============ -->
+<section class="view" id="view-setup">
+  <div class="sub-head">
+    <button class="icon-btn back" data-home>← Back</button>
+    <div class="htxt">
+      <span class="eyebrow">Operations</span>
+      <h2>Setup vs Steady State</h2>
+    </div>
+  </div>
+  <div class="research-body">
+    <div class="doc" id="setup-doc">
+      <div class="empty"><span class="tag">loading…</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ AUDIO STRATEGY ============ -->
+<section class="view" id="view-audio">
+  <div class="sub-head">
+    <button class="icon-btn back" data-home>← Back</button>
+    <div class="htxt">
+      <span class="eyebrow">Audio</span>
+      <h2>Audio Strategy</h2>
+    </div>
+  </div>
+  <div class="research-body">
+    <div class="doc" id="audio-doc">
+      <div class="empty"><span class="tag">loading…</span></div>
     </div>
   </div>
 </section>
@@ -347,30 +397,36 @@
   const STORE_KEY = "jpc.flow.board.v2";
 
   /* ---------- view routing ---------- */
-  const views = { home:'view-home', research:'view-research', flow:'view-flow' };
+  const views = { home:'view-home', research:'view-research', setup:'view-setup', audio:'view-audio', flow:'view-flow' };
+  const docs = {
+    research: { el:'research-doc', file:'research_report.html', loaded:false },
+    setup:    { el:'setup-doc',    file:'setup_tasks.html',     loaded:false },
+    audio:    { el:'audio-doc',    file:'audio_strategy.html',  loaded:false },
+  };
   function show(v){
     Object.values(views).forEach(id => document.getElementById(id).classList.remove('active'));
     document.getElementById(views[v]).classList.add('active');
     if(v === 'flow'){ renderBoard(); checkInbox(); }
-    if(v === 'research') loadReport();
+    if(docs[v]) loadDoc(v);
   }
-
-  let reportLoaded = false;
-  async function loadReport(){
-    if(reportLoaded) return;
-    const doc = document.getElementById('research-doc');
+  async function loadDoc(v){
+    const d = docs[v];
+    if(d.loaded) return;
+    const el = document.getElementById(d.el);
     try{
-      const r = await fetch('research_report.html?_=' + Date.now(), { cache:'no-store' });
+      const r = await fetch(d.file + '?_=' + Date.now(), { cache:'no-store' });
       if(!r.ok) throw new Error(r.status);
-      doc.innerHTML = await r.text();
-      reportLoaded = true;
+      el.innerHTML = await r.text();
+      d.loaded = true;
     }catch(e){
-      doc.innerHTML = '<div class="empty"><span class="tag">report failed to load</span>' +
-        '<p>Could not fetch research_report.html — check the local server is running, then reopen this view.</p></div>';
+      el.innerHTML = '<div class="empty"><span class="tag">failed to load</span>' +
+        '<p>Could not fetch ' + d.file + ' — check the local server is running, then reopen this view.</p></div>';
     }
   }
   document.getElementById('go-research').onclick = () => show('research');
   document.getElementById('go-flow').onclick = () => show('flow');
+  document.getElementById('go-setup').onclick = () => show('setup');
+  document.getElementById('go-audio').onclick = () => show('audio');
   document.querySelectorAll('[data-home]').forEach(b => b.onclick = () => show('home'));
 
   /* ---------- theme + clock ---------- */

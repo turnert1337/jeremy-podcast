@@ -1,0 +1,65 @@
+<div class="r-meta">
+  <span>Prepared 2026-08-29</span>
+  <span>Situation: episodes so far recorded off a literal phone call. Jeremy has a good mic and will use it. Your options: AirPods, Logitech camera, Plaud Note Pro.</span>
+</div>
+
+<div class="callout">
+  <strong>The strategy in one line.</strong> Stop recording <em>the call</em> and start recording <em>each side of the call locally</em> — the "double-ender." A phone line crushes both voices into one telephone-bandwidth track; a double-ender captures two studio-quality tracks no matter how bad the connection is. Everything below serves that one move.
+</div>
+
+<h3>1 · Why the phone call recording can't be the product</h3>
+<p>A phone call compresses voice to roughly telephone bandwidth (~8 kHz), mixes both speakers onto one track, and bakes in every network hiccup. That's fine for practice tapes and transcripts — it cannot be fixed in post. Separate local tracks give you: full-bandwidth voice, independent volume/EQ per speaker, the ability to cut crosstalk, and immunity to connection quality.</p>
+
+<h3>2 · The recording platform</h3>
+<table>
+  <thead><tr><th>Option</th><th>What it does</th><th>Verdict</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Riverside (recommended)</strong></td><td>Records each participant <em>locally in their browser</em> at up to 48 kHz, uploads as you talk. Free plan: 2 hrs/mo of separate-track recording — one episode. The call quality you hear doesn't matter; the recorded tracks are pristine.</td><td>Use this. Create the account as setup task S4.</td></tr>
+    <tr><td>Zoom w/ "record separate audio files" enabled</td><td>Separate tracks, but from the <em>compressed network streams</em> — connection problems get baked in.</td><td>Acceptable fallback; Jeremy already lives in Zoom/Fathom.</td></tr>
+    <tr><td>Phone call + recorder</td><td>One mixed telephone-quality track.</td><td>Practice tapes and transcripts only.</td></tr>
+  </tbody>
+</table>
+
+<h3>3 · Your gear, ranked honestly</h3>
+<table>
+  <thead><tr><th>Rank</th><th>Gear</th><th>Role</th><th>Why</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td><strong>Plaud Note Pro</strong></td><td><strong>Backup recorder + transcript engine — always running</strong></td><td>The best microphone array you own (4 directional mics, built for voice), but it's a standalone recorder — it can't be your call mic. Put it on the desk a foot from you, hit record before the call, let its auto-flow deliver the transcript straight toward the inbox. It's your safety net if anything else fails.</td></tr>
+    <tr><td>2</td><td><strong>Logitech camera mic</strong></td><td><strong>Call mic — for now</strong></td><td>USB audio, decent capsule, no Bluetooth compression. It will pick up some room reverb; sit close (2 ft or less), face it, and soften the room (curtains, rug, closed door). This is your best <em>live</em> input today.</td></tr>
+    <tr><td>3</td><td><strong>AirPods</strong></td><td><strong>Ears only — never the mic</strong></td><td>Wear them to listen (they prevent echo/bleed, which matters a lot). But when AirPods act as a microphone, Bluetooth drops them into a hands-free codec that sounds like a 2004 speakerphone. In Riverside/Zoom settings: <em>output</em> = AirPods, <em>input</em> = Logitech. Check this every call — macOS loves to silently switch the input.</td></tr>
+  </tbody>
+</table>
+<p><strong>The upgrade that actually moves the needle (~$70–100):</strong> a USB dynamic mic — Samson Q2U or Audio-Technica ATR2100x. Dynamic mics reject room noise (no acoustic treatment needed), plug straight into USB, and are the standard "podcast voice" for a reason. This one purchase takes your side from "acceptable" to "matches Jeremy." (The $250 Shure MV7 is the same idea with polish — Pocketbook Vote it if you're feeling it.)</p>
+
+<h3>4 · The recording recipe for the next call</h3>
+<ol>
+  <li><strong>Before:</strong> Riverside studio link sent. Mac on Do Not Disturb, phone silenced. Room door closed. Plaud charged.</li>
+  <li><strong>Inputs check (both of you, out loud):</strong> you — input: Logitech (or the new dynamic mic), output: AirPods. Jeremy — his mic, his headphones. Riverside shows each person's local levels; watch yours bounce as you speak.</li>
+  <li><strong>Start Plaud</strong> on the desk — it runs the whole session regardless of what the platform does.</li>
+  <li><strong>Roll:</strong> hit record in Riverside; both confirm "recording" verbally (that confirmation is on both local tracks — it's your sync proof). One sharp clap or "3-2-1" gives an alignment spike for post.</li>
+  <li><strong>Mic discipline:</strong> constant distance (a fist-and-a-half from mouth to mic), don't lean away on laughs — that's where good takes die.</li>
+  <li><strong>After:</strong> stay on the call until Riverside shows both uploads at 100% — leaving early truncates the local track. Then Plaud's transcript goes to the inbox for processing.</li>
+</ol>
+
+<h3>5 · Making sure you're both always recording (redundancy map)</h3>
+<table>
+  <thead><tr><th>Layer</th><th>Captures</th><th>Fails if…</th></tr></thead>
+  <tbody>
+    <tr><td>Riverside local tracks</td><td>Both voices, studio quality, separated</td><td>Browser crash mid-upload (rare — it uploads progressively)</td></tr>
+    <tr><td>Plaud Note Pro (your desk)</td><td>Your voice great + Jeremy through your speakers-into-room only if not using headphones — treat it as <em>your</em> side's backup + the transcript source</td><td>You forget to press record → make it a ritual: Plaud on before the greeting</td></tr>
+    <tr><td>Jeremy's side (Fathom / Whisper Flow note-taker)</td><td>His mixed recording + his transcript</td><td>He forgets — but it's his default habit already</td></tr>
+  </tbody>
+</table>
+<p>Three layers, no single point of failure — same principle as your terminal/wrapper separation: the platform is the visualizer, the local recordings are the bare terminals.</p>
+
+<h3>6 · What to tell Jeremy (copy-paste ready)</h3>
+<div class="callout">
+  <p style="margin-bottom:6px"><em>"Next call let's do it on Riverside instead of a phone call — free, runs in the browser, records us each locally in high quality so the connection doesn't matter. Use your good mic + headphones. I'll send the studio link. Keep Fathom running if you want, but Riverside's tracks are the masters. First 5 minutes are a sound check."</em></p>
+</div>
+
+<h3>Sources</h3>
+<ul class="src">
+  <li><a href="https://riverside.com/riverside-vs-zoom" target="_blank" rel="noopener">Riverside vs Zoom — local vs stream recording</a> · <a href="https://www.thepodcasthost.com/recording-skills/riverside-fm-review/" target="_blank" rel="noopener">The Podcast Host — Riverside review (free plan, multitrack)</a></li>
+  <li><a href="https://riverside.com/blog/multitrack-podcast-recording" target="_blank" rel="noopener">Multitrack recording &amp; the double-ender method</a></li>
+  <li>Plaud Note Pro capabilities: your own Aug 15 call notes (4-mic array, auto-flows, transcript templates)</li>
+</ul>
