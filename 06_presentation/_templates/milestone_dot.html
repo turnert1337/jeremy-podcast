@@ -1,0 +1,17 @@
+<!-- Milestone dot template — one .gantt-marker on the roadmap timeline.
+
+     Used by /add-milestone and /update-roadmap.
+
+     {STATUS}   — one of: done | now | future   (controls dot fill + strobing)
+     {LEFT}     — position percentage (e.g. "48%") — clamp to 5%-95%
+     {ABOVE}    — short title shown above the dot (e.g. "Phase 4")
+     {LABEL}    — short date shown below the dot (e.g. "May 25" or "Jun 2026")
+
+     The "now" status applies the strobing keyframe animation defined
+     in roadmap.html's :root <style>. Only ONE marker may have status="now".
+-->
+<div class="gantt-marker {STATUS}" style="left: {LEFT};">
+  <span class="above">{ABOVE}</span>
+  <span class="dot"></span>
+  <span class="label">{LABEL}</span>
+</div>

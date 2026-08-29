@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Anatomy of the Relay Frame — Modules, owner habits, post-baton pass payoff abilities</title>
+
+<style>
+  /* ============================================================
+     Walmart palette (light theme) — shared with index.html
+     ============================================================ */
+  :root {
+    --wm-blue: #0071CE;
+    --wm-blue-dark: #004F9A;
+    --wm-navy: #041f41;
+    --wm-spark: #FFC220;
+    --wm-spark-dark: #d99e0e;
+
+    --wm-gray-50:  #f8f9fa;
+    --wm-gray-100: #f0f2f5;
+    --wm-gray-200: #e0e3e7;
+    --wm-gray-300: #cbd1da;
+    --wm-gray-400: #aab1bb;
+    --wm-gray-600: #5e6672;
+    --wm-gray-800: #2e3338;
+
+    --bg-page:    #ffffff;
+    --bg-soft:    #f8f9fa;
+    --bg-softer:  #f0f2f5;
+    --text-strong:#041f41;
+    --text-body:  #2e3338;
+    --text-muted: #5e6672;
+    --text-faint: #aab1bb;
+    --border:     #e0e3e7;
+
+    --shadow-soft: 0 1px 2px rgba(4,31,65,0.04), 0 4px 16px rgba(4,31,65,0.05);
+    --shadow-hover: 0 8px 28px rgba(4,31,65,0.10);
+
+    --font-sans: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-mono: 'SF Mono', 'Cascadia Code', 'Consolas', 'Roboto Mono', monospace;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-sans);
+    background: var(--bg-page);
+    color: var(--text-body);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--wm-blue);
+    outline-offset: 3px;
+  }
+
+  a {
+    color: var(--wm-blue);
+    text-decoration: none;
+    border-bottom: 1px dotted rgba(0,113,206,0.4);
+    transition: color 0.15s ease, border-color 0.15s ease;
+  }
+  a:hover { color: var(--wm-blue-dark); border-bottom-color: var(--wm-blue-dark); }
+
+  /* ============================================================
+     Typography
+     ============================================================ */
+  h1 {
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 800;
+    line-height: 1.15;
+    margin: 0 0 1rem 0;
+    color: var(--text-strong);
+    letter-spacing: -0.02em;
+  }
+
+  h2 {
+    font-size: clamp(1.4rem, 2.6vw, 1.9rem);
+    font-weight: 700;
+    line-height: 1.2;
+    margin: 0 0 1rem 0;
+    color: var(--text-strong);
+    letter-spacing: -0.015em;
+  }
+
+  h3 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+    color: var(--text-strong);
+  }
+
+  p { margin: 0 0 1rem 0; color: var(--text-body); }
+
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--wm-spark-dark);
+    margin: 0 0 1rem 0;
+    font-weight: 700;
+  }
+  .eyebrow-centered { text-align: center; margin-bottom: 1.5rem; }
+  .eyebrow .desc {
+    color: var(--text-strong);
+    font-family: var(--font-sans);
+    text-transform: none;
+    letter-spacing: 0;
+    font-weight: 600;
+    font-size: 1.05rem;
+    display: block;
+    margin-top: 0.45rem;
+    line-height: 1.5;
+  }
+
+  /* ============================================================
+     Scene block (scroll-reveal sections)
+     ============================================================ */
+  .scene {
+    padding: 4rem 2rem;
+    border-bottom: 1px solid var(--border);
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+    scroll-margin-top: 1.5rem;
+  }
+  .scene.visible { opacity: 1; transform: translateY(0); }
+  .scene.short { padding: 3rem 2rem; }
+  .scene-inner { max-width: 1100px; margin: 0 auto; width: 100%; }
+
+  /* ============================================================
+     Page header (anatomy-header) — breadcrumb back-link + h1
+     ============================================================ */
+  .anatomy-header {
+    text-align: center;
+    background:
+      radial-gradient(ellipse at top, rgba(255,194,32,0.15), transparent 60%),
+      radial-gradient(ellipse at bottom, rgba(0,113,206,0.06), transparent 60%),
+      var(--bg-page);
+    padding: 4.5rem 2rem 3rem 2rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .anatomy-header .header-meta {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--wm-spark-dark);
+    margin: 0 0 1.25rem 0;
+    font-weight: 700;
+  }
+  .anatomy-header .header-meta .sep { color: var(--text-faint); margin: 0 0.6rem; }
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-weight: 700;
+    padding: 0.45rem 0.85rem;
+    border-radius: 999px;
+    border: 1px solid var(--wm-spark);
+    background: rgba(255,194,32,0.10);
+    color: var(--wm-spark-dark);
+    margin-bottom: 1.5rem;
+  }
+  .back-link:hover {
+    background: rgba(255,194,32,0.18);
+    color: var(--wm-spark-dark);
+    border-color: var(--wm-spark-dark);
+    border-bottom-color: var(--wm-spark-dark);
+  }
+  .anatomy-header h1 {
+    max-width: 900px;
+    margin: 0 auto 1rem auto;
+  }
+  .anatomy-header .subtitle {
+    max-width: 720px;
+    margin: 0 auto;
+    color: var(--text-muted);
+    font-size: 1.02rem;
+    line-height: 1.6;
+  }
+
+  /* ============================================================
+     Big ASCII (Vignelli-grid Frame Anatomy)
+     ============================================================ */
+  .big-ascii {
+    margin: 0;
+    background: var(--wm-navy);
+    border-radius: 12px;
+    padding: 2rem 1.5rem;
+    overflow-x: auto;
+    box-shadow: var(--shadow-soft);
+    text-align: center;
+  }
+  .big-ascii figcaption {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--wm-spark);
+    margin: 0 0 1rem 0;
+    font-weight: 700;
+    text-align: center;
+  }
+  .big-ascii pre {
+    display: inline-block;
+    margin: 0 auto;
+    font-family: var(--font-mono);
+    color: #e6edf3;
+    font-size: 0.78rem;
+    line-height: 1.45;
+    white-space: pre;
+    user-select: text;
+    text-align: left;
+  }
+  @media (max-width: 900px) {
+    .big-ascii pre { font-size: 0.68rem; }
+  }
+  @media (max-width: 600px) {
+    .big-ascii { padding: 1.5rem 1rem; }
+    .big-ascii pre { font-size: 0.6rem; line-height: 1.4; }
+  }
+
+  /* ============================================================
+     Frame Deep Dive — module accordions (.dd-* shared with index.html)
+     ============================================================ */
+
+  /* ASCII anatomy mini-figure (kept for stylistic parity) */
+  .dd-ascii {
+    margin: 0 0 1.75rem 0;
+    background: var(--wm-navy);
+    border-radius: 10px;
+    padding: 1.5rem;
+    overflow-x: auto;
+  }
+  .dd-ascii figcaption {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--wm-spark);
+    margin-bottom: 0.75rem;
+    font-weight: 700;
+  }
+  .dd-ascii pre {
+    margin: 0;
+    font-family: var(--font-mono);
+    color: #e6edf3;
+    font-size: 0.78rem;
+    line-height: 1.45;
+    white-space: pre;
+    user-select: text;
+  }
+
+  /* Module accordions */
+  .dd-accordion {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+  .dd-module {
+    background: var(--bg-page);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    transition: border-color .2s, box-shadow .2s;
+  }
+  .dd-module:hover { border-color: var(--wm-blue); }
+  .dd-module[open] {
+    border-color: var(--wm-spark);
+    box-shadow: var(--shadow-soft);
+  }
+  .dd-module > summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 0.95rem 1.2rem;
+    display: grid;
+    grid-template-columns: auto 1fr auto auto;
+    gap: 0.85rem;
+    align-items: center;
+  }
+  .dd-module > summary::-webkit-details-marker { display: none; }
+  .dd-mod-num { font-family: var(--font-mono); color: var(--wm-spark-dark); font-weight: 700; font-size: 0.85rem; }
+  .dd-mod-name { font-weight: 700; color: var(--text-strong); font-size: 1rem; }
+  .dd-mod-path {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--wm-blue-dark);
+    background: rgba(0,113,206,0.08);
+    padding: 0.18rem 0.5rem;
+    border-radius: 3px;
+    white-space: nowrap;
+  }
+  .dd-mod-chev { color: var(--wm-spark-dark); transition: transform .2s; }
+  .dd-module[open] .dd-mod-chev { transform: rotate(90deg); }
+  .dd-mod-body {
+    padding: 0 1.2rem 0.9rem 1.2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+  }
+  .dd-mod-summary { font-size: 0.95rem; color: var(--text-body); margin: 0; line-height: 1.55; }
+  .dd-mod-tag {
+    font-style: italic;
+    color: var(--wm-spark-dark);
+    font-weight: 600;
+    font-size: 0.92rem;
+    margin: 0;
+  }
+  .dd-mod-note {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    background: var(--bg-soft);
+    border-left: 3px solid var(--wm-gray-300);
+    padding: 0.55rem 0.95rem;
+    border-radius: 0 6px 6px 0;
+    margin: 0.1rem 0 0 0;
+    line-height: 1.55;
+  }
+  .dd-mod-note em { color: var(--text-strong); font-style: italic; font-weight: 600; }
+  .dd-mod-h {
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin: 0.15rem 0 0 0;
+    font-weight: 700;
+  }
+  .dd-feature, .dd-benefit {
+    background: var(--bg-soft);
+    border-radius: 6px;
+    padding: 0.65rem 1.05rem;
+    border-left: 3px solid var(--wm-spark);
+  }
+  .dd-benefit { border-left-color: var(--wm-blue); }
+  .dd-feature .chip, .dd-benefit .chip {
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--wm-spark-dark);
+    display: inline-block;
+    margin-bottom: 0.4rem;
+  }
+  .dd-benefit .chip { color: var(--wm-blue-dark); }
+  .dd-feature .quote {
+    font-style: italic;
+    color: var(--text-body);
+    margin: 0 0 0.5rem 0;
+    font-size: 0.92rem;
+    line-height: 1.55;
+  }
+  .dd-feature .attr-row {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+  }
+  .dd-feature .attr-row code {
+    background: rgba(0,113,206,0.08);
+    color: var(--wm-blue-dark);
+    padding: 0.08rem 0.35rem;
+    border-radius: 3px;
+    font-size: 0.92em;
+  }
+  .dd-benefit h5 { margin: 0 0 0.3rem 0; font-size: 0.98rem; color: var(--text-strong); }
+  .dd-benefit ul { margin: 0; padding-left: 1.1rem; }
+  .dd-benefit li { font-size: 0.9rem; color: var(--text-body); margin-bottom: 0.18rem; line-height: 1.5; }
+  .dd-benefit li:last-child { margin-bottom: 0; }
+  .dd-receipt {
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    color: var(--text-strong);
+    background: rgba(0,113,206,0.05);
+    border: 1px solid rgba(0,113,206,0.20);
+    border-left: 3px solid var(--wm-blue);
+    border-radius: 0 6px 6px 0;
+    padding: 0.55rem 0.85rem;
+    margin: 0.05rem 0 0 0;
+    line-height: 1.55;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+  .dd-receipt .receipt-head {
+    color: var(--wm-blue-dark);
+    font-weight: 700;
+    letter-spacing: 0.01em;
+  }
+  .dd-receipt .receipt-head .ok {
+    color: var(--wm-blue);
+    margin-right: 0.4rem;
+    font-weight: 700;
+  }
+  .dd-receipt .receipt-meta {
+    color: var(--text-muted);
+    font-size: 0.78rem;
+  }
+  .dd-receipt code {
+    background: transparent;
+    color: var(--wm-blue-dark);
+    padding: 0;
+    font-size: 0.95em;
+  }
+
+  /* ============================================================
+     Footer — back-link + attribution
+     ============================================================ */
+  .anatomy-footer {
+    padding: 3rem 2rem 4rem;
+    text-align: center;
+    background: var(--bg-soft);
+    border-top: 1px solid var(--border);
+  }
+  .footer-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 700;
+    padding: 0.55rem 1rem;
+    border-radius: 999px;
+    border: 1px solid var(--wm-spark);
+    background: var(--bg-page);
+    color: var(--wm-spark-dark);
+  }
+  .footer-back:hover {
+    background: rgba(255,194,32,0.12);
+    border-color: var(--wm-spark-dark);
+    border-bottom-color: var(--wm-spark-dark);
+    color: var(--wm-spark-dark);
+  }
+  .footer-attr {
+    margin-top: 1.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+  }
+
+  /* Print: force-open everything */
+  @media print {
+    .dd-module { box-shadow: none !important; }
+    .dd-module > *:not(summary) { display: block !important; }
+    .dd-mod-chev { display: none; }
+    .scene { opacity: 1 !important; transform: none !important; }
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .scene { transition: none; }
+    .dd-mod-chev { transition: none; }
+  }
+</style>
+</head>
+
+<body>
+
+<!-- ============================================================
+     HEADER — back-link breadcrumb + title + sub
+     ============================================================ -->
+<header class="anatomy-header">
+  <p class="header-meta">The Relay Frame &middot; Page 2 of 2 <span class="sep">&middot;</span> 2026-05-26</p>
+  <p><a class="back-link" href="index.html">&larr; Back to the one-pager</a></p>
+  <h1>Anatomy of the Relay Frame</h1>
+  <p class="subtitle">The exploded view &mdash; modules, owner habits feeding each one, and the day-one payoffs a new steward gets when they pick up the frame for the first time.</p>
+</header>
+
+
+<!-- ============================================================
+     MODULES — accordion of four (verbatim copy from index.html)
+     ============================================================ -->
+<section class="scene reveal" id="modules" aria-labelledby="modules-eyebrow">
+  <div class="scene-inner">
+    <p class="eyebrow" id="modules-eyebrow">The four modules
+      <span class="desc">Each module is one file (or one folder) plus the owner habit that keeps it fresh. Click to expand the owner habit feeding it and the day-one question it answers.</span>
+    </p>
+
+    <ol class="dd-accordion" role="list">
+
+      <!-- 01 — Cold Start -->
+      <li><details class="dd-module" id="m-cold-start">
+        <summary>
+          <span class="dd-mod-num">01</span>
+          <span class="dd-mod-name">Cold Start &middot; Claude and project files</span>
+          <span class="dd-mod-path">CLAUDE.md</span>
+          <span class="dd-mod-chev" aria-hidden="true">&#9656;</span>
+        </summary>
+        <div class="dd-mod-body">
+          <p class="dd-mod-summary">The orchestrator the AI reads at session start, plus the project&rsquo;s scope, data access, and scope-shift history.</p>
+          <p class="dd-mod-tag">Every rule is scar tissue from a real mistake.</p>
+
+          <p class="dd-mod-h">Owner habit feeding this file</p>
+          <article class="dd-feature">
+            <span class="chip">Capture scar tissue</span>
+            <p class="quote">&ldquo;Update your agent-level files with that FEEL script issue and instructions to check it in the future, along with using the colony skills so that error never happens again.&rdquo;</p>
+            <p class="attr-row"><strong>Feeds</strong> <code>CLAUDE.md</code> + <code>known_issues.yaml</code> + <code>.claude/commands/</code></p>
+          </article>
+
+          <p class="dd-mod-h">Enables Post Baton-Handoff Motions Like:</p>
+          <article class="dd-benefit">
+            <h5>Quick agent &amp; Associate context</h5>
+            <ul>
+              <li>&ldquo;Alec told me he&rsquo;d sorted through the API but he said it was fragile in testing &mdash; what did he see that led to that conclusion and was it sorted out?&rdquo;</li>
+              <li>&ldquo;Tell me why we did this project.&rdquo;</li>
+              <li>&ldquo;Who were the key Associates involved in advising this project?&rdquo;</li>
+            </ul>
+          </article>
+        </div>
+      </details></li>
+
+      <!-- 02 — Session Log -->
+      <li><details class="dd-module" id="m-session-log">
+        <summary>
+          <span class="dd-mod-num">02</span>
+          <span class="dd-mod-name">Session Log</span>
+          <span class="dd-mod-path">_session_log.md</span>
+          <span class="dd-mod-chev" aria-hidden="true">&#9656;</span>
+        </summary>
+        <div class="dd-mod-body">
+          <p class="dd-mod-summary">Append-only daybook with a fixed six-section format per dated entry.</p>
+          <p class="dd-mod-tag">A daily work tool, not a handoff doc.</p>
+
+          <p class="dd-mod-h">Owner habit feeding this file</p>
+          <article class="dd-feature">
+            <span class="chip">End-of-day close-out</span>
+            <p class="quote">&ldquo;Let&rsquo;s close out for today &mdash; update the session log.&rdquo;</p>
+            <p class="attr-row"><strong>Feeds</strong> <code>_session_log.md</code> &middot; carries forward into Module 03 (tasklist)</p>
+          </article>
+          <div class="dd-receipt" role="status" aria-label="Session log save receipt">
+            <span class="receipt-head"><span class="ok" aria-hidden="true">&#10003;</span>Session log updated &middot; <code>_session_log.md</code></span>
+            <span class="receipt-meta">Session 042 &middot; 2026-05-27 &middot; 6 sections &middot; 84 lines appended &middot; work landed.</span>
+          </div>
+
+          <p class="dd-mod-note">At cold start, <code>/frame-doctor</code> runs alongside the capacity meter (both parallelized, sub-second) and folds an eight-check health summary into the first visible output.</p>
+
+          <p class="dd-mod-h">Enables Post Baton-Handoff Motions Like:</p>
+          <article class="dd-benefit">
+            <h5>Best-in-class diagnostic support</h5>
+            <ul>
+              <li>&ldquo;The program is sending bad outputs &mdash; explain how the confidence engine was originally developed, and start diagnosing what I&rsquo;m seeing here.&rdquo;</li>
+            </ul>
+          </article>
+        </div>
+      </details></li>
+
+      <!-- 03 — Master Tasklist -->
+      <li><details class="dd-module" id="m-tasklist">
+        <summary>
+          <span class="dd-mod-num">03</span>
+          <span class="dd-mod-name">Master Tasklist</span>
+          <span class="dd-mod-path">00_Master_Tasklist.md</span>
+          <span class="dd-mod-chev" aria-hidden="true">&#9656;</span>
+        </summary>
+        <div class="dd-mod-body">
+          <p class="dd-mod-summary">Two-tier file &mdash; status dashboard above the fold, verbatim receipts below.</p>
+          <p class="dd-mod-tag">Completed work is swept, never summarized.</p>
+
+          <p class="dd-mod-h">Owner habits feeding this file</p>
+          <article class="dd-feature">
+            <span class="chip">In-the-moment task detail capture</span>
+            <p class="quote">&ldquo;Update the tasklist to document why the API feature was scrapped, then sweep it off the main task list.&rdquo;</p>
+            <p class="attr-row"><strong>Feeds</strong> <code>00_Master_Tasklist.md</code> + <code>NN_Complete_Sweep_*.md</code></p>
+          </article>
+          <article class="dd-feature">
+            <span class="chip">Future-state note</span>
+            <p class="quote">&ldquo;Long term, the plan for HITL is to use MerchOne, but we aren&rsquo;t there yet &mdash; be sure that detail makes it to that task on the tasklist.&rdquo;</p>
+            <p class="attr-row"><strong>Feeds</strong> <code>00_Master_Tasklist.md</code> below-the-fold</p>
+          </article>
+
+          <p class="dd-mod-h">Enables Post Baton-Handoff Motions Like:</p>
+          <article class="dd-benefit">
+            <h5>Rapid continued development</h5>
+            <ul>
+              <li>&ldquo;Samson&rsquo;s out all next week &mdash; can anyone volunteer to fire up the Relay Frame he had going for the monthly leadership update and run through his deck update path?&rdquo;</li>
+              <li>&ldquo;What wasn&rsquo;t completed in this project, and why?&rdquo;</li>
+              <li>&ldquo;Were there future steps or a roadmap flagged to add to this project?&rdquo;</li>
+            </ul>
+          </article>
+        </div>
+      </details></li>
+
+      <!-- 04 — Custom Skills & Project Files -->
+      <li><details class="dd-module" id="m-skills">
+        <summary>
+          <span class="dd-mod-num">04</span>
+          <span class="dd-mod-name">Custom Skills &amp; Project Files</span>
+          <span class="dd-mod-path">.claude/commands/*.md</span>
+          <span class="dd-mod-chev" aria-hidden="true">&#9656;</span>
+        </summary>
+        <div class="dd-mod-body">
+          <p class="dd-mod-summary">Markdown protocols re-read on every invocation, plus the working files those protocols operate on &mdash; all checked into the repo.</p>
+          <p class="dd-mod-tag">Executable behavior, not narrative.</p>
+
+          <p class="dd-mod-note">Skills resolve two ways. The canonical file lives at its module path (e.g., <code>02_session_skills/00_session_log_protocol.md</code>) &mdash; that&rsquo;s the spec, harness-portable. A thin shim at <code>.claude/commands/&lt;slug&gt;.md</code> auto-routes Claude Code&rsquo;s slash-command lookup to the same canonical file. <em>Path-first, shim-second.</em></p>
+
+          <p class="dd-mod-h">Owner habit feeding these files</p>
+          <article class="dd-feature">
+            <span class="chip">Capture scar tissue</span>
+            <p class="quote">When a recurring mistake earns a permanent fix, the protocol gets a new canonical skill file at its module path &mdash; checked in, re-read every time the command runs &mdash; plus a one-line shim at <code>.claude/commands/&lt;slug&gt;.md</code>.</p>
+            <p class="attr-row"><strong>Feeds</strong> <code>02_session_skills/</code> (et al.) + <code>.claude/commands/</code></p>
+          </article>
+
+          <p class="dd-mod-h">Enables Post Baton-Handoff Motions Like:</p>
+          <article class="dd-benefit">
+            <h5>Protocol over narrative</h5>
+            <ul>
+              <li>&ldquo;Priya hardened <code>/frame-doctor</code> after the deploy bug last quarter &mdash; run it now before I commit anything, just like she would have.&rdquo;</li>
+              <li>&ldquo;What custom skills exist for this project, and what scar tissue does each one enforce?&rdquo;</li>
+            </ul>
+          </article>
+        </div>
+      </details></li>
+
+    </ol>
+
+  </div>
+</section>
+
+
+<!-- ============================================================
+     ANATOMY DIAGRAM — Vignelli-grid ASCII
+     ============================================================ -->
+<section class="scene reveal" id="anatomy-diagram" aria-labelledby="diagram-eyebrow">
+  <div class="scene-inner">
+    <p class="eyebrow eyebrow-centered" id="diagram-eyebrow">The Frame, exploded</p>
+
+    <figure class="big-ascii">
+<pre aria-label="Vignelli-grid ASCII diagram of the Relay Frame: operator, cold start, persistent state, on-demand modules, and end-of-session receipt.">
+&#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472; OPERATOR &#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;
+&#9474;
+&#9474;   Associate or AI Agent opens the frame
+&#9474;
+
+
+                                      &#9474;
+                                      &#9660;
+
+
+&#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472; COLD START &#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;
+&#9474;   sub-second &middot; runs every session
+&#9474;
+&#9474;   CLAUDE.md       &#9472;&#9472;&#9658;   /frame-doctor +        &#9472;&#9472;&#9658;   /intro-card
+&#9474;   orchestrator          /frame-capacity              (clean frame)
+&#9474;                         (parallel &middot; &#x1F7E2;/&#x1F7E0;/&#x1F534;)   &middot;or&middot;  greeting
+&#9474;                                                            from last log
+&#9474;
+
+
+                                      &#9474;  discovery chain
+                                      &#9660;
+
+
+&#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472; PERSISTENT STATE &#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;
+&#9474;   read in order on cold start
+&#9474;
+&#9474;   _session_log      00_Master_         _people_list       _settings_and_
+&#9474;   .md               Tasklist.md        .md                customizations.md
+&#9474;   append-only       above + below      active roster      prefs + history
+&#9474;        &#9474;                 &#9474;                  &#9474;                   &#9474;
+&#9474;        &#9660;                 &#9660;                  &#9660;                   &#9660;
+&#9474;   /session-log      /refactor-tasklist  /people-list-      /log-
+&#9474;   /session-log-     &#9500; /sweep-tasks       update             customization
+&#9474;    factcheck        &#9500; /reorder-tasks
+&#9474;   (4 validators)    &#9500; /renumber-tasks   (3 validators)     (edit-first,
+&#9474;                     &#9492; /tasklist-                             log-second)
+&#9474;                        factcheck
+&#9474;                              &#9474;
+&#9474;                              &#9660;
+&#9474;                     _swept/NN_Complete_Sweep_YYYY-MM-DD.md
+&#9474;                     (frozen archive)
+&#9474;
+
+
+                                      &#9474;  citations
+                                      &#9660;
+
+
+&#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472; ON-DEMAND MODULES &#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;
+&#9474;   loaded only when invoked
+&#9474;
+&#9474;   05_meeting_       06_presentation/    07_team_skills/    99_project_
+&#9474;   management/       /update-landing     /team              skills/
+&#9474;   1_inbox/          /update-features    /buddy-build
+&#9474;   &#9656; 2_processed/    /update-roadmap     /persona-fan-out   (empty by
+&#9474;   &#9656; 3_future/       /add-milestone      /research-team      design &mdash;
+&#9474;                                         /validate           operator
+&#9474;   /process-meeting  &rarr; docs/             (buddy-system       drops
+&#9474;   /plan-next-meeting    index.html       multi-agent        custom
+&#9474;   /draft-meeting-       anatomy.html     patterns)          skills here)
+&#9474;    request
+&#9474;   /draft-email
+&#9474;
+
+
+                                      &#9474;  drives
+                                      &#9660;
+
+
+&#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472; END-OF-SESSION RECEIPT &#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;
+&#9474;                                                                            &#9474;
+&#9474;   &#x1F7E2; tasklist context saved                                                &#9474;
+&#9474;   &#x1F7E2; session log updated                                                   &#9474;
+&#9474;   &#x1F7E2; git committed &middot; branch: &lt;name&gt;                                        &#9474;
+&#9474;                                                                            &#9474;
+&#9474;   Frame Capacity &middot; &#x1F7E2; 87k / 170k (51%)                                     &#9474;
+&#9474;                                                                            &#9474;
+&#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;
+</pre>
+    </figure>
+
+  </div>
+</section>
+
+
+<!-- ============================================================
+     FOOTER — back-link + attribution
+     ============================================================ -->
+<footer class="anatomy-footer">
+  <p><a class="footer-back" href="index.html">&larr; Back to the one-pager</a></p>
+  <p class="footer-attr">The Relay Frame &middot; MVP draft 2 &middot; 2026-05-26</p>
+</footer>
+
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Scene fade-in on scroll
+    if ("IntersectionObserver" in window) {
+      var observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("visible");
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12, rootMargin: "0px 0px -8% 0px" });
+      document.querySelectorAll(".reveal").forEach(function (el) {
+        observer.observe(el);
+      });
+    } else {
+      document.querySelectorAll(".reveal").forEach(function (el) {
+        el.classList.add("visible");
+      });
+    }
+
+    // One-open-at-a-time accordion: when a module opens, close any others
+    var modules = document.querySelectorAll('.dd-module');
+    modules.forEach(function (mod) {
+      mod.addEventListener('toggle', function () {
+        if (mod.open) {
+          modules.forEach(function (other) {
+            if (other !== mod && other.open) other.open = false;
+          });
+        }
+      });
+    });
+
+    // Deep-link preservation: open ancestor <details> if hash targets a module
+    function openAncestorDetails(hash) {
+      if (!hash || hash.length < 2) return;
+      var target = document.querySelector(hash);
+      if (!target) return;
+      var node = target;
+      while (node && node !== document.body) {
+        if (node.tagName === 'DETAILS') node.open = true;
+        node = node.parentElement;
+      }
+      setTimeout(function () {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 80);
+    }
+    if (location.hash) openAncestorDetails(location.hash);
+    window.addEventListener('hashchange', function () { openAncestorDetails(location.hash); });
+  });
+</script>
+
+</body>
+</html>

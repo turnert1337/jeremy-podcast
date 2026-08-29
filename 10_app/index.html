@@ -1,0 +1,581 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Podcast Control</title>
+<style>
+  /* ============ TOKENS ============ */
+  :root{
+    --ground:#F7F3EC; --panel:#FFFFFF; --panel-2:#FBF7EF;
+    --ink:#26221B; --ink-soft:#6A6154; --ink-faint:#968B7A;
+    --line:#E6DECF; --line-strong:#D6CBB6;
+    --accent:#EE4D2E; --accent-ink:#FFFFFF; --brass:#A9791F;
+    --good:#2F8F5B; --warn:#C6892A; --blue:#3B6EA5;
+    --shadow:0 1px 2px rgba(40,32,20,.05), 0 8px 24px rgba(40,32,20,.06);
+    --radius:12px;
+    --mono:ui-monospace,"SF Mono","Cascadia Code",Menlo,Consolas,monospace;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    --grid: color-mix(in srgb,var(--line) 60%,transparent);
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --ground:#17140F; --panel:#211C15; --panel-2:#1B1710;
+      --ink:#ECE4D6; --ink-soft:#A79C89; --ink-faint:#6F6555;
+      --line:#302A20; --line-strong:#3D3527;
+      --accent:#F5643F; --accent-ink:#1A1109; --brass:#CFA24E;
+      --good:#4FB07A; --warn:#DBA43C; --blue:#6E9BCB;
+      --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="light"]{
+    --ground:#F7F3EC; --panel:#FFFFFF; --panel-2:#FBF7EF;
+    --ink:#26221B; --ink-soft:#6A6154; --ink-faint:#968B7A;
+    --line:#E6DECF; --line-strong:#D6CBB6;
+    --accent:#EE4D2E; --accent-ink:#FFFFFF; --brass:#A9791F;
+    --good:#2F8F5B; --warn:#C6892A; --blue:#3B6EA5;
+    --shadow:0 1px 2px rgba(40,32,20,.05), 0 8px 24px rgba(40,32,20,.06);
+  }
+  :root[data-theme="dark"]{
+    --ground:#17140F; --panel:#211C15; --panel-2:#1B1710;
+    --ink:#ECE4D6; --ink-soft:#A79C89; --ink-faint:#6F6555;
+    --line:#302A20; --line-strong:#3D3527;
+    --accent:#F5643F; --accent-ink:#1A1109; --brass:#CFA24E;
+    --good:#4FB07A; --warn:#DBA43C; --blue:#6E9BCB;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.35);
+  }
+
+  *{box-sizing:border-box}
+  html,body{margin:0; height:100%}
+  body{
+    background:var(--ground); color:var(--ink);
+    font-family:var(--sans); line-height:1.5;
+    -webkit-font-smoothing:antialiased; height:100vh; overflow:hidden;
+  }
+  button{font-family:inherit}
+
+  /* ============ VIEWS ============ */
+  .view{display:none; height:100vh; flex-direction:column}
+  .view.active{display:flex}
+
+  /* ---- shared top bar ---- */
+  .bar{
+    display:flex; align-items:center; gap:14px;
+    padding:13px clamp(14px,3vw,24px); flex:none;
+    background:var(--panel); border-bottom:1px solid var(--line);
+  }
+  .tally{
+    display:inline-flex; align-items:center; gap:9px;
+    font-family:var(--mono); font-size:11px; letter-spacing:.12em;
+    text-transform:uppercase; color:var(--ink-soft);
+    padding:5px 11px 5px 9px; border:1px solid var(--line-strong);
+    border-radius:100px; background:var(--panel-2);
+  }
+  .dot{width:9px; height:9px; border-radius:50%; background:var(--accent);
+    animation:pulse 2.4s ease-out infinite}
+  @keyframes pulse{
+    0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--accent) 55%,transparent)}
+    70%{box-shadow:0 0 0 7px color-mix(in srgb,var(--accent) 0%,transparent)}
+    100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--accent) 0%,transparent)}
+  }
+  @media (prefers-reduced-motion:reduce){ .dot{animation:none} }
+  .title{display:flex; flex-direction:column; gap:2px; margin-right:auto; min-width:0}
+  .title h1{margin:0; font-size:16px; font-weight:640; letter-spacing:-.01em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .title .sub{font-family:var(--mono); font-size:11px; color:var(--ink-faint); letter-spacing:.04em}
+  .clock{font-family:var(--mono); font-size:12px; color:var(--ink-soft); font-variant-numeric:tabular-nums}
+  .icon-btn{
+    appearance:none; border:1px solid var(--line-strong); background:var(--panel-2);
+    color:var(--ink-soft); height:32px; min-width:32px; padding:0 9px; border-radius:8px;
+    cursor:pointer; font-size:13px; display:inline-flex; align-items:center; gap:6px; justify-content:center;
+    transition:border-color .15s, color .15s;
+  }
+  .icon-btn:hover{border-color:var(--accent); color:var(--accent)}
+  .icon-btn:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+  .icon-btn.solid{background:var(--accent); border-color:var(--accent); color:var(--accent-ink)}
+  .icon-btn.solid:hover{filter:brightness(1.06); color:var(--accent-ink)}
+
+  /* ============ HOME ============ */
+  .home-body{flex:1; overflow-y:auto; padding:clamp(20px,4vw,40px)}
+  .home-inner{max-width:760px; margin:0 auto}
+  .lede{margin:0 4px 22px}
+  .lede h2{margin:0 0 5px; font-family:var(--mono); font-size:12px; font-weight:600;
+    text-transform:uppercase; letter-spacing:.16em; color:var(--ink-soft)}
+  .lede p{margin:0; font-size:13.5px; color:var(--ink-faint); max-width:56ch}
+
+  .cards{display:grid; gap:16px; grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+  .card{
+    text-align:left; cursor:pointer; appearance:none;
+    background:var(--panel); border:1px solid var(--line); border-radius:var(--radius);
+    box-shadow:var(--shadow); padding:22px 22px 20px; color:var(--ink);
+    display:flex; flex-direction:column; gap:12px; min-height:172px;
+    transition:transform .16s cubic-bezier(.32,.72,.35,1), border-color .16s, box-shadow .16s;
+  }
+  .card:hover{transform:translateY(-3px); border-color:var(--line-strong);
+    box-shadow:0 4px 8px rgba(40,32,20,.06), 0 16px 40px rgba(40,32,20,.12)}
+  .card:focus-visible{outline:2px solid var(--accent); outline-offset:3px}
+  .card .ico{
+    width:42px; height:42px; border-radius:11px; display:grid; place-items:center;
+    font-size:20px; background:var(--panel-2); border:1px solid var(--line);
+  }
+  .card.a .ico{color:var(--brass)}
+  .card.b .ico{color:var(--accent)}
+  .card h3{margin:0; font-size:17px; font-weight:640; letter-spacing:-.015em; text-wrap:balance}
+  .card p{margin:0; font-size:13px; color:var(--ink-soft); line-height:1.5; flex:1}
+  .card .go{font-family:var(--mono); font-size:11px; letter-spacing:.06em; text-transform:uppercase;
+    color:var(--ink-faint); display:inline-flex; align-items:center; gap:7px}
+  .card:hover .go{color:var(--accent)}
+
+  /* ============ SUB-VIEW HEADER ============ */
+  .sub-head{
+    display:flex; align-items:center; gap:12px; flex:none;
+    padding:12px clamp(14px,3vw,20px); background:var(--panel); border-bottom:1px solid var(--line);
+  }
+  .sub-head h2{margin:0; font-size:15px; font-weight:620; letter-spacing:-.01em}
+  .sub-head .eyebrow{font-family:var(--mono); font-size:10px; letter-spacing:.13em;
+    text-transform:uppercase; color:var(--accent)}
+  .sub-head .htxt{display:flex; flex-direction:column; gap:1px; margin-right:auto}
+  .back{gap:7px}
+
+  /* ============ RESEARCH VIEW ============ */
+  .research-body{flex:1; overflow-y:auto; padding:clamp(22px,4vw,40px)}
+  .doc{max-width:680px; margin:0 auto}
+  .doc .empty{
+    border:1px dashed var(--line-strong); border-radius:var(--radius);
+    background:var(--panel-2); padding:22px; margin-bottom:26px;
+  }
+  .doc .empty .tag{font-family:var(--mono); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase;
+    color:var(--warn); display:inline-flex; gap:7px; align-items:center; margin-bottom:10px}
+  .doc .empty .tag::before{content:""; width:7px; height:7px; border-radius:50%; background:var(--warn)}
+  .doc .empty p{margin:0 0 9px; font-size:13.5px; color:var(--ink-soft)}
+  .doc .empty p:last-child{margin:0}
+  .doc h3{font-family:var(--mono); font-size:11.5px; letter-spacing:.12em; text-transform:uppercase;
+    color:var(--ink-soft); margin:26px 0 10px; padding-bottom:8px; border-bottom:1px solid var(--line)}
+  .doc .slot{border:1px solid var(--line); background:var(--panel); border-radius:10px;
+    padding:14px 16px; color:var(--ink-faint); font-size:13px; margin-bottom:10px}
+  /* report typography */
+  .doc p, .doc li{font-size:13.5px; line-height:1.62; color:var(--ink)}
+  .doc p{margin:0 0 14px}
+  .doc ul, .doc ol{margin:0 0 16px; padding-left:22px}
+  .doc li{margin-bottom:7px}
+  .doc li strong, .doc p strong{font-weight:640}
+  .doc em{color:var(--ink-soft)}
+  .doc .r-meta{display:flex; flex-direction:column; gap:3px; margin-bottom:18px;
+    font-family:var(--mono); font-size:11px; color:var(--ink-faint); letter-spacing:.03em}
+  .doc .callout{border:1px solid color-mix(in srgb,var(--accent) 35%,var(--line));
+    border-left:3px solid var(--accent); background:var(--panel); border-radius:10px;
+    padding:15px 17px; margin-bottom:10px; font-size:13.5px; line-height:1.6}
+  .doc .table-wrap, .doc table{max-width:100%}
+  .doc table{border-collapse:collapse; width:100%; margin:0 0 16px; font-size:12.5px;
+    background:var(--panel); border:1px solid var(--line); border-radius:10px; overflow:hidden;
+    display:block; overflow-x:auto}
+  .doc thead th{font-family:var(--mono); font-size:10.5px; text-transform:uppercase;
+    letter-spacing:.08em; color:var(--ink-faint); text-align:left; padding:9px 12px;
+    border-bottom:1px solid var(--line-strong); background:var(--panel-2); white-space:nowrap}
+  .doc tbody td{padding:10px 12px; border-bottom:1px solid var(--line); vertical-align:top;
+    line-height:1.55; min-width:120px}
+  .doc tbody tr:last-child td{border-bottom:none}
+  .doc table.ros tbody td:first-child{font-family:var(--mono); color:var(--accent);
+    font-weight:600; min-width:0}
+  .doc a{color:var(--blue)}
+  .doc ul.src{font-size:12px; color:var(--ink-soft)}
+  .doc ul.src li{margin-bottom:5px}
+
+  /* ============ FLOW CANVAS ============ */
+  .flow-tools{display:flex; align-items:center; gap:10px; margin-left:auto; flex-wrap:wrap}
+  .chip{
+    font-family:var(--mono); font-size:11px; letter-spacing:.04em;
+    display:inline-flex; align-items:center; gap:7px; padding:6px 11px;
+    border:1px solid var(--line-strong); border-radius:100px; background:var(--panel-2); color:var(--ink-soft);
+  }
+  .chip .cdot{width:8px; height:8px; border-radius:50%; background:var(--ink-faint)}
+  .chip.ready{color:var(--good); border-color:color-mix(in srgb,var(--good) 45%,var(--line))}
+  .chip.ready .cdot{background:var(--good)}
+  .canvas-scroll{flex:1; overflow:auto; position:relative; background:var(--ground)}
+  .canvas{
+    position:relative; width:2600px; height:1700px;
+    background-image:
+      radial-gradient(circle, var(--grid) 1.1px, transparent 1.1px);
+    background-size:26px 26px; background-position:14px 14px;
+  }
+  .hint{position:absolute; top:16px; left:20px; font-family:var(--mono); font-size:11px;
+    color:var(--ink-faint); letter-spacing:.03em; pointer-events:none}
+
+  .block{
+    position:absolute; width:250px; background:var(--panel); border:1px solid var(--line-strong);
+    border-radius:12px; box-shadow:var(--shadow); display:flex; flex-direction:column;
+    overflow:hidden; touch-action:none;
+  }
+  .block.tint-accent{border-top:3px solid var(--accent)}
+  .block.tint-blue{border-top:3px solid var(--blue)}
+  .block.tint-brass{border-top:3px solid var(--brass)}
+  .block .bhead{
+    display:flex; align-items:center; gap:8px; padding:9px 10px 8px; cursor:grab;
+    border-bottom:1px solid var(--line); background:var(--panel-2); user-select:none;
+  }
+  .block .bhead:active{cursor:grabbing}
+  .block .btitle{flex:1; font-size:13px; font-weight:620; letter-spacing:-.01em; outline:none; min-width:0}
+  .block .btitle:focus{color:var(--accent)}
+  .block .bdel{border:none; background:transparent; color:var(--ink-faint); cursor:pointer;
+    font-size:13px; padding:2px 4px; border-radius:5px; line-height:1}
+  .block .bdel:hover{color:var(--accent); background:color-mix(in srgb,var(--accent) 12%,transparent)}
+  .block .bbody{padding:10px 11px; font-size:12.5px; color:var(--ink-soft); line-height:1.5;
+    outline:none; min-height:20px}
+  .block .bbody:empty::before{content:"Add a note…"; color:var(--ink-faint)}
+  .block .blinks{display:flex; flex-direction:column; gap:5px; padding:0 11px 8px}
+  .block .link{
+    display:flex; align-items:center; gap:7px; font-size:12px; color:var(--blue);
+    text-decoration:none; padding:5px 8px; border:1px solid var(--line); border-radius:7px;
+    background:var(--panel-2);
+  }
+  .block .link:hover{border-color:var(--blue)}
+  .block .link .lx{margin-left:auto; color:var(--ink-faint); cursor:pointer; padding:0 3px}
+  .block .link .lx:hover{color:var(--accent)}
+  .block .baddlink{margin:0 11px 10px; font-family:var(--mono); font-size:10.5px; letter-spacing:.04em;
+    color:var(--ink-faint); background:transparent; border:1px dashed var(--line-strong);
+    border-radius:7px; padding:6px; cursor:pointer; text-transform:uppercase}
+  .block .baddlink:hover{color:var(--accent); border-color:var(--accent)}
+
+  /* inbox block special */
+  .inbox-status{margin:0 11px 10px; padding:10px 11px; border-radius:9px;
+    border:1px solid var(--line); background:var(--panel-2); font-size:12.5px}
+  .inbox-status .row{display:flex; align-items:center; gap:8px; font-family:var(--mono);
+    font-size:11px; letter-spacing:.03em; color:var(--ink-soft)}
+  .inbox-status .row .sdot{width:9px; height:9px; border-radius:50%; background:var(--ink-faint); flex:none}
+  .inbox-status.has .row{color:var(--good)}
+  .inbox-status.has .row .sdot{background:var(--good); box-shadow:0 0 0 3px color-mix(in srgb,var(--good) 22%,transparent)}
+  .inbox-status .files{margin:8px 0 0; padding:0; list-style:none; display:flex; flex-direction:column; gap:3px}
+  .inbox-status .files li{font-family:var(--mono); font-size:11px; color:var(--ink);
+    background:var(--panel); border:1px solid var(--line); border-radius:5px; padding:3px 7px;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .inbox-actions{display:flex; gap:6px; padding:0 11px 11px}
+  .inbox-actions a, .inbox-actions button{
+    flex:1; text-align:center; font-family:var(--mono); font-size:10.5px; letter-spacing:.04em;
+    text-transform:uppercase; text-decoration:none; padding:7px 6px; border-radius:7px;
+    border:1px solid var(--line-strong); background:var(--panel-2); color:var(--ink-soft); cursor:pointer;
+  }
+  .inbox-actions a:hover, .inbox-actions button:hover{border-color:var(--accent); color:var(--accent)}
+  .path-note{font-family:var(--mono); font-size:10px; color:var(--ink-faint); padding:0 11px 11px;
+    word-break:break-all; line-height:1.45}
+
+  .toast{position:fixed; bottom:20px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:var(--ink); color:var(--ground); font-size:12.5px; padding:9px 16px; border-radius:100px;
+    opacity:0; pointer-events:none; transition:opacity .2s, transform .2s; z-index:50; font-family:var(--mono); letter-spacing:.03em}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<!-- ============ HOME ============ -->
+<section class="view active" id="view-home">
+  <div class="bar">
+    <span class="tally"><span class="dot"></span>Control · Live</span>
+    <div class="title">
+      <h1>Jeremy — Podcast Control</h1>
+      <span class="sub">production console · frame v1</span>
+    </div>
+    <span class="clock" id="clock">--:--:--</span>
+    <button class="icon-btn" id="theme" title="Toggle theme" aria-label="Toggle light/dark theme">◐</button>
+  </div>
+  <div class="home-body">
+    <div class="home-inner">
+      <div class="lede">
+        <h2>Control Center</h2>
+        <p>Two workspaces. Plan the shape of the show, then manage the flow that builds each episode.</p>
+      </div>
+      <div class="cards">
+        <button class="card a" id="go-research">
+          <span class="ico">◪</span>
+          <h3>Research &amp; Content Plan</h3>
+          <p>The structural research report: reference shows analyzed, the AI podcast landscape mapped, and a proposed run of show built from your Aug 15 call.</p>
+          <span class="go">Open report →</span>
+        </button>
+        <button class="card b" id="go-flow">
+          <span class="ico">❖</span>
+          <h3>Manage the Flow</h3>
+          <p>A Freeform-style board for the auto-generation pipeline. Add blocks, drop in links, wire out to n8n. Starts at “Generate Podcast.”</p>
+          <span class="go">Open board →</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ RESEARCH ============ -->
+<section class="view" id="view-research">
+  <div class="sub-head">
+    <button class="icon-btn back" data-home>← Back</button>
+    <div class="htxt">
+      <span class="eyebrow">Research</span>
+      <h2>Research &amp; Content Plan</h2>
+    </div>
+  </div>
+  <div class="research-body">
+    <div class="doc" id="research-doc">
+      <div class="empty"><span class="tag">loading report…</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FLOW ============ -->
+<section class="view" id="view-flow">
+  <div class="sub-head">
+    <button class="icon-btn back" data-home>← Back</button>
+    <div class="htxt">
+      <span class="eyebrow">Flow</span>
+      <h2>Auto-Generation Flow</h2>
+    </div>
+    <div class="flow-tools">
+      <span class="chip" id="inbox-chip"><span class="cdot"></span><span id="inbox-chip-txt">inbox —</span></span>
+      <button class="icon-btn" id="reset-board" title="Reset board to defaults">↺ Reset</button>
+      <button class="icon-btn solid" id="add-block">+ Add block</button>
+    </div>
+  </div>
+  <div class="canvas-scroll">
+    <div class="canvas" id="canvas">
+      <div class="hint">Drag blocks by their header · double-click a title or note to edit · everything saves automatically</div>
+    </div>
+  </div>
+</section>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  "use strict";
+  // ---- absolute path to the transcript inbox (openable in Finder) ----
+  const INBOX_ABS = "/Users/turnertomlinson/CommandCenter/Jeremy Podcast test/10_app/transcript_inbox/";
+  const INBOX_URL = "transcript_inbox/";           // served by the local static server
+  const STORE_KEY = "jpc.flow.board.v2";
+
+  /* ---------- view routing ---------- */
+  const views = { home:'view-home', research:'view-research', flow:'view-flow' };
+  function show(v){
+    Object.values(views).forEach(id => document.getElementById(id).classList.remove('active'));
+    document.getElementById(views[v]).classList.add('active');
+    if(v === 'flow'){ renderBoard(); checkInbox(); }
+    if(v === 'research') loadReport();
+  }
+
+  let reportLoaded = false;
+  async function loadReport(){
+    if(reportLoaded) return;
+    const doc = document.getElementById('research-doc');
+    try{
+      const r = await fetch('research_report.html?_=' + Date.now(), { cache:'no-store' });
+      if(!r.ok) throw new Error(r.status);
+      doc.innerHTML = await r.text();
+      reportLoaded = true;
+    }catch(e){
+      doc.innerHTML = '<div class="empty"><span class="tag">report failed to load</span>' +
+        '<p>Could not fetch research_report.html — check the local server is running, then reopen this view.</p></div>';
+    }
+  }
+  document.getElementById('go-research').onclick = () => show('research');
+  document.getElementById('go-flow').onclick = () => show('flow');
+  document.querySelectorAll('[data-home]').forEach(b => b.onclick = () => show('home'));
+
+  /* ---------- theme + clock ---------- */
+  document.getElementById('theme').onclick = () => {
+    const cur = document.documentElement.getAttribute('data-theme');
+    const next = cur === 'dark' ? 'light' : cur === 'light' ? 'dark'
+      : (matchMedia('(prefers-color-scheme:dark)').matches ? 'light' : 'dark');
+    document.documentElement.setAttribute('data-theme', next);
+  };
+  const clock = document.getElementById('clock');
+  (function tick(){ clock.textContent = new Date().toLocaleTimeString([], {hour12:false}); setTimeout(tick, 1000); })();
+
+  function toast(msg){
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('show'), 1800);
+  }
+
+  /* ---------- board state ---------- */
+  const uid = () => 'b' + Math.random().toString(36).slice(2, 9);
+  const SEED = [
+    { id: uid(), type:'note', tint:'accent', x:60,  y:70,
+      title:'Generate Podcast', body:'Start of the auto-flow. Kicks off generation of a new episode.',
+      links:[] },
+    { id: uid(), type:'inbox', tint:'blue', x:400, y:70,
+      title:'Processing · Transcript',
+      body:'Drop a transcript in the inbox, then this block confirms it’s ready to process.',
+      links:[] },
+  ];
+  let board = load();
+  function load(){
+    try{ const s = JSON.parse(localStorage.getItem(STORE_KEY)); if(Array.isArray(s) && s.length) return s; }catch(e){}
+    return structuredClone(SEED);
+  }
+  function save(){ localStorage.setItem(STORE_KEY, JSON.stringify(board)); }
+
+  const canvas = document.getElementById('canvas');
+
+  function renderBoard(){
+    canvas.querySelectorAll('.block').forEach(b => b.remove());
+    board.forEach(renderBlock);
+  }
+
+  function renderBlock(b){
+    const el = document.createElement('div');
+    el.className = 'block' + (b.tint ? ' tint-' + b.tint : '');
+    el.style.left = b.x + 'px'; el.style.top = b.y + 'px';
+    el.dataset.id = b.id;
+
+    // header
+    const head = document.createElement('div');
+    head.className = 'bhead';
+    const title = document.createElement('div');
+    title.className = 'btitle'; title.contentEditable = 'true'; title.spellcheck = false;
+    title.textContent = b.title;
+    title.addEventListener('input', () => { b.title = title.textContent; save(); });
+    title.addEventListener('mousedown', e => e.stopPropagation());
+    const del = document.createElement('button');
+    del.className = 'bdel'; del.title = 'Delete block'; del.textContent = '✕';
+    del.onclick = () => { board = board.filter(x => x.id !== b.id); save(); el.remove(); };
+    head.append(title, del);
+    el.appendChild(head);
+
+    // body
+    const body = document.createElement('div');
+    body.className = 'bbody'; body.contentEditable = 'true'; body.spellcheck = false;
+    body.textContent = b.body || '';
+    body.addEventListener('input', () => { b.body = body.textContent; save(); });
+    el.appendChild(body);
+
+    // inbox special content
+    if(b.type === 'inbox'){
+      const status = document.createElement('div');
+      status.className = 'inbox-status'; status.dataset.inbox = '1';
+      status.innerHTML = '<div class="row"><span class="sdot"></span><span class="stxt">checking inbox…</span></div>';
+      el.appendChild(status);
+
+      const actions = document.createElement('div');
+      actions.className = 'inbox-actions';
+      const open = document.createElement('a');
+      open.href = 'file://' + encodeURI(INBOX_ABS);
+      open.textContent = '⇱ Open folder';
+      open.addEventListener('click', () => toast('Opening inbox in Finder…'));
+      const refresh = document.createElement('button');
+      refresh.textContent = '↺ Recheck';
+      refresh.onclick = () => checkInbox();
+      actions.append(open, refresh);
+      el.appendChild(actions);
+
+      const path = document.createElement('div');
+      path.className = 'path-note';
+      path.textContent = INBOX_ABS;
+      el.appendChild(path);
+    }
+
+    // links
+    const links = document.createElement('div');
+    links.className = 'blinks';
+    (b.links || []).forEach((lk, i) => links.appendChild(renderLink(b, lk, i, links)));
+    el.appendChild(links);
+
+    const addLink = document.createElement('button');
+    addLink.className = 'baddlink'; addLink.textContent = '+ link';
+    addLink.onclick = () => {
+      const label = prompt('Link label (e.g. "n8n workflow"):'); if(label === null) return;
+      const url = prompt('URL:'); if(url === null) return;
+      b.links = b.links || []; b.links.push({ label: label || url, url });
+      links.appendChild(renderLink(b, b.links[b.links.length-1], b.links.length-1, links));
+      save();
+    };
+    el.appendChild(addLink);
+
+    makeDraggable(el, head, b);
+    canvas.appendChild(el);
+  }
+
+  function renderLink(b, lk, i, container){
+    const a = document.createElement('a');
+    a.className = 'link'; a.href = lk.url || '#'; a.target = '_blank'; a.rel = 'noopener';
+    a.innerHTML = '<span>↗</span>';
+    const label = document.createElement('span');
+    label.textContent = lk.label; label.style.flex = '1';
+    label.style.overflow = 'hidden'; label.style.textOverflow = 'ellipsis'; label.style.whiteSpace = 'nowrap';
+    const x = document.createElement('span');
+    x.className = 'lx'; x.textContent = '✕'; x.title = 'Remove link';
+    x.onclick = (e) => { e.preventDefault(); e.stopPropagation();
+      b.links.splice(b.links.indexOf(lk), 1); save(); a.remove(); };
+    if(!lk.url){ a.removeAttribute('href'); a.style.cursor = 'default'; }
+    a.append(label, x);
+    return a;
+  }
+
+  /* ---------- dragging ---------- */
+  function makeDraggable(el, handle, b){
+    let sx, sy, ox, oy, dragging = false;
+    handle.addEventListener('pointerdown', e => {
+      if(e.target.classList.contains('btitle') || e.target.classList.contains('bdel')) return;
+      dragging = true; el.style.zIndex = 10;
+      sx = e.clientX; sy = e.clientY; ox = b.x; oy = b.y;
+      handle.setPointerCapture(e.pointerId);
+    });
+    handle.addEventListener('pointermove', e => {
+      if(!dragging) return;
+      b.x = Math.max(0, ox + (e.clientX - sx));
+      b.y = Math.max(0, oy + (e.clientY - sy));
+      el.style.left = b.x + 'px'; el.style.top = b.y + 'px';
+    });
+    handle.addEventListener('pointerup', e => {
+      if(!dragging) return; dragging = false; el.style.zIndex = '';
+      handle.releasePointerCapture(e.pointerId); save();
+    });
+  }
+
+  /* ---------- add / reset ---------- */
+  document.getElementById('add-block').onclick = () => {
+    const scroll = canvas.parentElement;
+    const nb = { id: uid(), type:'note', tint:'brass',
+      x: scroll.scrollLeft + 60, y: scroll.scrollTop + 90,
+      title:'New block', body:'', links:[] };
+    board.push(nb); renderBlock(nb); save();
+  };
+  document.getElementById('reset-board').onclick = () => {
+    if(!confirm('Reset the board to the default two blocks? Your added blocks will be cleared.')) return;
+    board = structuredClone(SEED); save(); renderBoard(); checkInbox();
+  };
+
+  /* ---------- inbox polling ---------- */
+  async function checkInbox(){
+    let files = [];
+    try{
+      const r = await fetch(INBOX_URL + '?_=' + Date.now(), { cache:'no-store' });
+      const html = await r.text();
+      const doc = new DOMParser().parseFromString(html, 'text/html');
+      files = [...doc.querySelectorAll('a')]
+        .map(a => decodeURIComponent(a.getAttribute('href') || ''))
+        .filter(h => h && !h.endsWith('/') && !/^readme\.txt$/i.test(h) && !h.startsWith('?'));
+    }catch(e){ files = null; }
+    paintInbox(files);
+  }
+  function paintInbox(files){
+    // chip
+    const chip = document.getElementById('inbox-chip');
+    const chipTxt = document.getElementById('inbox-chip-txt');
+    if(files === null){ chip.className = 'chip'; chipTxt.textContent = 'inbox: offline'; }
+    else if(files.length){ chip.className = 'chip ready'; chipTxt.textContent = files.length + ' ready to process'; }
+    else { chip.className = 'chip'; chipTxt.textContent = 'inbox empty'; }
+
+    // inbox block(s)
+    canvas.querySelectorAll('[data-inbox]').forEach(box => {
+      const stxt = box.querySelector('.stxt');
+      const old = box.querySelector('.files'); if(old) old.remove();
+      if(files === null){ box.classList.remove('has'); stxt.textContent = 'inbox unreachable'; return; }
+      if(files.length){
+        box.classList.add('has');
+        stxt.textContent = files.length + (files.length === 1 ? ' transcript ready' : ' transcripts ready');
+        const ul = document.createElement('ul'); ul.className = 'files';
+        files.slice(0, 6).forEach(f => { const li = document.createElement('li'); li.textContent = f; ul.appendChild(li); });
+        box.appendChild(ul);
+      } else {
+        box.classList.remove('has');
+        stxt.textContent = 'inbox empty — drop a transcript';
+      }
+    });
+  }
+  setInterval(() => { if(document.getElementById('view-flow').classList.contains('active')) checkInbox(); }, 5000);
+</script>
+</body>
+</html>

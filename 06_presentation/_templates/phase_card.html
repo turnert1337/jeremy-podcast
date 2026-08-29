@@ -1,0 +1,29 @@
+<!-- Phase card template — one .phase-card in the roadmap phase grid.
+
+     Used by /add-milestone and /update-roadmap.
+
+     {NUM}        — phase number (1, 2, 3, ...). Sequential, no gaps.
+     {STATUS}     — pill class: done | in-progress | planned | future
+     {STATUS_LBL} — pill label: "Shipped" | "In progress" | "Planned" | "Future"
+     {NOW}        — if this is the "now" phase, set CLASS=" now" and
+                    NOW_BADGE='<span class="now-badge">Now</span>'.
+                    Otherwise leave both empty.
+     {TITLE}      — phase title (e.g. "Phase 4 — Presentation")
+     {WHEN}       — when (e.g. "May 25, 2026" or "Jun 2026")
+     {DESC}       — one-paragraph description
+     {BULLETS}    — <li>...</li> items (3-5)
+
+     Note: every phase card must have a matching milestone dot on the
+     timeline. Use /add-milestone to create both together.
+-->
+<div class="phase-card{NOW_CLASS}">
+  <span class="phase-num">{NUM}</span>
+  <span class="status-pill {STATUS}">{STATUS_LBL}</span>
+  {NOW_BADGE}
+  <h3>{TITLE}</h3>
+  <div class="when">{WHEN}</div>
+  <p>{DESC}</p>
+  <ul>
+    {BULLETS}
+  </ul>
+</div>

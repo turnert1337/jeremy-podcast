@@ -1,0 +1,10 @@
+# The Relay Frame — .gitignore
+.DS_Store
+*.swp
+*.tmp
+*~
+
+# Never publish dropped podcast transcripts (public repo — privacy guard).
+# The README stays so the folder exists on clone.
+10_app/transcript_inbox/*
+!10_app/transcript_inbox/README.txt

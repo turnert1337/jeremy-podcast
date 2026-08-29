@@ -1,0 +1,8 @@
+{
+  "name": "Jeremy Podcast test",
+  "stage": "review-ready",
+  "note": "Research & Content Plan report is live behind button 1 — open it and review the proposed run of show. Flow board live behind button 2.",
+  "url": "http://localhost:4010/",
+  "launch": "python3 -m http.server 4010 --directory \"10_app\"",
+  "updated": "2026-08-29T12:00:00Z"
+}

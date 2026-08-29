@@ -1,0 +1,30 @@
+<!-- Accordion item template — one Module row in docs/index.html
+
+     Used by /update-features when adding/regenerating a module.
+     Replace {TAG}, {TITLE}, {LOC}, {INTRO}, {ROWS}, {SPEC} with module values.
+
+     {TAG}     — single capital letter (A, B, C, ...)
+     {TITLE}   — module title from 05_features_and_benefits.md heading
+     {LOC}     — file/folder location (monospace, right-aligned)
+     {INTRO}   — one-paragraph "What it is:" line
+     {ROWS}    — table rows, each: <tr><td><strong>FEATURE.</strong> ...</td><td>BENEFIT</td></tr>
+     {SPEC}    — "Skills: ... · Rules: ..." line
+-->
+<div class="acc-item">
+  <button class="acc-header" aria-expanded="false">
+    <span class="tag">{TAG}</span>
+    <span class="title">{TITLE}</span>
+    <span class="loc">{LOC}</span>
+    <span class="chev">▸</span>
+  </button>
+  <div class="acc-body">
+    <p>{INTRO}</p>
+    <table>
+      <thead><tr><th>Feature</th><th>Operator benefit</th></tr></thead>
+      <tbody>
+        {ROWS}
+      </tbody>
+    </table>
+    <div class="spec">{SPEC}</div>
+  </div>
+</div>
