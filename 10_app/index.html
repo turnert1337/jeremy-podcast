@@ -181,6 +181,34 @@
     border:1px solid var(--line); border-radius:4px; padding:1px 5px}
   .doc .callout ol, .doc .callout p{margin-bottom:8px}
   .doc .callout ol{padding-left:20px}
+  .card.e .ico{color:var(--warn)}
+
+  /* ============ CALL SHEET (large type, glanceable) ============ */
+  .doc-cs{max-width:880px}
+  .cs{display:flex; flex-direction:column; gap:14px}
+  .cs-block{background:var(--panel); border:1px solid var(--line); border-radius:10px;
+    padding:18px 22px; box-shadow:var(--shadow)}
+  .cs-block h3{margin:0 0 12px; font-size:21px; font-weight:680; letter-spacing:-.015em;
+    color:var(--ink); border:none; padding:0; text-transform:none; font-family:var(--sans)}
+  .cs-dim{font-weight:450; color:var(--ink-faint); font-size:16px}
+  .cs-warn{color:var(--accent); font-weight:600}
+  .cs-check{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:9px}
+  .cs-check li{margin:0}
+  .cs-check label{display:flex; align-items:flex-start; gap:12px; font-size:19px;
+    line-height:1.4; cursor:pointer; color:var(--ink)}
+  .cs-check input{width:22px; height:22px; margin-top:2px; accent-color:var(--accent); flex:none; cursor:pointer}
+  .cs-check label:has(input:checked){color:var(--ink-faint); text-decoration:line-through;
+    text-decoration-color:color-mix(in srgb,var(--ink-faint) 60%,transparent)}
+  .cs-ros{margin:0; padding-left:30px; display:flex; flex-direction:column; gap:11px;
+    font-size:19px; line-height:1.35}
+  .cs-ros li::marker{font-family:var(--mono); color:var(--accent); font-weight:600}
+  .cs-time{font-family:var(--mono); font-size:14px; color:var(--ink-faint); margin-left:6px}
+  .cs-sub{font-size:15px; color:var(--ink-soft)}
+  .cs-bring{border-left:4px solid var(--warn)}
+  .cs-bullets{margin:0; padding-left:24px; display:flex; flex-direction:column; gap:11px;
+    font-size:18px; line-height:1.45}
+  .cs-bullets li:first-child{font-size:19px}
+  .cs-end{border-left:4px solid var(--good)}
 
   /* ============ FLOW CANVAS ============ */
   .flow-tools{display:flex; align-items:center; gap:10px; margin-left:auto; flex-wrap:wrap}
@@ -305,6 +333,14 @@
           </div>
           <span class="go">→</span>
         </button>
+        <button class="card e" id="go-callsheet">
+          <span class="ico">☎</span>
+          <div class="ctxt">
+            <h3>Call Sheet</h3>
+            <p>Large-type quick reference for the live call: setup, roll ritual, sections, bring-ups.</p>
+          </div>
+          <span class="go">→</span>
+        </button>
         <button class="card d" id="go-audio">
           <span class="ico">〜</span>
           <div class="ctxt">
@@ -330,6 +366,22 @@
   <div class="research-body">
     <div class="doc" id="research-doc">
       <div class="empty"><span class="tag">loading report…</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CALL SHEET ============ -->
+<section class="view" id="view-callsheet">
+  <div class="sub-head">
+    <button class="icon-btn back" data-home>← Back</button>
+    <div class="htxt">
+      <span class="eyebrow">Live</span>
+      <h2>Call Sheet</h2>
+    </div>
+  </div>
+  <div class="research-body">
+    <div class="doc doc-cs" id="callsheet-doc">
+      <div class="empty"><span class="tag">loading…</span></div>
     </div>
   </div>
 </section>
@@ -397,11 +449,12 @@
   const STORE_KEY = "jpc.flow.board.v2";
 
   /* ---------- view routing ---------- */
-  const views = { home:'view-home', research:'view-research', setup:'view-setup', audio:'view-audio', flow:'view-flow' };
+  const views = { home:'view-home', research:'view-research', setup:'view-setup', audio:'view-audio', callsheet:'view-callsheet', flow:'view-flow' };
   const docs = {
-    research: { el:'research-doc', file:'research_report.html', loaded:false },
-    setup:    { el:'setup-doc',    file:'setup_tasks.html',     loaded:false },
-    audio:    { el:'audio-doc',    file:'audio_strategy.html',  loaded:false },
+    research:  { el:'research-doc',  file:'research_report.html', loaded:false },
+    setup:     { el:'setup-doc',     file:'setup_tasks.html',     loaded:false },
+    audio:     { el:'audio-doc',     file:'audio_strategy.html',  loaded:false },
+    callsheet: { el:'callsheet-doc', file:'call_sheet.html',      loaded:false },
   };
   function show(v){
     Object.values(views).forEach(id => document.getElementById(id).classList.remove('active'));
@@ -427,6 +480,7 @@
   document.getElementById('go-flow').onclick = () => show('flow');
   document.getElementById('go-setup').onclick = () => show('setup');
   document.getElementById('go-audio').onclick = () => show('audio');
+  document.getElementById('go-callsheet').onclick = () => show('callsheet');
   document.querySelectorAll('[data-home]').forEach(b => b.onclick = () => show('home'));
 
   /* ---------- theme + clock ---------- */
