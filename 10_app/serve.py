@@ -15,7 +15,9 @@ class NoCacheHandler(http.server.SimpleHTTPRequestHandler):
         self.send_header("Expires", "0")
         super().end_headers()
 
-    def log_message(self, *args):
-        pass  # keep the log quiet
+    def log_message(self, fmt, *args):
+        with open("/tmp/podcast-pane-access.log", "a") as f:
+            import datetime
+            f.write(datetime.datetime.now().isoformat() + " " + (fmt % args) + "\n")
 
 http.server.ThreadingHTTPServer(("", PORT), NoCacheHandler).serve_forever()

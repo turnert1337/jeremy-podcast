@@ -184,6 +184,28 @@
   .card.e .ico{color:var(--warn)}
   .card.f .ico{color:var(--accent)}
   .card.g .ico{color:var(--good)}
+  .card.h .ico{color:var(--warn)}
+
+  /* ============ ROUND 1 ANNOTATIONS ============ */
+  .r1-item{background:var(--panel); border:1px solid var(--line); border-radius:10px;
+    padding:14px 16px; margin-bottom:12px; box-shadow:var(--shadow)}
+  .r1-item h4{margin:0 0 6px; font-size:14px; font-weight:640}
+  .r1-ctx{font-size:12px; color:var(--ink-soft); margin:0 0 9px}
+  .r1-dim{font-weight:450; color:var(--ink-faint); font-size:12px}
+  .pillrow{display:flex; flex-wrap:wrap; gap:7px; margin-bottom:9px}
+  .pillrow button{appearance:none; cursor:pointer; font-family:var(--sans); font-size:12.5px;
+    padding:6px 12px; border-radius:100px; border:1px solid var(--line-strong);
+    background:var(--panel-2); color:var(--ink); transition:all .12s}
+  .pillrow button:hover{border-color:var(--accent)}
+  .pillrow button.sel{background:var(--accent); border-color:var(--accent); color:var(--accent-ink);
+    font-weight:600}
+  .r1-item textarea{width:100%; min-height:52px; resize:vertical; font-family:var(--sans);
+    font-size:13px; line-height:1.5; padding:9px 11px; border-radius:8px;
+    border:1px solid var(--line); background:var(--ground); color:var(--ink)}
+  .r1-item textarea:focus{outline:none; border-color:var(--accent)}
+  .r1-item textarea.r1-big{min-height:110px}
+  .r1-sendrow{display:flex; align-items:center; gap:12px; margin:18px 0 8px}
+  .r1-sendrow .icon-btn{height:36px; font-size:13.5px; padding:0 16px}
 
   /* ============ CALL SHEET (large type, glanceable) ============ */
   .doc-cs{max-width:880px}
@@ -315,7 +337,7 @@
     <span class="tally"><span class="dot"></span>Control · Live</span>
     <div class="title">
       <h1>Jeremy — Podcast Control</h1>
-      <span class="sub">production console · frame v1</span>
+      <span class="sub">production console · v7 · 7 cards</span>
     </div>
     <span class="clock" id="clock">--:--:--</span>
     <button class="icon-btn" id="theme" title="Toggle theme" aria-label="Toggle light/dark theme">◐</button>
@@ -344,6 +366,14 @@
           <div class="ctxt">
             <h3>Setup vs Steady State</h3>
             <p>One-time setup (music, hosting, publishing) vs per-episode tasks. Ends with today's plan.</p>
+          </div>
+          <span class="go">→</span>
+        </button>
+        <button class="card h" id="go-round1">
+          <span class="ico">✎</span>
+          <div class="ctxt">
+            <h3>Round 1 · Review &amp; Annotate</h3>
+            <p>Your launch decisions: names, title, cut, music, intro, show notes, audio verdict. Autosaves; passes back to Claude.</p>
           </div>
           <span class="go">→</span>
         </button>
@@ -396,6 +426,22 @@
   <div class="research-body">
     <div class="doc" id="research-doc">
       <div class="empty"><span class="tag">loading report…</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ROUND 1 REVIEW ============ -->
+<section class="view" id="view-round1">
+  <div class="sub-head">
+    <button class="icon-btn back" data-home>← Back</button>
+    <div class="htxt">
+      <span class="eyebrow">Review Round</span>
+      <h2>Round 1 · Launch Decisions</h2>
+    </div>
+  </div>
+  <div class="research-body">
+    <div class="doc" id="round1-doc">
+      <div class="empty"><span class="tag">loading…</span></div>
     </div>
   </div>
 </section>
@@ -519,6 +565,7 @@
     callsheet: { el:'callsheet-doc', file:'call_sheet.html',      loaded:false },
     launch:    { el:'launch-doc',    file:'launch_guide.html',    loaded:false },
     ep01:      { el:'ep01-doc',      file:'ep01_report.html',     loaded:false },
+    round1:    { el:'round1-doc',    file:'round1_review.html',   loaded:false },
   };
   function show(v){
     Object.values(views).forEach(id => document.getElementById(id).classList.remove('active'));
@@ -535,6 +582,7 @@
       if(!r.ok) throw new Error(r.status);
       el.innerHTML = await r.text();
       d.loaded = true;
+      if(v === 'round1') bindAnnotations(el);
     }catch(e){
       el.innerHTML = '<div class="empty"><span class="tag">failed to load</span>' +
         '<p>Could not fetch ' + d.file + ' — check the local server is running, then reopen this view.</p></div>';
@@ -547,6 +595,52 @@
   document.getElementById('go-callsheet').onclick = () => show('callsheet');
   document.getElementById('go-launch').onclick = () => show('launch');
   document.getElementById('go-ep01').onclick = () => show('ep01');
+  document.getElementById('go-round1').onclick = () => show('round1');
+
+  /* ---------- round-1 annotation engine ---------- */
+  function r1Collect(){
+    const out = { savedAt: new Date().toISOString(), verdicts: {}, notes: {} };
+    for(let i = 0; i < localStorage.length; i++){
+      const k = localStorage.key(i);
+      if(k.startsWith('r1v.')) out.verdicts[k.slice(4)] = localStorage.getItem(k);
+      if(k.startsWith('r1n.')) out.notes[k.slice(4)] = localStorage.getItem(k);
+    }
+    return out;
+  }
+  let vizTimer = null;
+  function r1Save(){
+    clearTimeout(vizTimer);
+    vizTimer = setTimeout(() => {
+      console.log("CC_VIZSAVE::" + JSON.stringify({ file: "round1_annotations", payload: r1Collect() }));
+    }, 800);
+  }
+  function bindAnnotations(root){
+    root.querySelectorAll('.pillrow').forEach(row => {
+      const key = 'r1v.' + row.dataset.key;
+      const saved = localStorage.getItem(key);
+      row.querySelectorAll('button').forEach(b => {
+        if(saved === b.dataset.v) b.classList.add('sel');
+        b.onclick = () => {
+          row.querySelectorAll('button').forEach(x => x.classList.remove('sel'));
+          b.classList.add('sel');
+          localStorage.setItem(key, b.dataset.v);
+          r1Save();
+        };
+      });
+    });
+    root.querySelectorAll('textarea[data-ann]').forEach(t => {
+      const key = 'r1n.' + t.dataset.ann;
+      t.value = localStorage.getItem(key) || '';
+      t.addEventListener('input', () => { localStorage.setItem(key, t.value); r1Save(); });
+    });
+    const send = root.querySelector('#r1-send');
+    if(send) send.onclick = () => {
+      const data = r1Collect();
+      console.log("CC_VIZSAVE::" + JSON.stringify({ file: "round1_annotations", payload: data }));
+      try{ navigator.clipboard.writeText(JSON.stringify(data, null, 2)); }catch(e){}
+      toast('Annotations saved — tell the terminal: "process round 1"');
+    };
+  }
   document.querySelectorAll('[data-home]').forEach(b => b.onclick = () => show('home'));
 
   /* ---------- theme + clock ---------- */
