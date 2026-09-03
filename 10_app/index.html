@@ -369,11 +369,11 @@
           </div>
           <span class="go">→</span>
         </button>
-        <button class="card h" id="go-round2">
+        <button class="card h" id="go-round3">
           <span class="ico">✎</span>
           <div class="ctxt">
-            <h3>Round 2 · Review &amp; Annotate</h3>
-            <p>Ear-wormy naming riff, long-episode verdict, 3 intro drafts, music audition, phone-test steps, show notes v2.</p>
+            <h3>Round 3 · Review &amp; Annotate</h3>
+            <p>Trailer-style intro drafts, the Good Morning handshake, Lossy setup steps, show notes v3, assembly plan.</p>
           </div>
           <span class="go">→</span>
         </button>
@@ -426,6 +426,22 @@
   <div class="research-body">
     <div class="doc" id="research-doc">
       <div class="empty"><span class="tag">loading report…</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ROUND 3 REVIEW ============ -->
+<section class="view" id="view-round3">
+  <div class="sub-head">
+    <button class="icon-btn back" data-home>← Back</button>
+    <div class="htxt">
+      <span class="eyebrow">Review Round</span>
+      <h2>Round 3 · Intro, Music, Lossy</h2>
+    </div>
+  </div>
+  <div class="research-body">
+    <div class="doc" id="round3-doc">
+      <div class="empty"><span class="tag">loading…</span></div>
     </div>
   </div>
 </section>
@@ -573,7 +589,7 @@
   const STORE_KEY = "jpc.flow.board.v2";
 
   /* ---------- view routing ---------- */
-  const views = { home:'view-home', research:'view-research', setup:'view-setup', audio:'view-audio', callsheet:'view-callsheet', launch:'view-launch', ep01:'view-ep01', round1:'view-round1', round2:'view-round2', flow:'view-flow' };
+  const views = { home:'view-home', research:'view-research', setup:'view-setup', audio:'view-audio', callsheet:'view-callsheet', launch:'view-launch', ep01:'view-ep01', round1:'view-round1', round2:'view-round2', round3:'view-round3', flow:'view-flow' };
   const docs = {
     research:  { el:'research-doc',  file:'research_report.html', loaded:false },
     setup:     { el:'setup-doc',     file:'setup_tasks.html',     loaded:false },
@@ -583,6 +599,7 @@
     ep01:      { el:'ep01-doc',      file:'ep01_report.html',     loaded:false },
     round1:    { el:'round1-doc',    file:'round1_review.html',   loaded:false },
     round2:    { el:'round2-doc',    file:'round2_review.html',   loaded:false },
+    round3:    { el:'round3-doc',    file:'round3_review.html',   loaded:false },
   };
   function show(v){
     if(!views[v] || !document.getElementById(views[v])) v = 'home';   // never strand on a blank screen
@@ -603,7 +620,7 @@
       if(!r.ok) throw new Error(r.status);
       el.innerHTML = await r.text();
       d.loaded = true;
-      if(v === 'round1' || v === 'round2') bindAnnotations(el);
+      if(/^round\d/.test(v)) bindAnnotations(el);
     }catch(e){
       el.innerHTML = '<div class="empty"><span class="tag">failed to load</span>' +
         '<p>Could not fetch ' + d.file + ' — check the local server is running, then reopen this view.</p></div>';
@@ -616,7 +633,7 @@
   document.getElementById('go-callsheet').onclick = () => show('callsheet');
   document.getElementById('go-launch').onclick = () => show('launch');
   document.getElementById('go-ep01').onclick = () => show('ep01');
-  document.getElementById('go-round2').onclick = () => show('round2');
+  document.getElementById('go-round3').onclick = () => show('round3');
 
   /* ---------- review-round annotation engine (any round) ---------- */
   function annCollect(rnd){
@@ -637,7 +654,7 @@
   }
   function bindAnnotations(root){
     const rnd  = root.querySelector('[data-round]')?.dataset.round || 'r1';
-    const file = (rnd === 'r1' ? 'round1' : rnd === 'r2' ? 'round2' : rnd) + '_annotations';
+    const file = ({r1:'round1', r2:'round2', r3:'round3', r4:'round4'}[rnd] || rnd) + '_annotations';
     root.querySelectorAll('.pillrow').forEach(row => {
       const key = rnd + 'v.' + row.dataset.key;
       const saved = localStorage.getItem(key);
@@ -661,7 +678,7 @@
       const data = annCollect(rnd);
       console.log("CC_VIZSAVE::" + JSON.stringify({ file, payload: data }));
       try{ navigator.clipboard.writeText(JSON.stringify(data, null, 2)); }catch(e){}
-      toast('Annotations saved — tell the terminal: "process ' + (rnd === 'r2' ? 'round 2' : 'round 1') + '"');
+      toast('Annotations saved — tell the terminal: "process round ' + rnd.slice(1) + '"');
     };
   }
   document.querySelectorAll('[data-home]').forEach(b => b.onclick = () => show('home'));
