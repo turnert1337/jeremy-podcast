@@ -557,7 +557,7 @@
   const STORE_KEY = "jpc.flow.board.v2";
 
   /* ---------- view routing ---------- */
-  const views = { home:'view-home', research:'view-research', setup:'view-setup', audio:'view-audio', callsheet:'view-callsheet', launch:'view-launch', flow:'view-flow' };
+  const views = { home:'view-home', research:'view-research', setup:'view-setup', audio:'view-audio', callsheet:'view-callsheet', launch:'view-launch', ep01:'view-ep01', round1:'view-round1', flow:'view-flow' };
   const docs = {
     research:  { el:'research-doc',  file:'research_report.html', loaded:false },
     setup:     { el:'setup-doc',     file:'setup_tasks.html',     loaded:false },
@@ -568,11 +568,15 @@
     round1:    { el:'round1-doc',    file:'round1_review.html',   loaded:false },
   };
   function show(v){
-    Object.values(views).forEach(id => document.getElementById(id).classList.remove('active'));
+    if(!views[v] || !document.getElementById(views[v])) v = 'home';   // never strand on a blank screen
+    Object.values(views).forEach(id => document.getElementById(id)?.classList.remove('active'));
     document.getElementById(views[v]).classList.add('active');
     if(v === 'flow'){ renderBoard(); checkInbox(); }
     if(docs[v]) loadDoc(v);
   }
+  document.addEventListener('keydown', e => {
+    if(e.key === 'Escape' && !(e.target && /TEXTAREA|INPUT/.test(e.target.tagName))) show('home');
+  });
   async function loadDoc(v){
     const d = docs[v];
     if(d.loaded) return;
@@ -652,6 +656,12 @@
   };
   const clock = document.getElementById('clock');
   (function tick(){ clock.textContent = new Date().toLocaleTimeString([], {hour12:false}); setTimeout(tick, 1000); })();
+
+  // deep link: ?view=round1 etc. (runs after full script init via defer-to-end-of-tick)
+  setTimeout(() => {
+    const wantedView = new URLSearchParams(location.search).get('view');
+    if(wantedView && views[wantedView]) show(wantedView);
+  }, 0);
 
   function toast(msg){
     const t = document.getElementById('toast');
