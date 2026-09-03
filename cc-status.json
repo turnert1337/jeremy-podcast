@@ -1,8 +1,8 @@
 {
   "name": "Jeremy Podcast test",
-  "stage": "review-ready",
-  "note": "Report published for Jeremy (github.io/content-plan). 4-card console: research+hot topics, flow board, setup/steady-state, audio strategy. Next: drop Aug 15 transcript in inbox, walk first processing run.",
+  "stage": "active",
+  "note": "LAUNCH PUSH (trip tomorrow): Launch card live — annotate Substack names + export Riverside transcript to inbox for the cut list. Ep recorded, Magic Audio done; edit + Substack + Jeremy draft review remain.",
   "url": "http://localhost:4010/",
   "launch": "python3 -m http.server 4010 --directory \"10_app\"",
-  "updated": "2026-08-29T12:00:00Z"
+  "updated": "2026-09-03T14:30:00Z"
 }

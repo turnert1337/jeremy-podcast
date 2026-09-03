@@ -183,6 +183,7 @@
   .doc .callout ol{padding-left:20px}
   .card.e .ico{color:var(--warn)}
   .card.f .ico{color:var(--accent)}
+  .card.g .ico{color:var(--good)}
 
   /* ============ CALL SHEET (large type, glanceable) ============ */
   .doc-cs{max-width:880px}
@@ -346,6 +347,14 @@
           </div>
           <span class="go">→</span>
         </button>
+        <button class="card g" id="go-ep01">
+          <span class="ico">◉</span>
+          <div class="ctxt">
+            <h3>Ep 01 · Processing Report</h3>
+            <p>Cut list, title candidates, chapters, show notes draft, clip bank, steals ledger.</p>
+          </div>
+          <span class="go">→</span>
+        </button>
         <button class="card f" id="go-launch">
           <span class="ico">⚑</span>
           <div class="ctxt">
@@ -387,6 +396,22 @@
   <div class="research-body">
     <div class="doc" id="research-doc">
       <div class="empty"><span class="tag">loading report…</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ EP01 PROCESSING REPORT ============ -->
+<section class="view" id="view-ep01">
+  <div class="sub-head">
+    <button class="icon-btn back" data-home>← Back</button>
+    <div class="htxt">
+      <span class="eyebrow">Processing</span>
+      <h2>Ep 01 · Processing Report</h2>
+    </div>
+  </div>
+  <div class="research-body">
+    <div class="doc" id="ep01-doc">
+      <div class="empty"><span class="tag">loading…</span></div>
     </div>
   </div>
 </section>
@@ -493,6 +518,7 @@
     audio:     { el:'audio-doc',     file:'audio_strategy.html',  loaded:false },
     callsheet: { el:'callsheet-doc', file:'call_sheet.html',      loaded:false },
     launch:    { el:'launch-doc',    file:'launch_guide.html',    loaded:false },
+    ep01:      { el:'ep01-doc',      file:'ep01_report.html',     loaded:false },
   };
   function show(v){
     Object.values(views).forEach(id => document.getElementById(id).classList.remove('active'));
@@ -520,6 +546,7 @@
   document.getElementById('go-audio').onclick = () => show('audio');
   document.getElementById('go-callsheet').onclick = () => show('callsheet');
   document.getElementById('go-launch').onclick = () => show('launch');
+  document.getElementById('go-ep01').onclick = () => show('ep01');
   document.querySelectorAll('[data-home]').forEach(b => b.onclick = () => show('home'));
 
   /* ---------- theme + clock ---------- */
