@@ -369,11 +369,11 @@
           </div>
           <span class="go">→</span>
         </button>
-        <button class="card h" id="go-round1">
+        <button class="card h" id="go-round2">
           <span class="ico">✎</span>
           <div class="ctxt">
-            <h3>Round 1 · Review &amp; Annotate</h3>
-            <p>Your launch decisions: names, title, cut, music, intro, show notes, audio verdict. Autosaves; passes back to Claude.</p>
+            <h3>Round 2 · Review &amp; Annotate</h3>
+            <p>Ear-wormy naming riff, long-episode verdict, 3 intro drafts, music audition, phone-test steps, show notes v2.</p>
           </div>
           <span class="go">→</span>
         </button>
@@ -426,6 +426,22 @@
   <div class="research-body">
     <div class="doc" id="research-doc">
       <div class="empty"><span class="tag">loading report…</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ROUND 2 REVIEW ============ -->
+<section class="view" id="view-round2">
+  <div class="sub-head">
+    <button class="icon-btn back" data-home>← Back</button>
+    <div class="htxt">
+      <span class="eyebrow">Review Round</span>
+      <h2>Round 2 · Naming, Intro, Finish Plan</h2>
+    </div>
+  </div>
+  <div class="research-body">
+    <div class="doc" id="round2-doc">
+      <div class="empty"><span class="tag">loading…</span></div>
     </div>
   </div>
 </section>
@@ -557,7 +573,7 @@
   const STORE_KEY = "jpc.flow.board.v2";
 
   /* ---------- view routing ---------- */
-  const views = { home:'view-home', research:'view-research', setup:'view-setup', audio:'view-audio', callsheet:'view-callsheet', launch:'view-launch', ep01:'view-ep01', round1:'view-round1', flow:'view-flow' };
+  const views = { home:'view-home', research:'view-research', setup:'view-setup', audio:'view-audio', callsheet:'view-callsheet', launch:'view-launch', ep01:'view-ep01', round1:'view-round1', round2:'view-round2', flow:'view-flow' };
   const docs = {
     research:  { el:'research-doc',  file:'research_report.html', loaded:false },
     setup:     { el:'setup-doc',     file:'setup_tasks.html',     loaded:false },
@@ -566,6 +582,7 @@
     launch:    { el:'launch-doc',    file:'launch_guide.html',    loaded:false },
     ep01:      { el:'ep01-doc',      file:'ep01_report.html',     loaded:false },
     round1:    { el:'round1-doc',    file:'round1_review.html',   loaded:false },
+    round2:    { el:'round2-doc',    file:'round2_review.html',   loaded:false },
   };
   function show(v){
     if(!views[v] || !document.getElementById(views[v])) v = 'home';   // never strand on a blank screen
@@ -586,7 +603,7 @@
       if(!r.ok) throw new Error(r.status);
       el.innerHTML = await r.text();
       d.loaded = true;
-      if(v === 'round1') bindAnnotations(el);
+      if(v === 'round1' || v === 'round2') bindAnnotations(el);
     }catch(e){
       el.innerHTML = '<div class="empty"><span class="tag">failed to load</span>' +
         '<p>Could not fetch ' + d.file + ' — check the local server is running, then reopen this view.</p></div>';
@@ -599,28 +616,30 @@
   document.getElementById('go-callsheet').onclick = () => show('callsheet');
   document.getElementById('go-launch').onclick = () => show('launch');
   document.getElementById('go-ep01').onclick = () => show('ep01');
-  document.getElementById('go-round1').onclick = () => show('round1');
+  document.getElementById('go-round2').onclick = () => show('round2');
 
-  /* ---------- round-1 annotation engine ---------- */
-  function r1Collect(){
+  /* ---------- review-round annotation engine (any round) ---------- */
+  function annCollect(rnd){
     const out = { savedAt: new Date().toISOString(), verdicts: {}, notes: {} };
     for(let i = 0; i < localStorage.length; i++){
       const k = localStorage.key(i);
-      if(k.startsWith('r1v.')) out.verdicts[k.slice(4)] = localStorage.getItem(k);
-      if(k.startsWith('r1n.')) out.notes[k.slice(4)] = localStorage.getItem(k);
+      if(k.startsWith(rnd + 'v.')) out.verdicts[k.slice(rnd.length + 2)] = localStorage.getItem(k);
+      if(k.startsWith(rnd + 'n.')) out.notes[k.slice(rnd.length + 2)] = localStorage.getItem(k);
     }
     return out;
   }
   let vizTimer = null;
-  function r1Save(){
+  function annSave(rnd, file){
     clearTimeout(vizTimer);
     vizTimer = setTimeout(() => {
-      console.log("CC_VIZSAVE::" + JSON.stringify({ file: "round1_annotations", payload: r1Collect() }));
+      console.log("CC_VIZSAVE::" + JSON.stringify({ file, payload: annCollect(rnd) }));
     }, 800);
   }
   function bindAnnotations(root){
+    const rnd  = root.querySelector('[data-round]')?.dataset.round || 'r1';
+    const file = (rnd === 'r1' ? 'round1' : rnd === 'r2' ? 'round2' : rnd) + '_annotations';
     root.querySelectorAll('.pillrow').forEach(row => {
-      const key = 'r1v.' + row.dataset.key;
+      const key = rnd + 'v.' + row.dataset.key;
       const saved = localStorage.getItem(key);
       row.querySelectorAll('button').forEach(b => {
         if(saved === b.dataset.v) b.classList.add('sel');
@@ -628,21 +647,21 @@
           row.querySelectorAll('button').forEach(x => x.classList.remove('sel'));
           b.classList.add('sel');
           localStorage.setItem(key, b.dataset.v);
-          r1Save();
+          annSave(rnd, file);
         };
       });
     });
     root.querySelectorAll('textarea[data-ann]').forEach(t => {
-      const key = 'r1n.' + t.dataset.ann;
+      const key = rnd + 'n.' + t.dataset.ann;
       t.value = localStorage.getItem(key) || '';
-      t.addEventListener('input', () => { localStorage.setItem(key, t.value); r1Save(); });
+      t.addEventListener('input', () => { localStorage.setItem(key, t.value); annSave(rnd, file); });
     });
     const send = root.querySelector('#r1-send');
     if(send) send.onclick = () => {
-      const data = r1Collect();
-      console.log("CC_VIZSAVE::" + JSON.stringify({ file: "round1_annotations", payload: data }));
+      const data = annCollect(rnd);
+      console.log("CC_VIZSAVE::" + JSON.stringify({ file, payload: data }));
       try{ navigator.clipboard.writeText(JSON.stringify(data, null, 2)); }catch(e){}
-      toast('Annotations saved — tell the terminal: "process round 1"');
+      toast('Annotations saved — tell the terminal: "process ' + (rnd === 'r2' ? 'round 2' : 'round 1') + '"');
     };
   }
   document.querySelectorAll('[data-home]').forEach(b => b.onclick = () => show('home'));
