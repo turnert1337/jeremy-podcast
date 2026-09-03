@@ -369,11 +369,11 @@
           </div>
           <span class="go">→</span>
         </button>
-        <button class="card h" id="go-round7">
+        <button class="card h" id="go-round8">
           <span class="ico">✎</span>
           <div class="ctxt">
-            <h3>Round 7 · Preflight &amp; Launch</h3>
-            <p>The preflight checklist: draft complete, phone pass, Jeremy's link, publish-from-the-road, housekeeping.</p>
+            <h3>Round 8 · Ep 2 Seeds &amp; Handoff</h3>
+            <p>Episode 2 callback ledger, Main Thread candidates, scheduling, and the trip handoff. Round 7 (preflight) still reachable via ?view=round7.</p>
           </div>
           <span class="go">→</span>
         </button>
@@ -426,6 +426,22 @@
   <div class="research-body">
     <div class="doc" id="research-doc">
       <div class="empty"><span class="tag">loading report…</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ROUND 8 REVIEW ============ -->
+<section class="view" id="view-round8">
+  <div class="sub-head">
+    <button class="icon-btn back" data-home>← Back</button>
+    <div class="htxt">
+      <span class="eyebrow">Review Round</span>
+      <h2>Round 8 · Ep 2 Seeds &amp; Handoff</h2>
+    </div>
+  </div>
+  <div class="research-body">
+    <div class="doc" id="round8-doc">
+      <div class="empty"><span class="tag">loading…</span></div>
     </div>
   </div>
 </section>
@@ -653,7 +669,7 @@
   const STORE_KEY = "jpc.flow.board.v2";
 
   /* ---------- view routing ---------- */
-  const views = { home:'view-home', research:'view-research', setup:'view-setup', audio:'view-audio', callsheet:'view-callsheet', launch:'view-launch', ep01:'view-ep01', round1:'view-round1', round2:'view-round2', round3:'view-round3', round4:'view-round4', round5:'view-round5', round6:'view-round6', round7:'view-round7', flow:'view-flow' };
+  const views = { home:'view-home', research:'view-research', setup:'view-setup', audio:'view-audio', callsheet:'view-callsheet', launch:'view-launch', ep01:'view-ep01', round1:'view-round1', round2:'view-round2', round3:'view-round3', round4:'view-round4', round5:'view-round5', round6:'view-round6', round7:'view-round7', round8:'view-round8', flow:'view-flow' };
   const docs = {
     research:  { el:'research-doc',  file:'research_report.html', loaded:false },
     setup:     { el:'setup-doc',     file:'setup_tasks.html',     loaded:false },
@@ -668,6 +684,7 @@
     round5:    { el:'round5-doc',    file:'round5_review.html',   loaded:false },
     round6:    { el:'round6-doc',    file:'round6_review.html',   loaded:false },
     round7:    { el:'round7-doc',    file:'round7_review.html',   loaded:false },
+    round8:    { el:'round8-doc',    file:'round8_review.html',   loaded:false },
   };
   function show(v){
     if(!views[v] || !document.getElementById(views[v])) v = 'home';   // never strand on a blank screen
@@ -701,7 +718,7 @@
   document.getElementById('go-callsheet').onclick = () => show('callsheet');
   document.getElementById('go-launch').onclick = () => show('launch');
   document.getElementById('go-ep01').onclick = () => show('ep01');
-  document.getElementById('go-round7').onclick = () => show('round7');
+  document.getElementById('go-round8').onclick = () => show('round8');
 
   /* ---------- review-round annotation engine (any round) ---------- */
   function annCollect(rnd){
