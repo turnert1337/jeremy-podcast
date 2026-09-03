@@ -8,3 +8,9 @@
 # The README stays so the folder exists on clone.
 10_app/transcript_inbox/*
 !10_app/transcript_inbox/README.txt
+
+# raw podcast media stays local (public repo)
+10_app/podcast_assets/*.m4a
+10_app/podcast_assets/*.mp4
+10_app/podcast_assets/*.wav
+10_app/podcast_assets/music/*.mp3
