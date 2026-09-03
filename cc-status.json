@@ -1,7 +1,7 @@
 {
   "name": "Jeremy Podcast test",
-  "stage": "active",
-  "note": "LAUNCH PUSH (trip tomorrow): Launch card live — annotate Substack names + export Riverside transcript to inbox for the cut list. Ep recorded, Magic Audio done; edit + Substack + Jeremy draft review remain.",
+  "stage": "review-ready",
+  "note": "Ep 01 processed via Riverside MCP: review the cut list + titles in the Ep 01 card, approve cuts, annotate Substack names. Then I apply cuts, you export + post draft to Jeremy.",
   "url": "http://localhost:4010/",
   "launch": "python3 -m http.server 4010 --directory \"10_app\"",
   "updated": "2026-09-03T14:30:00Z"
