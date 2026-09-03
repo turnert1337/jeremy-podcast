@@ -182,6 +182,7 @@
   .doc .callout ol, .doc .callout p{margin-bottom:8px}
   .doc .callout ol{padding-left:20px}
   .card.e .ico{color:var(--warn)}
+  .card.f .ico{color:var(--accent)}
 
   /* ============ CALL SHEET (large type, glanceable) ============ */
   .doc-cs{max-width:880px}
@@ -345,6 +346,14 @@
           </div>
           <span class="go">→</span>
         </button>
+        <button class="card f" id="go-launch">
+          <span class="ico">⚑</span>
+          <div class="ctxt">
+            <h3>Launch: Substack ✕ Riverside</h3>
+            <p>Naming rounds, Substack setup, editing walkthrough, and today's launch checklist.</p>
+          </div>
+          <span class="go">→</span>
+        </button>
         <button class="card e" id="go-callsheet">
           <span class="ico">☎</span>
           <div class="ctxt">
@@ -378,6 +387,22 @@
   <div class="research-body">
     <div class="doc" id="research-doc">
       <div class="empty"><span class="tag">loading report…</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LAUNCH GUIDE ============ -->
+<section class="view" id="view-launch">
+  <div class="sub-head">
+    <button class="icon-btn back" data-home>← Back</button>
+    <div class="htxt">
+      <span class="eyebrow">Launch</span>
+      <h2>Substack ✕ Riverside</h2>
+    </div>
+  </div>
+  <div class="research-body">
+    <div class="doc" id="launch-doc">
+      <div class="empty"><span class="tag">loading…</span></div>
     </div>
   </div>
 </section>
@@ -461,12 +486,13 @@
   const STORE_KEY = "jpc.flow.board.v2";
 
   /* ---------- view routing ---------- */
-  const views = { home:'view-home', research:'view-research', setup:'view-setup', audio:'view-audio', callsheet:'view-callsheet', flow:'view-flow' };
+  const views = { home:'view-home', research:'view-research', setup:'view-setup', audio:'view-audio', callsheet:'view-callsheet', launch:'view-launch', flow:'view-flow' };
   const docs = {
     research:  { el:'research-doc',  file:'research_report.html', loaded:false },
     setup:     { el:'setup-doc',     file:'setup_tasks.html',     loaded:false },
     audio:     { el:'audio-doc',     file:'audio_strategy.html',  loaded:false },
     callsheet: { el:'callsheet-doc', file:'call_sheet.html',      loaded:false },
+    launch:    { el:'launch-doc',    file:'launch_guide.html',    loaded:false },
   };
   function show(v){
     Object.values(views).forEach(id => document.getElementById(id).classList.remove('active'));
@@ -493,6 +519,7 @@
   document.getElementById('go-setup').onclick = () => show('setup');
   document.getElementById('go-audio').onclick = () => show('audio');
   document.getElementById('go-callsheet').onclick = () => show('callsheet');
+  document.getElementById('go-launch').onclick = () => show('launch');
   document.querySelectorAll('[data-home]').forEach(b => b.onclick = () => show('home'));
 
   /* ---------- theme + clock ---------- */
