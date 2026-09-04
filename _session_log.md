@@ -39,6 +39,6 @@ Publicity        | tweet drafted, bio adopted | operator applies from phone
 Episode 2        | seeded (Round 8 ledger)   | date TBD — Jeremy out ~Sep 12
 Frame pane       | 9 rounds live on :4010    | none
 **People-list delta:** added 0 · touched 0 · skipped 1 (Jeremy Hodge — add proposed twice, operator confirmation still pending)
-**Git:** committed (721d74f) "session 1: launch day log + tasklist seeded" · pushed
+**Git:** committed (c5ee609) "session 1: launch day log + tasklist seeded" · pushed
 
 After logging, verify the master tasklist AND people list match reality.
