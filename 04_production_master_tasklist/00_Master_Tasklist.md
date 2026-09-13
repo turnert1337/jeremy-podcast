@@ -26,7 +26,7 @@
 
 | # | Status | Task |
 |---|--------|------|
-| 1 | 🟠 | **Spotify listing goes live** — synced via Substack; waiting on Spotify catalog indexing |
+| 1 | ✅ | **Spotify listing live** — confirmed HTTP 200 on 2026-09-13 |
 | 2 | 🟠 | **Apple Podcasts submission** — waiting on Apple's Podcasts Connect account-setup bug to clear |
 | 3 | 🟠 | **Jeremy's billing confirmation** — published with "Jeremy Hodge and Turner Tomlinson"; waiting on his word |
 | 4 | 🟡 | **Launch publicity** — tweet in X drafts; Substack bio/colors/links per Round 9 |
@@ -38,9 +38,9 @@
 
 ## Below the fold — Detail blocks
 
-## Task 1 — Spotify listing goes live 🟠
+## Task 1 — Spotify listing live ✅
 
-**Waiting on:** Spotify catalog indexing (Spotify-side lag, typically minutes–hours, occasionally a day).
+**Complete 2026-09-13.** Indexing lag resolved during the trip; link verified HTTP 200. Swept on next `/refactor-tasklist`.
 
 - Substack's built-in sync succeeded and returned the show link: `https://open.spotify.com/show/2P77kAG0gPvfKSfc9JG331` — currently 404 (verified server-side 2026-09-04).
 - **Do NOT resubmit the RSS manually at Spotify for Podcasters** — creates a duplicate show (Substack's own docs warn this).

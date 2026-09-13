@@ -369,6 +369,14 @@
           </div>
           <span class="go">→</span>
         </button>
+        <button class="card e" id="go-ep02sheet">
+          <span class="ico">☎</span>
+          <div class="ctxt">
+            <h3>Ep 2 · Tight Call Sheet</h3>
+            <p>Half-screen: 20-second intro blurb (Fayetteville / Greenville / detox bit), agenda, news cruise.</p>
+          </div>
+          <span class="go">→</span>
+        </button>
         <button class="card h" id="go-round9">
           <span class="ico">✦</span>
           <div class="ctxt">
@@ -434,6 +442,22 @@
   <div class="research-body">
     <div class="doc" id="research-doc">
       <div class="empty"><span class="tag">loading report…</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ EP 2 CALL SHEET ============ -->
+<section class="view" id="view-ep02sheet">
+  <div class="sub-head">
+    <button class="icon-btn back" data-home>← Back</button>
+    <div class="htxt">
+      <span class="eyebrow">Live document</span>
+      <h2>Ep 2 · Tight Call Sheet</h2>
+    </div>
+  </div>
+  <div class="research-body">
+    <div class="doc" id="ep02sheet-doc">
+      <div class="empty"><span class="tag">loading…</span></div>
     </div>
   </div>
 </section>
@@ -693,7 +717,7 @@
   const STORE_KEY = "jpc.flow.board.v2";
 
   /* ---------- view routing ---------- */
-  const views = { home:'view-home', research:'view-research', setup:'view-setup', audio:'view-audio', callsheet:'view-callsheet', launch:'view-launch', ep01:'view-ep01', round1:'view-round1', round2:'view-round2', round3:'view-round3', round4:'view-round4', round5:'view-round5', round6:'view-round6', round7:'view-round7', round8:'view-round8', round9:'view-round9', flow:'view-flow' };
+  const views = { home:'view-home', research:'view-research', setup:'view-setup', audio:'view-audio', callsheet:'view-callsheet', launch:'view-launch', ep01:'view-ep01', round1:'view-round1', round2:'view-round2', round3:'view-round3', round4:'view-round4', round5:'view-round5', round6:'view-round6', round7:'view-round7', round8:'view-round8', round9:'view-round9', ep02sheet:'view-ep02sheet', flow:'view-flow' };
   const docs = {
     research:  { el:'research-doc',  file:'research_report.html', loaded:false },
     setup:     { el:'setup-doc',     file:'setup_tasks.html',     loaded:false },
@@ -710,6 +734,7 @@
     round7:    { el:'round7-doc',    file:'round7_review.html',   loaded:false },
     round8:    { el:'round8-doc',    file:'round8_review.html',   loaded:false },
     round9:    { el:'round9-doc',    file:'round9_review.html',   loaded:false },
+    ep02sheet: { el:'ep02sheet-doc', file:'ep02_callsheet.html',  loaded:false },
   };
   function show(v){
     if(!views[v] || !document.getElementById(views[v])) v = 'home';   // never strand on a blank screen
@@ -745,6 +770,7 @@
   document.getElementById('go-ep01').onclick = () => show('ep01');
   document.getElementById('go-round8').onclick = () => show('round8');
   document.getElementById('go-round9').onclick = () => show('round9');
+  document.getElementById('go-ep02sheet').onclick = () => show('ep02sheet');
 
   /* ---------- review-round annotation engine (any round) ---------- */
   function annCollect(rnd){
