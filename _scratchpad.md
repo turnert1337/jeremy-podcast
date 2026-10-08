@@ -1,5 +1,8 @@
-# Scratchpad — Jeremy Podcast test
+# Scratchpad — DCC sweep notes
 
-## Notes - substack
+## 2026-10-07 · Car Menu door hand-back (for the DCC orchestrator)
 
-checking substack credentials, my login is turnerjtomlinson@gmail.com, account exists and I can get into it, not sure if you can set up an MCP or there's one I can set up fr you so you can work with me in the substack to do setup things or guide me, otherwise let's work back and forth in the style of: go to this link: " and I have a clickable in a report/artifact if we're doing that or you offer the url in chat to copy and paste ot.
+- **Car URL (wire this behind the "Jeremy Podcast" door):** https://claude.ai/code/artifact/48b0b977-f764-4f57-9e74-93ff9bc81217
+- **What it is:** "In Practice · Control Room" — car-tuned status board (big tap targets, no text inputs so the Tesla keyboard never deploys, in-page A−/A+ font control, light/dark). State is baked at publish; this frame's agent sweeps & republishes to the SAME url on status change.
+- **One-line status:** Ep1 live (Substack + Spotify) · Ep2 recorded 9/13 — Jeremy's track safe, Turner's track lost in upload, Plaud recovery pending · Round 10 decisions (3 Substack clusters + 25m excerpt ep) awaiting Turner's annotations.
+- Desktop console remains http://127.0.0.1:4010/?v=7 (unchanged in cc-status.json `url`; car link added as `car_url`).

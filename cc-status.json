@@ -1,8 +1,9 @@
 {
   "name": "Jeremy Podcast test",
-  "stage": "review-ready",
-  "note": "SHIPPING: final MP3 rendering (100:00). Publish pack in Ep 01 card: upload to readlossy.substack.com as draft, preview to Jeremy, publish on his OK.",
+  "stage": "ep2-processing",
+  "note": "Ep1 LIVE (Substack+Spotify). Ep2 recorded 9/13: Jeremy track safe, Turner track lost in upload — Plaud recovery pending. Round 10 (3 Substack clusters + excerpt ep) awaiting annotations. CAR DOOR → car_url.",
   "url": "http://127.0.0.1:4010/?v=7",
+  "car_url": "https://claude.ai/code/artifact/48b0b977-f764-4f57-9e74-93ff9bc81217",
   "launch": "python3 -m http.server 4010 --directory \"10_app\"",
-  "updated": "2026-09-03T20:30:00Z"
+  "updated": "2026-10-07T00:00:00Z"
 }
