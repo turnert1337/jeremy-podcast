@@ -1,9 +1,9 @@
 {
   "name": "Jeremy Podcast test",
-  "stage": "ep2-processing",
-  "note": "Ep1 LIVE (Substack+Spotify). Ep2 recorded 9/13: Jeremy track safe, Turner track lost in upload — Plaud recovery pending. Round 10 (3 Substack clusters + excerpt ep) awaiting annotations. CAR DOOR → car_url.",
-  "url": "http://127.0.0.1:4010/?v=7",
+  "stage": "ep3-content-round",
+  "note": "Ep3 recorded 10/10 (79 min, both tracks clean). Content Round 3 BUILT: 16 topics mapped, 9 post outlines, top-3 recommended (Slop Bomb / Rate Limit / Compost Heap), 3 excerpt edits cut in Riverside (drafts, no export) + VO scripts awaiting Turner's recording. Review at content_review.html \u2014 new reusable round surface. Round 10 (ep2) still awaiting annotations.",
+  "url": "http://127.0.0.1:4010/content_review.html?round=3",
   "car_url": "https://claude.ai/code/artifact/48b0b977-f764-4f57-9e74-93ff9bc81217",
   "launch": "python3 -m http.server 4010 --directory \"10_app\"",
-  "updated": "2026-10-07T00:00:00Z"
+  "updated": "2026-10-10T15:10:00Z"
 }

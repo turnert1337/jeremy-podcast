@@ -369,6 +369,14 @@
           </div>
           <span class="go">→</span>
         </button>
+        <button class="card h" id="go-content">
+          <span class="ico">▣</span>
+          <div class="ctxt">
+            <h3>Content Rounds</h3>
+            <p>Reusable review surface for derived content — all candidate topics, top Substack posts, excerpt-episode plans. Round-switchable.</p>
+          </div>
+          <span class="go">→</span>
+        </button>
         <button class="card h" id="go-round10">
           <span class="ico">⚐</span>
           <div class="ctxt">
@@ -797,6 +805,7 @@
   document.getElementById('go-round9').onclick = () => show('round9');
   document.getElementById('go-ep02sheet').onclick = () => show('ep02sheet');
   document.getElementById('go-round10').onclick = () => show('round10');
+  document.getElementById('go-content').onclick = () => location.href = 'content_review.html';
 
   /* ---------- review-round annotation engine (any round) ---------- */
   function annCollect(rnd){

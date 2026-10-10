@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Content Review</title>
+<style>
+  :root{
+    --ground:#F3F4F6; --panel:#FFFFFF; --panel-2:#ECEEF1;
+    --ink:#1B1F26; --ink-soft:#5A6472; --ink-faint:#8A93A1;
+    --line:#E1E4E9; --line-strong:#C9CFD7;
+    --accent:#E0462A; --accent-ink:#FFFFFF;
+    --good:#25835A; --warn:#B07C22; --blue:#33619C;
+    --shadow:0 1px 2px rgba(20,25,35,.05), 0 4px 14px rgba(20,25,35,.05);
+    --radius:8px;
+    --mono:ui-monospace,"SF Mono","Cascadia Code",Menlo,Consolas,monospace;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --ground:#13161B; --panel:#1B1F26; --panel-2:#161A20;
+      --ink:#E5E8EC; --ink-soft:#9AA3B0; --ink-faint:#68717E;
+      --line:#272C34; --line-strong:#353C46;
+      --accent:#F05B3E; --accent-ink:#14100E;
+      --good:#43A87A; --warn:#CE9A34; --blue:#6C95C8;
+      --shadow:0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.3);
+    }
+  }
+  :root[data-theme="light"]{
+    --ground:#F3F4F6; --panel:#FFFFFF; --panel-2:#ECEEF1;
+    --ink:#1B1F26; --ink-soft:#5A6472; --ink-faint:#8A93A1;
+    --line:#E1E4E9; --line-strong:#C9CFD7;
+    --accent:#E0462A; --accent-ink:#FFFFFF;
+    --good:#25835A; --warn:#B07C22; --blue:#33619C;
+  }
+  :root[data-theme="dark"]{
+    --ground:#13161B; --panel:#1B1F26; --panel-2:#161A20;
+    --ink:#E5E8EC; --ink-soft:#9AA3B0; --ink-faint:#68717E;
+    --line:#272C34; --line-strong:#353C46;
+    --accent:#F05B3E; --accent-ink:#14100E;
+    --good:#43A87A; --warn:#CE9A34; --blue:#6C95C8;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0; height:100%}
+  body{background:var(--ground); color:var(--ink); font-family:var(--sans); line-height:1.5;
+    -webkit-font-smoothing:antialiased; height:100vh; overflow:hidden; display:flex; flex-direction:column}
+  button{font-family:inherit}
+
+  .bar{display:flex; align-items:center; gap:12px; padding:8px clamp(12px,2.5vw,18px); flex:none;
+    background:var(--panel); border-bottom:1px solid var(--line); flex-wrap:wrap}
+  .eyebrow{font-family:var(--mono); font-size:9.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--accent)}
+  .htxt{display:flex; align-items:baseline; gap:8px; margin-right:auto}
+  .htxt h2{margin:0; font-size:13.5px; font-weight:640; letter-spacing:-.01em}
+  .icon-btn{appearance:none; border:1px solid var(--line-strong); background:var(--panel-2);
+    color:var(--ink-soft); height:26px; min-width:26px; padding:0 8px; border-radius:6px;
+    cursor:pointer; font-size:12px; display:inline-flex; align-items:center; gap:5px; justify-content:center;
+    transition:border-color .15s, color .15s; text-decoration:none}
+  .icon-btn:hover{border-color:var(--accent); color:var(--accent)}
+  .icon-btn.solid{background:var(--accent); border-color:var(--accent); color:var(--accent-ink)}
+  .icon-btn.solid:hover{filter:brightness(1.06); color:var(--accent-ink)}
+  .chip{font-family:var(--mono); font-size:11px; letter-spacing:.04em; display:inline-flex; align-items:center;
+    gap:7px; padding:5px 10px; border:1px solid var(--line-strong); border-radius:100px;
+    background:var(--panel-2); color:var(--ink-soft)}
+  select.round-pick{font-family:var(--mono); font-size:11px; border:1px solid var(--line-strong);
+    border-radius:100px; background:var(--panel-2); color:var(--ink); padding:4px 9px; cursor:pointer}
+
+  .research-body{flex:1; overflow-y:auto; padding:clamp(14px,2.5vw,24px)}
+  .doc{max-width:760px; margin:0 auto}
+  .doc .empty{border:1px dashed var(--line-strong); border-radius:var(--radius); background:var(--panel-2);
+    padding:22px; margin-bottom:26px}
+  .doc .empty .tag{font-family:var(--mono); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase;
+    color:var(--warn)}
+  .doc h3{font-family:var(--mono); font-size:11.5px; letter-spacing:.12em; text-transform:uppercase;
+    color:var(--ink-soft); margin:26px 0 10px; padding-bottom:8px; border-bottom:1px solid var(--line)}
+  .doc h3:first-child{margin-top:0}
+  .doc p{font-size:13.5px; line-height:1.62; color:var(--ink); margin:0 0 10px}
+  .r-meta{display:flex; flex-direction:column; gap:3px; margin-bottom:18px;
+    font-family:var(--mono); font-size:11px; color:var(--ink-faint); letter-spacing:.03em}
+  .r-meta a{color:var(--blue)}
+  .placeholder{color:var(--warn); font-style:italic}
+
+  .r1-item{background:var(--panel); border:1px solid var(--line); border-radius:10px;
+    padding:14px 16px; margin-bottom:12px; box-shadow:var(--shadow)}
+  .r1-item h4{margin:0 0 6px; font-size:14px; font-weight:640; display:flex; align-items:baseline; gap:8px}
+  .r1-ctx{font-size:12px; color:var(--ink-soft); margin:0 0 9px}
+  .r1-dim{font-weight:450; color:var(--ink-faint); font-size:11.5px}
+  .badge{font-family:var(--mono); font-size:10px; letter-spacing:.04em; padding:2px 7px; border-radius:100px;
+    border:1px solid var(--line-strong); background:var(--panel-2); color:var(--ink-soft)}
+  .badge.good{color:var(--good); border-color:color-mix(in srgb,var(--good) 45%,var(--line))}
+  blockquote{margin:0 0 9px; padding:7px 12px; border-left:3px solid var(--line-strong);
+    font-size:12.5px; color:var(--ink-soft); background:var(--panel-2); border-radius:0 6px 6px 0}
+  blockquote cite{font-family:var(--mono); font-size:10.5px; color:var(--ink-faint); display:block; margin-top:2px}
+  .pillrow{display:flex; flex-wrap:wrap; gap:7px; margin-bottom:9px}
+  .pillrow button{appearance:none; cursor:pointer; font-family:var(--sans); font-size:12.5px;
+    padding:6px 12px; border-radius:100px; border:1px solid var(--line-strong);
+    background:var(--panel-2); color:var(--ink); transition:all .12s}
+  .pillrow button:hover{border-color:var(--accent)}
+  .pillrow button.sel{background:var(--accent); border-color:var(--accent); color:var(--accent-ink); font-weight:600}
+  .r1-item textarea{width:100%; min-height:48px; resize:vertical; font-family:var(--sans);
+    font-size:13px; line-height:1.5; padding:9px 11px; border-radius:8px;
+    border:1px solid var(--line); background:var(--ground); color:var(--ink)}
+  .r1-item textarea:focus{outline:none; border-color:var(--accent)}
+  .r1-sendrow{display:flex; align-items:center; gap:12px; margin:18px 0 8px; flex-wrap:wrap}
+  .r1-sendrow .icon-btn{height:36px; font-size:13.5px; padding:0 16px}
+
+  details.expand{margin-top:6px}
+  details.expand summary{cursor:pointer; font-size:12px; color:var(--blue); list-style:none; font-family:var(--mono);
+    letter-spacing:.02em}
+  details.expand summary::-webkit-details-marker{display:none}
+  details.expand summary::before{content:"▸ "}
+  details.expand[open] summary::before{content:"▾ "}
+  details.expand .inner{margin-top:9px; padding-top:9px; border-top:1px solid var(--line)}
+  .outline{margin:0 0 9px; padding-left:20px; font-size:12.5px; color:var(--ink)}
+  .outline li{margin-bottom:4px}
+  .kv{font-size:12px; color:var(--ink-soft); margin:0 0 6px}
+  .kv strong{color:var(--ink); font-weight:620}
+
+  .toast{position:fixed; bottom:20px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:var(--ink); color:var(--ground); font-size:12.5px; padding:9px 16px; border-radius:100px;
+    opacity:0; pointer-events:none; transition:opacity .2s, transform .2s; z-index:50; font-family:var(--mono); letter-spacing:.03em}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <a class="icon-btn" href="index.html">← Control</a>
+  <div class="htxt">
+    <span class="eyebrow">Content Review</span>
+    <h2 id="bar-title">Round —</h2>
+  </div>
+  <span class="chip" id="episode-chip">ep —</span>
+  <select class="round-pick" id="round-pick" title="Switch round"></select>
+  <button class="icon-btn" id="theme" title="Toggle theme" aria-label="Toggle light/dark theme">◐</button>
+</div>
+
+<div class="research-body">
+  <div class="doc" id="doc">
+    <div class="empty"><span class="tag">loading…</span></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="content_rounds/registry.js"></script>
+<script>
+  "use strict";
+  const doc = document.getElementById('doc');
+
+  function toast(msg){
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('show'), 2000);
+  }
+  document.getElementById('theme').onclick = () => {
+    const cur = document.documentElement.getAttribute('data-theme');
+    const next = cur === 'dark' ? 'light' : cur === 'light' ? 'dark'
+      : (matchMedia('(prefers-color-scheme:dark)').matches ? 'light' : 'dark');
+    document.documentElement.setAttribute('data-theme', next);
+  };
+
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const ph = s => (!s || /^\(filling/.test(s)) ? '<span class="placeholder">' + esc(s || '(filling — agents running)') + '</span>' : esc(s);
+
+  /* ---------- pick + load round ---------- */
+  const rounds = (window.CONTENT_ROUNDS || []).slice().sort((a,b) => a - b);
+  const params = new URLSearchParams(location.search);
+  let wanted = parseInt(params.get('round'), 10);
+  if(!rounds.includes(wanted)) wanted = rounds.length ? Math.max(...rounds) : null;
+
+  const pick = document.getElementById('round-pick');
+  rounds.forEach(n => {
+    const o = document.createElement('option'); o.value = n; o.textContent = 'Round ' + n;
+    if(n === wanted) o.selected = true;
+    pick.appendChild(o);
+  });
+  pick.onchange = () => { location.search = '?round=' + pick.value; };
+
+  if(!wanted){
+    doc.innerHTML = '<div class="empty"><span class="tag">no rounds registered</span>' +
+      '<p>content_rounds/registry.js lists no rounds yet.</p></div>';
+  } else {
+    const s = document.createElement('script');
+    s.src = 'content_rounds/round' + wanted + '.js?_=' + Date.now();
+    s.onload = () => render(wanted);
+    s.onerror = () => {
+      doc.innerHTML = '<div class="empty"><span class="tag">failed to load</span>' +
+        '<p>content_rounds/round' + wanted + '.js did not load.</p></div>';
+    };
+    document.head.appendChild(s);
+  }
+
+  /* ---------- render ---------- */
+  function render(n){
+    const data = window['CONTENT_ROUND_' + n];
+    if(!data){
+      doc.innerHTML = '<div class="empty"><span class="tag">missing data</span>' +
+        '<p>window.CONTENT_ROUND_' + n + ' was not defined by round' + n + '.js.</p></div>';
+      return;
+    }
+    document.getElementById('bar-title').textContent = 'Round ' + data.round;
+    document.getElementById('episode-chip').textContent = 'ep ' + data.episode + ' · ' + (data.date || '—');
+
+    const rid = 'r' + data.round;
+    let html = '';
+
+    html += '<div class="r-meta">' +
+      '<span>Episode ' + esc(data.episode) + ' · Round ' + esc(data.round) + ' · ' + esc(data.date) + '</span>' +
+      '<span>Recording: <a href="' + esc(data.recordingUrl) + '" target="_blank" rel="noopener">' + esc(data.recordingId) + '</a></span>' +
+      '</div>';
+
+    html += '<h3>Audience brief highlights</h3>';
+    if(data.brief && data.brief.highlights && data.brief.highlights.length){
+      html += '<ul>' + data.brief.highlights.map(h => '<li>' + esc(h) + '</li>').join('') + '</ul>';
+    } else {
+      html += '<p class="placeholder">(filling — agents running)</p>';
+    }
+    html += '<p class="r1-ctx">Source: <code>' + esc(data.brief && data.brief.path) + '</code></p>';
+
+    html += '<h3>All candidate topics</h3>';
+    (data.topics || []).forEach(t => { html += renderTopic(rid, t); });
+    if(!(data.topics || []).length) html += '<p class="placeholder">(filling — agents running)</p>';
+
+    html += '<h3>Top recommended Substack posts</h3>';
+    (data.posts || []).slice().sort((a,b) => (a.rank||0) - (b.rank||0)).forEach(p => { html += renderPost(rid, p); });
+    if(!(data.posts || []).length) html += '<p class="placeholder">(filling — agents running)</p>';
+
+    html += '<h3>Excerpt-episode plans</h3>';
+    (data.excerpts || []).forEach(x => { html += renderExcerpt(rid, x); });
+    if(!(data.excerpts || []).length) html += '<p class="placeholder">(filling — agents running)</p>';
+
+    html += '<div class="r1-sendrow">' +
+      '<button class="icon-btn solid" id="send-ann">📤 Copy annotations</button>' +
+      '<span class="r1-dim">Pastes a window.CONTENT_' + rid.toUpperCase() + '_ANNOTATIONS object — paste it into content_rounds/' + rid + '_annotations.js and tell the terminal "process content round ' + data.round + '".</span>' +
+      '</div>';
+
+    doc.innerHTML = html;
+    bindAnnotations(rid);
+  }
+
+  function renderTopic(rid, t){
+    return '<div class="r1-item">' +
+      '<h4>' + ph(t.title) + ' <span class="r1-dim">' + esc(t.start) + '–' + esc(t.end) + ' · ' + esc(t.minutes) + 'm</span>' +
+      (t.viable ? '<span class="badge good">viable</span>' : '<span class="badge">marginal</span>') + '</h4>' +
+      '<p class="r1-ctx"><strong>Driver:</strong> ' + ph(t.driver) + '</p>' +
+      '<p class="r1-ctx">' + ph(t.summary) + '</p>' +
+      (t.quotes || []).map(q => '<blockquote>' + ph(q.text) + '<cite>' + esc(q.t) + ' — ' + esc(q.who) + '</cite></blockquote>').join('') +
+      '<div class="pillrow" data-key="' + esc(t.id) + '">' +
+        '<button data-v="promote">Promote to post</button>' +
+        '<button data-v="hold">Hold</button>' +
+        '<button data-v="drop">Drop</button>' +
+      '</div>' +
+      '<textarea data-ann="' + esc(t.id) + '" placeholder="Notes on this topic…"></textarea>' +
+    '</div>';
+  }
+
+  function renderPost(rid, p){
+    return '<div class="r1-item">' +
+      '<h4>#' + esc(p.rank) + ' · ' + ph(p.title) + '</h4>' +
+      '<p class="r1-ctx"><strong>Hook:</strong> ' + ph(p.hook) + '</p>' +
+      '<p class="kv"><strong>' + esc(p.size_words) + ' words</strong> target</p>' +
+      '<details class="expand"><summary>Outline, excerpts, crafting direction</summary><div class="inner">' +
+        '<p class="r1-ctx"><strong>Outline</strong></p>' +
+        '<ol class="outline">' + (p.outline || []).map(o => '<li>' + ph(o) + '</li>').join('') + '</ol>' +
+        '<p class="r1-ctx"><strong>Verbatim excerpts</strong></p>' +
+        (p.excerpts || []).map(q => '<blockquote>' + ph(q.text) + '<cite>' + esc(q.t) + ' — ' + esc(q.who) + '</cite></blockquote>').join('') +
+        '<p class="r1-ctx"><strong>Crafting direction:</strong> ' + ph(p.crafting) + '</p>' +
+        '<p class="r1-ctx"><strong>Why this earns attention:</strong> ' + ph(p.why) + '</p>' +
+      '</div></details>' +
+      '<div class="pillrow" data-key="' + esc(p.id) + '" style="margin-top:9px">' +
+        '<button data-v="approve">Post it</button>' +
+        '<button data-v="revise">Revise angle</button>' +
+        '<button data-v="skip">Skip</button>' +
+      '</div>' +
+      '<textarea data-ann="' + esc(p.id) + '" placeholder="Your spin…"></textarea>' +
+    '</div>';
+  }
+
+  function renderExcerpt(rid, x){
+    return '<div class="r1-item">' +
+      '<h4>' + ph(x.title) + ' <span class="badge">' + esc(x.status) + '</span></h4>' +
+      '<p class="r1-ctx"><strong>Supports post:</strong> ' + esc(x.post_id) + (x.edit_id ? ' · edit ' + esc(x.edit_id) : '') + '</p>' +
+      '<p class="r1-ctx"><strong>Cut ranges</strong></p>' +
+      '<ul>' + (x.ranges || []).map(r => '<li>' + esc(r.start) + '–' + esc(r.end) + ' — ' + ph(r.desc) + '</li>').join('') + '</ul>' +
+      '<details class="expand"><summary>VO intro script</summary><div class="inner"><p class="r1-ctx">' + ph(x.vo_script) + '</p></div></details>' +
+      '<div class="pillrow" data-key="' + esc(x.id) + '" style="margin-top:9px">' +
+        '<button data-v="approve">Approve cut</button>' +
+        '<button data-v="revise">Revise cut</button>' +
+        '<button data-v="skip">Skip</button>' +
+      '</div>' +
+      '<textarea data-ann="' + esc(x.id) + '" placeholder="Notes on this excerpt…"></textarea>' +
+    '</div>';
+  }
+
+  /* ---------- annotation engine (localStorage, keyed by round) ---------- */
+  function annCollect(rid){
+    const out = { savedAt: new Date().toISOString(), verdicts: {}, notes: {} };
+    const vPrefix = 'content.' + rid + '.v.', nPrefix = 'content.' + rid + '.n.';
+    for(let i = 0; i < localStorage.length; i++){
+      const k = localStorage.key(i);
+      if(k.startsWith(vPrefix)) out.verdicts[k.slice(vPrefix.length)] = localStorage.getItem(k);
+      if(k.startsWith(nPrefix)) out.notes[k.slice(nPrefix.length)] = localStorage.getItem(k);
+    }
+    return out;
+  }
+  function bindAnnotations(rid){
+    doc.querySelectorAll('.pillrow').forEach(row => {
+      const key = 'content.' + rid + '.v.' + row.dataset.key;
+      const saved = localStorage.getItem(key);
+      row.querySelectorAll('button').forEach(b => {
+        if(saved === b.dataset.v) b.classList.add('sel');
+        b.onclick = () => {
+          row.querySelectorAll('button').forEach(x => x.classList.remove('sel'));
+          b.classList.add('sel');
+          localStorage.setItem(key, b.dataset.v);
+        };
+      });
+    });
+    doc.querySelectorAll('textarea[data-ann]').forEach(t => {
+      const key = 'content.' + rid + '.n.' + t.dataset.ann;
+      t.value = localStorage.getItem(key) || '';
+      t.addEventListener('input', () => localStorage.setItem(key, t.value));
+    });
+    const send = document.getElementById('send-ann');
+    if(send) send.onclick = () => {
+      const data = annCollect(rid);
+      const varName = 'CONTENT_' + rid.toUpperCase() + '_ANNOTATIONS';
+      const text = 'window.' + varName + ' = ' + JSON.stringify(data, null, 1) + ';\n';
+      try{ navigator.clipboard.writeText(text); }catch(e){}
+      console.log("CC_VIZSAVE::" + JSON.stringify({ file: rid + '_annotations.js', payload: data }));
+      toast('Copied ' + varName + ' — paste into content_rounds/' + rid + '_annotations.js');
+    };
+  }
+</script>
+</body>
+</html>
