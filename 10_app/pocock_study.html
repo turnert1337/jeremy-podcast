@@ -1,0 +1,702 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pocock Study</title>
+<style>
+  :root{
+    --ground:#F3F4F6; --panel:#FFFFFF; --panel-2:#ECEEF1;
+    --ink:#1B1F26; --ink-soft:#5A6472; --ink-faint:#8A93A1;
+    --line:#E1E4E9; --line-strong:#C9CFD7;
+    --accent:#E0462A; --accent-ink:#FFFFFF; --brass:#8A6D1F;
+    --good:#25835A; --warn:#B07C22; --blue:#33619C; --chart-blue:#33619C;
+    --shadow:0 1px 2px rgba(20,25,35,.05), 0 4px 14px rgba(20,25,35,.05);
+    --radius:8px;
+    --mono:ui-monospace,"SF Mono","Cascadia Code",Menlo,Consolas,monospace;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --ground:#13161B; --panel:#1B1F26; --panel-2:#161A20;
+      --ink:#E5E8EC; --ink-soft:#9AA3B0; --ink-faint:#68717E;
+      --line:#272C34; --line-strong:#353C46;
+      --accent:#F05B3E; --accent-ink:#14100E; --brass:#C4A24A;
+      --good:#43A87A; --warn:#CE9A34; --blue:#6C95C8; --chart-blue:#4F8FE0;
+      --shadow:0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.3);
+    }
+  }
+  :root[data-theme="light"]{
+    --ground:#F3F4F6; --panel:#FFFFFF; --panel-2:#ECEEF1;
+    --ink:#1B1F26; --ink-soft:#5A6472; --ink-faint:#8A93A1;
+    --line:#E1E4E9; --line-strong:#C9CFD7;
+    --accent:#E0462A; --accent-ink:#FFFFFF; --brass:#8A6D1F;
+    --good:#25835A; --warn:#B07C22; --blue:#33619C; --chart-blue:#33619C;
+  }
+  :root[data-theme="dark"]{
+    --ground:#13161B; --panel:#1B1F26; --panel-2:#161A20;
+    --ink:#E5E8EC; --ink-soft:#9AA3B0; --ink-faint:#68717E;
+    --line:#272C34; --line-strong:#353C46;
+    --accent:#F05B3E; --accent-ink:#14100E; --brass:#C4A24A;
+    --good:#43A87A; --warn:#CE9A34; --blue:#6C95C8; --chart-blue:#4F8FE0;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0; height:100%}
+  body{background:var(--ground); color:var(--ink); font-family:var(--sans); line-height:1.5;
+    -webkit-font-smoothing:antialiased; min-height:100vh; display:flex; flex-direction:column}
+  button{font-family:inherit}
+
+  .bar{display:flex; align-items:center; gap:12px; padding:8px clamp(12px,2.5vw,18px); flex:none;
+    background:var(--panel); border-bottom:1px solid var(--line); flex-wrap:wrap; position:sticky; top:0; z-index:5}
+  .eyebrow{font-family:var(--mono); font-size:9.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--accent)}
+  .htxt{display:flex; align-items:baseline; gap:8px; margin-right:auto}
+  .htxt h2{margin:0; font-size:13.5px; font-weight:640; letter-spacing:-.01em}
+  .icon-btn{appearance:none; border:1px solid var(--line-strong); background:var(--panel-2);
+    color:var(--ink-soft); height:26px; min-width:26px; padding:0 8px; border-radius:6px;
+    cursor:pointer; font-size:12px; display:inline-flex; align-items:center; gap:5px; justify-content:center;
+    transition:border-color .15s, color .15s; text-decoration:none}
+  .icon-btn:hover{border-color:var(--accent); color:var(--accent)}
+  .chip{font-family:var(--mono); font-size:11px; letter-spacing:.04em; display:inline-flex; align-items:center;
+    gap:7px; padding:5px 10px; border:1px solid var(--line-strong); border-radius:100px;
+    background:var(--panel-2); color:var(--ink-soft)}
+
+  .research-body{flex:1; overflow-y:auto; padding:clamp(14px,2.5vw,24px)}
+  .doc{max-width:1000px; margin:0 auto}
+
+  .doc p, .doc li{font-size:13.5px; line-height:1.62; color:var(--ink)}
+  .doc p{margin:0 0 14px}
+  .doc ul, .doc ol{margin:0 0 16px; padding-left:22px}
+  .doc li{margin-bottom:7px}
+  .doc li strong, .doc p strong{font-weight:640}
+  .doc em{color:var(--ink-soft)}
+  .doc .r-meta{display:flex; flex-direction:column; gap:3px; margin-bottom:18px;
+    font-family:var(--mono); font-size:11px; color:var(--ink-faint); letter-spacing:.03em}
+  .doc .r-meta a{color:var(--blue)}
+  .doc .callout{border:1px solid color-mix(in srgb,var(--accent) 35%,var(--line));
+    border-left:3px solid var(--accent); background:var(--panel); border-radius:10px;
+    padding:15px 17px; margin-bottom:14px; font-size:13.5px; line-height:1.6}
+  .doc .callout.warn{border-left-color:var(--warn)}
+  .doc .callout.warn .cal-tag{color:var(--warn)}
+  .doc .cal-tag{font-family:var(--mono); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase;
+    color:var(--accent); display:block; margin-bottom:6px}
+  .doc table{border-collapse:collapse; width:100%; margin:0 0 16px; font-size:12.5px;
+    background:var(--panel); border:1px solid var(--line); border-radius:10px; overflow:hidden;
+    display:block; overflow-x:auto}
+  .doc thead th{font-family:var(--mono); font-size:10.5px; text-transform:uppercase;
+    letter-spacing:.08em; color:var(--ink-faint); text-align:left; padding:9px 12px;
+    border-bottom:1px solid var(--line-strong); background:var(--panel-2); white-space:nowrap}
+  .doc tbody td{padding:10px 12px; border-bottom:1px solid var(--line); vertical-align:top;
+    line-height:1.55; min-width:120px}
+  .doc tbody tr:last-child td{border-bottom:none}
+  .doc a{color:var(--blue)}
+  .doc ul.src{font-size:12px; color:var(--ink-soft)}
+  .doc ul.src li{margin-bottom:5px}
+  .doc code{font-family:var(--mono); font-size:11.5px; background:var(--panel-2);
+    border:1px solid var(--line); border-radius:4px; padding:1px 5px}
+
+  .doc h3{font-family:var(--mono); font-size:11.5px; letter-spacing:.12em; text-transform:uppercase;
+    color:var(--ink-soft); margin:34px 0 12px; padding-bottom:8px; border-bottom:1px solid var(--line);
+    display:flex; align-items:baseline; gap:8px}
+  .doc h3:first-of-type{margin-top:0}
+  .doc h3 .secno{color:var(--accent); font-weight:700}
+  .doc h4{font-size:14px; font-weight:650; margin:22px 0 9px; letter-spacing:-.01em; color:var(--ink)}
+  .doc h4:first-child{margin-top:0}
+
+  .badge{font-family:var(--mono); font-size:10px; letter-spacing:.04em; padding:2px 7px; border-radius:100px;
+    border:1px solid var(--line-strong); background:var(--panel-2); color:var(--ink-soft); white-space:nowrap}
+  .badge.good{color:var(--good); border-color:color-mix(in srgb,var(--good) 45%,var(--line))}
+  .badge.warn{color:var(--warn); border-color:color-mix(in srgb,var(--warn) 45%,var(--line))}
+  .badge.accent{color:var(--accent); border-color:color-mix(in srgb,var(--accent) 45%,var(--line))}
+  .badge.faint{color:var(--ink-faint); border-style:dashed}
+
+  /* ---- stat tiles ---- */
+  .stat-row{display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:10px; margin:0 0 20px}
+  .stat-tile{background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:14px 16px;
+    box-shadow:var(--shadow)}
+  .stat-tile .sv{font-family:var(--mono); font-size:24px; font-weight:650; color:var(--ink); letter-spacing:-.01em}
+  .stat-tile .sl{font-size:11.5px; color:var(--ink-soft); margin-top:3px; line-height:1.4}
+  .stat-tile .sb{margin-top:8px}
+
+  /* ---- chart cards ---- */
+  .chart-card{background:var(--panel); border:1px solid var(--line); border-radius:12px;
+    padding:16px 18px 14px; margin-bottom:10px; box-shadow:var(--shadow)}
+  .chart-card .ch-head{display:flex; align-items:baseline; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-bottom:4px}
+  .chart-card .ch-head h4{margin:0}
+  .chart-card .ch-sub{font-size:12px; color:var(--ink-soft); margin:0 0 10px}
+  .chart-wrap{position:relative; width:100%}
+  .chart-wrap svg{width:100%; height:auto; display:block; overflow:visible}
+  .axis line{stroke:var(--line)}
+  .axis text{fill:var(--ink-faint); font-family:var(--mono); font-size:9.5px}
+  .gridline{stroke:var(--line); stroke-dasharray:2,3}
+  .ann-line{stroke:var(--ink-faint); stroke-dasharray:3,3; stroke-width:1}
+  .ann-dot circle{fill:var(--panel); stroke:var(--accent); stroke-width:1.5}
+  .ann-dot text{fill:var(--panel); font-family:var(--mono); font-weight:700; font-size:9px}
+  .ann-dot .ann-bg{fill:var(--accent)}
+  .series-line{fill:none; stroke:var(--accent); stroke-width:2}
+  .series-dot{fill:var(--accent); cursor:pointer}
+  .series-dot:hover{stroke:var(--panel); stroke-width:2}
+  .bar-rect{cursor:pointer}
+  .bar-label{font-family:var(--mono); font-size:11px; fill:var(--ink); font-weight:650}
+  .bar-sub{font-family:var(--sans); font-size:10.5px; fill:var(--ink-soft)}
+  .legend-row{display:flex; flex-wrap:wrap; gap:10px 16px; margin:10px 0 2px; font-size:11.5px; color:var(--ink-soft)}
+  .legend-row .lg-item{display:flex; align-items:flex-start; gap:6px}
+  .legend-row .lg-num{font-family:var(--mono); font-weight:700; color:var(--accent-ink); background:var(--accent);
+    border-radius:50%; width:16px; height:16px; display:inline-flex; align-items:center; justify-content:center;
+    font-size:9.5px; flex:none; margin-top:1px}
+  .conf-note{font-size:11.5px; color:var(--ink-faint); margin:8px 0 0; line-height:1.5}
+  .conf-note strong{color:var(--ink-soft)}
+
+  .tooltip{position:fixed; pointer-events:none; background:var(--ink); color:var(--ground);
+    font-family:var(--mono); font-size:11px; padding:7px 10px; border-radius:7px; z-index:40;
+    opacity:0; transition:opacity .1s; max-width:220px; line-height:1.5; box-shadow:var(--shadow)}
+  .tooltip.show{opacity:1}
+
+  /* ---- funnel ---- */
+  .funnel{display:flex; align-items:stretch; gap:8px; margin:6px 0 4px; flex-wrap:wrap}
+  .funnel .fstep{flex:1; min-width:170px; background:var(--panel); border:1px solid var(--line);
+    border-radius:10px; padding:12px 13px; box-shadow:var(--shadow); position:relative}
+  .funnel .fstep .ftag{font-family:var(--mono); font-size:9.5px; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--accent); display:block; margin-bottom:5px}
+  .funnel .fstep h5{margin:0 0 5px; font-size:13px; font-weight:650}
+  .funnel .fstep p{font-size:11.5px; color:var(--ink-soft); margin:0; line-height:1.5}
+  .funnel .farrow{display:flex; align-items:center; justify-content:center; color:var(--ink-faint);
+    font-size:18px; flex:none; width:18px}
+  @media (max-width:760px){
+    .funnel{flex-direction:column}
+    .funnel .farrow{width:auto; transform:rotate(90deg); margin:-2px 0}
+  }
+
+  /* ---- mechanic / recommendation cards ---- */
+  .mech-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:10px; margin:6px 0 4px}
+  .mech-card{background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:13px 15px;
+    box-shadow:var(--shadow)}
+  .mech-card .mnum{font-family:var(--mono); color:var(--accent); font-weight:700; font-size:11px}
+  .mech-card h5{margin:4px 0 6px; font-size:13.5px; font-weight:650}
+  .mech-card p{font-size:12px; color:var(--ink-soft); margin:0; line-height:1.55}
+
+  .rec-card{background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:14px 16px;
+    margin-bottom:10px; box-shadow:var(--shadow)}
+  .rec-card .rhead{display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; margin-bottom:8px}
+  .rec-card .rhead .rnum{font-family:var(--mono); color:var(--accent); font-weight:700; font-size:13px}
+  .rec-card .rhead h5{margin:0; font-size:14px; font-weight:650; flex:1; min-width:180px}
+  .rec-row{display:grid; grid-template-columns:1fr 1fr; gap:10px 16px; margin-bottom:6px}
+  .rec-row .rlbl{font-family:var(--mono); font-size:9.5px; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--ink-faint); margin-bottom:3px; display:block}
+  .rec-row p{margin:0; font-size:12.5px; color:var(--ink); line-height:1.55}
+  @media (max-width:560px){ .rec-row{grid-template-columns:1fr} }
+
+  .toast{position:fixed; bottom:20px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:var(--ink); color:var(--ground); font-size:12.5px; padding:9px 16px; border-radius:100px;
+    opacity:0; pointer-events:none; transition:opacity .2s, transform .2s; z-index:50; font-family:var(--mono); letter-spacing:.03em}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <a class="icon-btn" href="index.html">← Control</a>
+  <div class="htxt">
+    <span class="eyebrow">Platform Study</span>
+    <h2>Matt Pocock — The Growth Playbook</h2>
+  </div>
+  <span class="chip">compiled 2026-10-10</span>
+  <button class="icon-btn" id="theme" title="Toggle theme" aria-label="Toggle light/dark theme">◐</button>
+</div>
+
+<div class="research-body">
+<div class="doc">
+
+  <div class="r-meta">
+    <span>Commissioned to study a practitioner-educator whose audience overlaps Turner's target (In Practice with Jeremy &amp; Turner → readlossy.substack.com + X) — not to clone his topic (TypeScript/AI tooling), but his distribution mechanics.</span>
+    <span>Sources: Wayback Machine archival scrape (41 Grade-A YouTube snapshots), GitHub API, live-site fetches, X snowflake-ID date decoding, web search synthesis. Adversarially fact-checked — see §6 for the verdict ledger. Corrections from the fact-check pass are binding and applied throughout; nothing below repeats a claim the fact-check overturned.</span>
+  </div>
+
+  <h3><span class="secno">§1</span>Verdict, first</h3>
+
+  <div class="stat-row">
+    <div class="stat-tile">
+      <div class="sv">399,000</div>
+      <div class="sl">YouTube subscribers, Oct 5 2026 — from 11,900 in Nov 2022</div>
+      <div class="sb"><span class="badge good">Grade A · archival</span></div>
+    </div>
+    <div class="stat-tile">
+      <div class="sv">+247,000</div>
+      <div class="sl">subs added Feb→Oct 2026 (8 months) — ~13× the 2024–25 steady-state monthly rate</div>
+      <div class="sb"><span class="badge good">Grade A · derived</span></div>
+    </div>
+    <div class="stat-tile">
+      <div class="sv">283,910★</div>
+      <div class="sl">mattpocock/skills GitHub stars vs React's 250,819★, checked 2026-10-10</div>
+      <div class="sb"><span class="badge good">Confirmed · GitHub API</span></div>
+    </div>
+  </div>
+
+  <p>Pocock's YouTube channel grew from 11,900 subscribers (Nov 2022) to 399,000 (Oct 2026) in four distinct phases: a 6.5x breakout year riding the Total TypeScript launch (2022–23), a long plateau typical of a mature single-topic channel (2024–early 2026, roughly +2,300 subs/month), and then a sharp re-acceleration beginning February 2026 that added more subscribers in eight months (+247,000) than the prior three-plus years combined.</p>
+  <p>The honest version of "why" is: <strong>the trigger is an open question, not a solved one.</strong> The two candidates either research pass reached for — AI Hero's record-sized cohort (enrollment opened May 17, 2026) and the skills repo going viral (first spike, April 27, 2026) — both happen <em>after</em> the inflection is already visible in the archival data (152K on Feb 11, 2026 → already 169K by Mar 29, before either event). A second fact-check pass caught this as a confirmed timing mismatch, not just an unproven claim: Wayback snapshots of aihero.dev from Feb 11 and Mar 1, 2026 show no cohort being promoted at all. The only event that precedes the inflection's start is the <code>mattpocock/skills</code> repo's creation on Feb 3, 2026 — but a repo merely existing, before any virality, is a weak mechanism for moving a subscriber count on a different platform. AI Hero itself is <em>not</em> new in 2026 regardless — it launched in 2025, with a 1,000-person first cohort in July 2025 that Pocock called his "most successful product launch ever" at the time; the 2026 date belongs to a later, larger, 2,500+-student cohort, not the product's origin. That correction stands, but it no longer doubles as a causal explanation for the inflection — no source found identifies what actually triggered the March 2026 acceleration.</p>
+  <p>What this means for a growth playbook: Pocock didn't get a lucky spike, he ran the exact same free-top-of-funnel-then-structured-paid-product playbook twice — Total TypeScript (2022–23, book + course) and AI Hero (2025–26, email course + cohorts + skills repo) — and the second run is now outperforming the first by a wide margin, on a longer runway of pre-seeded audience (the AI Hero newsletter was already at "3,000+ developers" in April 2025, over a year before the visible inflection). The skills repo is the most structurally interesting new piece: it's a fifth funnel leg (alongside X, YouTube, newsletter, courses) that functions as marketing, documentation, and product simultaneously, and it reaches working engineers who will never watch a YouTube tutorial.</p>
+  <p>Two things this study will <strong>not</strong> do, because the evidence doesn't support them: draw a causal arrow from any single dated event to the YouTube inflection, or chart his X/Twitter follower count. Both are explained in §2.</p>
+
+  <h3><span class="secno">§2</span>The Numbers</h3>
+
+  <h4>(a) YouTube subscribers, 2022–2026</h4>
+  <div class="chart-card">
+    <div class="ch-head"><h4>mattpocock/@mattpocockuk — subscriber count</h4><span class="badge good">Grade A — 41 archival points</span></div>
+    <p class="ch-sub">Every point below is pulled directly from an archived, server-rendered YouTube page (Wayback Machine), cross-checked against the paired video count. Markers ①–⑤ mark coincident events — <strong>timing, not causation.</strong> Note that ④ and ⑤ both land <em>after</em> the inflection is already visible on the line (see the causality check below) — only ③ precedes it, and even that is a weak mechanism pre-virality. Hover a point for the exact date and count.</p>
+    <div class="chart-wrap" id="chart-line"></div>
+    <div class="legend-row" id="line-legend"></div>
+    <p class="conf-note"><strong>Confidence:</strong> the series itself was independently re-fetched and confirmed for 5 spot-check dates during adversarial fact-check — the shape is solid, and every annotated event is independently confirmed as real. What's <em>not</em> confirmed is that any of them caused the inflection — two of the five postdate its start; see the callout below and §4.</p>
+  </div>
+
+  <div class="callout warn">
+    <span class="cal-tag">Causality check — the trigger is unresolved, not just unproven</span>
+    A second, more adversarial fact-check pass confirmed a timing mismatch, not merely an unproven claim: the YouTube series itself shows the inflection already underway by Mar 29, 2026 (169K, up from 152K on Feb 11) — a full acceleration, visible before either proposed cause occurred. Wayback snapshots of aihero.dev at Feb 11 and Mar 1, 2026 show <strong>no active cohort being promoted at all</strong>; the next cohort didn't open enrollment until May 17, 2026 (annotation not charted — it's a course-signup event, not a YouTube one). The skills repo's first viral spike (④, Apr 27, 2026, +5,551★ in a day, confirmed) also postdates the inflection's start by roughly a month. That leaves exactly one event that precedes it: the repo's creation on Feb 3, 2026 (③) — and a repo merely existing, before any virality, is a weak mechanism for moving a subscriber count on an entirely different platform. Correct framing: <strong>no identified event precedes and plausibly explains the inflection.</strong> This is presented as an open question, not a resolved mechanism — no causal arrow is drawn anywhere in this report.
+  </div>
+
+  <h4>(b) Growth by phase — subscribers added</h4>
+  <div class="chart-card">
+    <div class="ch-head"><h4>Subscribers added per growth phase</h4><span class="badge good">Grade A — derived from the series above</span></div>
+    <p class="ch-sub">Same Grade-A data, bucketed into the three phases the numbers themselves describe. Phase boundaries are descriptive (picked to match the narrative breaks in the archival record), not a statistical fit.</p>
+    <div class="chart-wrap" id="chart-bar"></div>
+    <p class="conf-note"><strong>Confidence:</strong> high — pure arithmetic on the archival series, no modeling. <strong>Read:</strong> the AI-pivot phase is adding subscribers roughly 13× faster per month than the 2024–25 steady state, and about 4.7× faster than the original Total TypeScript breakout year.</p>
+  </div>
+
+  <h4>(c) Skills-repo stars vs. React</h4>
+  <div class="chart-card">
+    <div class="ch-head"><h4>mattpocock/skills vs. facebook/react — GitHub stars</h4><span class="badge good">Confirmed · GitHub API · 2026-10-10</span></div>
+    <p class="ch-sub">Direct GitHub API check, not a press claim. A live count — it will already be out of date; treat as a dated snapshot, not a trend.</p>
+    <div class="chart-wrap" id="chart-stars"></div>
+    <p class="conf-note"><strong>Confidence:</strong> confirmed directly, highest grade in this study. <strong>Caveat:</strong> star count is a proxy for developer attention/credibility, not for audience size in the sense the rest of this report tracks (subscribers, list members) — it's included because it's the clearest evidence the skills-repo funnel leg is genuinely large, not self-reported.</p>
+  </div>
+
+  <div class="callout warn">
+    <span class="cal-tag">Why X, LinkedIn &amp; TikTok aren't charted</span>
+    Turner's own mental model of Pocock is probably anchored on X — that's a reasonable instinct, Pocock's "Ultimate TypeScript Thread" and tip format did build his original reputation there. But the evidence for a chartable X trend doesn't exist: X/Twitter profile pages have been pure client-rendered single-page apps for the entire archival window (earliest capture, May 2022), so no follower count ever appears in the static HTML a Wayback snapshot can read. Live scraping is blocked (403/Cloudflare), and no third-party tracker (Social Blade, Trackalytics, Nitter mirrors) has public archived data for this handle. The only numbers available are four different search-engine cache snippets for "today" — 287,400 / 268,900 / 330,567 / 228,500 — mutually inconsistent, undated relative to each other, and impossible to reconcile into one point, let alone a series. LinkedIn (~73K) and TikTok (~13.7K) have the same problem in miniature: a single undateable current-snapshot figure each, Grade D, no independent corroboration. Charting any of these as a line would manufacture a trend that doesn't exist in the sourceable record. If X matters to the growth story — and directionally it probably does, especially pre-2023 — it has to be argued qualitatively (see §3), not plotted.
+  </div>
+
+  <h3><span class="secno">§3</span>The Machine</h3>
+
+  <h4>The funnel</h4>
+  <div class="funnel">
+    <div class="fstep"><span class="ftag">Top of funnel</span><h5>X tips &amp; threads / YouTube long-form</h5><p>Numbered single-concept tips, the evergreen master-thread on X; full tutorials and crash-courses on YouTube. Reputation and discovery.</p></div>
+    <div class="farrow">→</div>
+    <div class="fstep"><span class="ftag">Free deep asset</span><h5>Essentials book / AI Hero email course / skills repo</h5><p>"100% free. Forever." Builds trust, captures the newsletter signup, no paywall.</p></div>
+    <div class="farrow">→</div>
+    <div class="fstep"><span class="ftag">Paid structured product</span><h5>Pro Essentials ($200) / Bundle ($400–500) / AI Hero cohorts</h5><p>Where the free-layer trust converts to revenue — exercises, bundles, live cohorts with office hours.</p></div>
+    <div class="farrow">→</div>
+    <div class="fstep"><span class="ftag">Connective tissue</span><h5>Newsletter (two lists: Total TypeScript + AI Hero)</h5><p>Re-markets to everyone who touched any free layer, regardless of entry point. Every free-asset push explicitly says "join my newsletter."</p></div>
+  </div>
+
+  <h4>Five load-bearing mechanics</h4>
+  <div class="mech-grid">
+    <div class="mech-card"><span class="mnum">01</span><h5>The single-concept tip</h5><p>Numbered "TypeScript Tip #N" posts and ~2-minute videos, each isolating exactly one mental model. His most externally-recognized format — other sites curate it as a genre.</p></div>
+    <div class="mech-card"><span class="mnum">02</span><h5>The evergreen master-thread</h5><p>One ongoing thread, repeatedly added to for years ("at least 3 more tips a week," April 2022) — a compounding asset, not a one-off post.</p></div>
+    <div class="mech-card"><span class="mnum">03</span><h5>The free-forever foundational asset</h5><p>A full 16-chapter book, an email course, a GitHub repo — each explicitly "free forever," doing trust-building before any paywall appears.</p></div>
+    <div class="mech-card"><span class="mnum">04</span><h5>Controversy as content</h5><p>The multi-year anti-enums campaign: one defensible-but-debatable technical stance, restated across formats and news hooks for three-plus years. Disagreement is the distribution mechanism, not a risk to it.</p></div>
+    <div class="mech-card"><span class="mnum">05</span><h5>The code repo as content</h5><p>The skills repo is simultaneously marketing, documentation, and product — a living artifact that reaches working engineers who'd never watch a tutorial.</p></div>
+  </div>
+
+  <h4>Posting frequency &amp; format mix</h4>
+  <table>
+    <thead><tr><th>Surface</th><th>Cadence</th><th>Status</th><th>Note</th></tr></thead>
+    <tbody>
+      <tr><td>X — TypeScript-tips era (2022–23)</td><td>≥3 substantive posts/week (stated minimum)</td><td><span class="badge good">Measured</span></td><td>Verbatim tweet, date snowflake-verified (Apr 1, 2022)</td></tr>
+      <tr><td>X — AI Hero/skills era (2025–26)</td><td>Irregular, milestone/build-log driven</td><td><span class="badge warn">Estimated</span></td><td>Qualitative shift observed, no exact count sourced</td></tr>
+      <tr><td>YouTube</td><td>~weekly (4–5 videos/month)</td><td><span class="badge warn">Estimated</span></td><td>Third-party tool estimate (vidIQ), not self-stated</td></tr>
+      <tr><td>Newsletter</td><td>Unknown</td><td><span class="badge faint">Unknown</span></td><td>Substack showed placeholder/"coming soon" content at research time — no cadence claim located</td></tr>
+      <tr><td>GitHub skills repo</td><td>Burst / re-ignition, not periodic</td><td><span class="badge warn">Estimated</span></td><td>Observed pattern (re-spikes months after initial release), not a stated cadence</td></tr>
+    </tbody>
+  </table>
+
+  <h3><span class="secno">§4</span>The AI Pivot Timeline <span class="badge good" style="margin-left:4px">snowflake-verified</span></h3>
+  <p>Corrected per the fact-check (see §6, discrepancy #1): AI Hero is an 18-month-old product as of this writing, not a 2026 launch. The dates below are reconstructed from X tweet snowflake IDs, independently decoded and validated against a date both research passes already agreed on before being trusted on the disputed ones.</p>
+  <table>
+    <thead><tr><th>Date</th><th>Event</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr><td>2025-03-05</td><td>DeepSearch course concept first discussed publicly ("agentic loops, UI, evals, query rewriting")</td><td><span class="badge good">Confirmed</span></td></tr>
+      <tr><td>2025-04-01</td><td>AI Hero newsletter already at "3,000+ Developers" — pre-seeded over a year before the visible YouTube inflection</td><td><span class="badge good">Confirmed</span></td></tr>
+      <tr><td>2025-04-11</td><td>"First section of first AI Hero course complete"</td><td><span class="badge good">Confirmed</span></td></tr>
+      <tr><td>2025-07-03</td><td>1,000 developers sign up for AI Hero's first cohort</td><td><span class="badge good">Confirmed</span></td></tr>
+      <tr><td>2025-07-14</td><td>First AI Hero cohort starts</td><td><span class="badge good">Confirmed</span></td></tr>
+      <tr><td>2025-07-15</td><td>Pocock: "my most successful product launch ever. Lightning struck twice"</td><td><span class="badge good">Confirmed</span></td></tr>
+      <tr><td>2026-02-03</td><td><code>mattpocock/skills</code> repo created — the only candidate event that precedes the YouTube inflection's Mar 2026 start; a weak mechanism pre-virality</td><td><span class="badge good">Confirmed (new finding)</span></td></tr>
+      <tr><td>2026-03-29</td><td>YouTube inflection already visible: 169,000 subs, up from 152,000 on Feb 11 — before either proposed cause below occurs</td><td><span class="badge good">Confirmed</span></td></tr>
+      <tr><td>2026-04-27</td><td>Skills repo's first viral spike: +5,551★ in a day (to 27,115 total), #1 on GitHub Trending Apr 26–29 — postdates the inflection's start</td><td><span class="badge good">Confirmed</span></td></tr>
+      <tr><td>2026-05-17</td><td>Enrollment opens for "AI Coding for Real Engineers" — a later, larger (2,500+ student) <strong>record cohort</strong>, not the AI Hero launch; also postdates the inflection's start, and aihero.dev was promoting no cohort at all as of Feb/Mar 2026</td><td><span class="badge good">Real date, relabeled</span></td></tr>
+      <tr><td>2026-06-01 → 06-12</td><td>That record cohort runs</td><td><span class="badge good">Confirmed</span></td></tr>
+      <tr><td>2026-09-04 → 09-06</td><td>Skills repo re-spikes, GitHub Trending #2, +2,200+★/day</td><td><span class="badge good">Confirmed (mer.vin)</span></td></tr>
+      <tr><td>2026-10-10</td><td>Skills repo: 283,910★ vs. React's 250,819★</td><td><span class="badge good">Confirmed (GitHub API)</span></td></tr>
+    </tbody>
+  </table>
+  <div class="callout warn">
+    <span class="cal-tag">Open question</span>
+    Reading the table in date order makes the mismatch plain: the inflection is already running by Mar 29, 2026, and <em>both</em> of the events usually credited for it — the skills-repo spike (Apr 27) and the record-cohort enrollment (May 17) — come later. Nothing in the available record identifies what actually triggered the March acceleration. This report does not resolve it; it flags it as open.
+  </div>
+  <p>Pocock's own framing for the pivot, per the Pragmatic Engineer interview (paraphrased from aggregated coverage, not a verbatim quote): as AI absorbed syntax-level programming knowledge, demand for "how do I write this type" content shrank while demand for judgment-level skills — specs, process, directing agents — grew. He calls this a <strong>knowledge vs. wisdom</strong> split and repointed his entire teaching apparatus at the wisdom side. Audience reaction, by his own account and by proxy metrics (1,000-person first cohort, the self-described best launch ever, a repo that out-stars React), reads as strongly positive; no organized pushback was located in this research pass, though that's an absence-of-evidence finding, not a confirmed absence of any.</p>
+
+  <h3><span class="secno">§5</span>What Transfers to Turner</h3>
+  <p>Mapped against the audience brief and the wedge already named for this project (bottom-up practitioner mechanics vs. top-down thinkpieces — "take a thing the thinkpieces predict, show the version you actually ran, state your opinion of where it breaks"). Each row: the Pocock mechanic, the Turner-specific translation, and an honest effort level. Flagged where a mechanic collides with Walmart employer discretion rather than recommending it blindly.</p>
+
+  <div class="rec-card">
+    <div class="rhead"><span class="rnum">1</span><h5>Single-concept tip → pull-quotes &amp; excerpt chapters</h5><span class="badge good">Already underway</span><span class="badge faint">Effort: Low</span></div>
+    <div class="rec-row">
+      <div><span class="rlbl">Pocock mechanic</span><p>Numbered Tip #N / 2-minute videos — one isolated mental model per unit, endlessly repackable across formats.</p></div>
+      <div><span class="rlbl">Turner translation</span><p>The 2–3 standalone pull-quotes per post and the ~7–8 minute excerpt-episode chapters already specified in the audience brief and the "exhaust plume" cross-link plan are the direct equivalent. Keep treating each clip as a complete, isolated unit — not a highlight reel.</p></div>
+    </div>
+  </div>
+
+  <div class="rec-card">
+    <div class="rhead"><span class="rnum">2</span><h5>The evergreen master-thread → a running "signals we're tracking" note</h5><span class="badge warn">Effort: Medium</span></div>
+    <div class="rec-row">
+      <div><span class="rlbl">Pocock mechanic</span><p>One ongoing thread, added to for years — low-commitment, high-frequency, doesn't compete with the flagship format.</p></div>
+      <div><span class="rlbl">Turner translation</span><p>The audience brief's own Simon Willison craft lesson calls for exactly this: a lower-commitment, frequently-updated format so cadence doesn't depend entirely on 1,400–2,200-word essay production. A running X thread or short Substack Note logging raw practitioner observations between full posts.</p></div>
+    </div>
+  </div>
+
+  <div class="rec-card">
+    <div class="rhead"><span class="rnum">3</span><h5>Newsletter as connective tissue → every surface routes to readlossy</h5><span class="badge good">Already underway</span><span class="badge faint">Effort: Low</span></div>
+    <div class="rec-row">
+      <div><span class="rlbl">Pocock mechanic</span><p>Every free-asset push explicitly says "join my newsletter" — the newsletter re-markets across every entry point regardless of which platform brought the reader in.</p></div>
+      <div><span class="rlbl">Turner translation</span><p>The cross-link lattice is already designed (excerpt episode → each post → footer link → show notes → back to readlossy). The discipline ask is just: never let a clip or post skip the explicit "subscribe" close, the way Pocock never does.</p></div>
+    </div>
+  </div>
+
+  <div class="rec-card">
+    <div class="rhead"><span class="rnum">4</span><h5>Controversy as content → yes, but scoped away from Walmart</h5><span class="badge warn">⚠ Employer-discretion flag</span><span class="badge faint">Effort: Low</span></div>
+    <div class="rec-row">
+      <div><span class="rlbl">Pocock mechanic</span><p>A multi-year, repeated, defensible-but-debatable technical stance (anti-enums) that uses disagreement as the distribution mechanism, restated across formats and news hooks for years.</p></div>
+      <div><span class="rlbl">Turner translation</span><p>This transfers cleanly at the craft level — stakes like "prompt engineering is a distraction from management engineering" are exactly this move, and the audience-response research independently confirms contestation is a feature, not a bug, for this readership. The collision: Turner works at Walmart. The mechanic must stay scoped to agent-management/harness-building theory, never drift into anything readable as a statement about Walmart's AI strategy, vendors, or internal practice. Recommend adopting the pattern, not the specific stance, and treating "could this be read as about my employer" as a standing filter before any spiky post ships.</p></div>
+    </div>
+  </div>
+
+  <div class="rec-card">
+    <div class="rhead"><span class="rnum">5</span><h5>Code-repo-as-content → not DCC itself</h5><span class="badge warn">⚠ IP-lock flag</span><span class="badge faint">Effort: High</span></div>
+    <div class="rec-row">
+      <div><span class="rlbl">Pocock mechanic</span><p>A free, forkable GitHub repo that is simultaneously marketing, documentation, and product — now a bigger credibility surface than his YouTube channel.</p></div>
+      <div><span class="rlbl">Turner translation</span><p>The nearest available equivalent is something small and genuinely shareable pulled off the podcast's build-your-own-harness thread — a prompt pack, a call-sheet template, a standalone "coach loop" skill file. Explicitly NOT the Dev Command Center frame itself: the DCC IP posture is locked to outbound-donations-only per standing operator decision, and this recommendation does not reopen that question.</p></div>
+    </div>
+  </div>
+
+  <div class="rec-card">
+    <div class="rhead"><span class="rnum">6</span><h5>Platform-role separation → matches the wedge almost exactly</h5><span class="badge good">Already underway</span><span class="badge faint">Effort: Low</span></div>
+    <div class="rec-row">
+      <div><span class="rlbl">Pocock mechanic</span><p>X = discovery/reputation, YouTube/long-form = authority, newsletter = owned re-marketing layer — each platform does one job, never overlapping.</p></div>
+      <div><span class="rlbl">Turner translation</span><p>Already the plan: X carries essays and pull-quotes, LinkedIn is explicitly treated as dead weight (0.69x reach, confirmed in the audience research), the podcast is the long-form authority surface, Substack is the owned layer. This is a discipline ask, not new building — keep every platform in its lane.</p></div>
+    </div>
+  </div>
+
+  <div class="rec-card">
+    <div class="rhead"><span class="rnum">7</span><h5>Free-forever foundational asset → the essay archive itself</h5><span class="badge faint">Effort: High · later</span></div>
+    <div class="rec-row">
+      <div><span class="rlbl">Pocock mechanic</span><p>A full-length free book (Essentials) doing top-of-funnel trust-building ahead of any paid product.</p></div>
+      <div><span class="rlbl">Turner translation</span><p>Turner has no paid product yet, so the direct analogue is simpler: keep the entire readlossy essay archive free-forever, and once the series has enough posts, consider compiling them into one reference document the way Pocock's book compiled his tips. Premature to build now — flagged as a future option, not a near-term task.</p></div>
+    </div>
+  </div>
+
+  <div class="rec-card">
+    <div class="rhead"><span class="rnum">8</span><h5>Naming the pivot → let "taste compounds" do the work</h5><span class="badge warn">Effort: Medium</span></div>
+    <div class="rec-row">
+      <div><span class="rlbl">Pocock mechanic</span><p>Pocock names his own shift ("knowledge vs. wisdom") rather than letting it look reactive — a coined term that compounds distribution only if it survives contact with skeptics (cf. swyx's "AI Engineer").</p></div>
+      <div><span class="rlbl">Turner translation</span><p>Cluster B's working thesis already has a candidate nameable phrase — "orchestration-as-a-service will commoditize the floor; your harness is your taste, and taste compounds." Recommend deliberately repeating "taste compounds" / "the floor" across the series and tracking, the way Pocock implicitly does, whether anyone cites it unprompted.</p></div>
+    </div>
+  </div>
+
+  <div class="rec-card">
+    <div class="rhead"><span class="rnum">9</span><h5>Cadence discipline → the one-extra-post-a-week rule</h5><span class="badge warn">Effort: Medium · ongoing</span></div>
+    <div class="rec-row">
+      <div><span class="rlbl">Pocock mechanic</span><p>≥3 tips/week sustained through his steepest growth phase — a trackable, numbered series, not sporadic output.</p></div>
+      <div><span class="rlbl">Turner translation</span><p>The audience brief already names "one extra post/week" as the single highest-leverage cadence variable across a 13,844-newsletter study. This is the same mechanic Pocock ran at his steepest growth phase — treat the brief's cadence prescription as load-bearing, not optional.</p></div>
+    </div>
+  </div>
+
+  <div class="rec-card">
+    <div class="rhead"><span class="rnum">10</span><h5>Cohort / live format → not yet</h5><span class="badge faint">Effort: High · not urgent</span></div>
+    <div class="rec-row">
+      <div><span class="rlbl">Pocock mechanic</span><p>AI Hero added live-cohort office hours as a new paid format, the highest-converting layer once an engaged list exists.</p></div>
+      <div><span class="rlbl">Turner translation</span><p>The most speculative item here. Readlossy is pre-launch; a paid cohort or live session is a plausible eventual monetization step once a real list exists, mirroring AI Hero's format innovation over Total TypeScript's book-only model — but premature now. Flagged for a future round, not this one.</p></div>
+    </div>
+  </div>
+
+  <h3><span class="secno">§6</span>Sources &amp; Verification</h3>
+
+  <h4>Fact-check verdict counts (17 load-bearing claims, two independent review passes)</h4>
+  <table>
+    <thead><tr><th>Verdict</th><th>Count</th><th>Examples</th></tr></thead>
+    <tbody>
+      <tr><td><span class="badge good">Confirmed</span></td><td>13</td><td>YouTube series shape, AI Hero 2025 cohort timeline, skills-repo-vs-React star count, both skills-repo viral spikes (Apr 27 &amp; Sept 4–6, 2026), anti-enums campaign, Pragmatic Engineer $2.5M figure</td></tr>
+      <tr><td><span class="badge warn">Contradicted — framing and timing</span></td><td>2</td><td>"AI Hero launching caused the inflection" — both proposed causes confirmed to postdate the inflection's own start; newsletter 3,500→18,000 starting-point claim</td></tr>
+      <tr><td><span class="badge good">Real, mislabeled</span></td><td>1</td><td>May 17, 2026 "enrollment opened" — real date, wrong product-launch label</td></tr>
+      <tr><td><span class="badge faint">Unverifiable</span></td><td>2</td><td>X/Twitter follower count (4 inconsistent figures, re-checked twice); LinkedIn/TikTok current snapshots</td></tr>
+    </tbody>
+  </table>
+  <p style="font-size:11.5px; color:var(--ink-faint); margin-top:-6px">A second adversarial pass on 02c revised the April 27, 2026 skills-repo spike from "uncorroborated" to <strong>confirmed</strong> (star-history.com + independent press corroboration), and separately established that neither proposed cause for the YouTube inflection actually precedes it — see §1 and §4.</p>
+
+  <h4>Confidence grade legend</h4>
+  <table>
+    <thead><tr><th>Grade</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td><strong>A</strong></td><td>Archival/primary — verifiable byte-for-byte from an archived page or direct API check</td></tr>
+      <tr><td><strong>B</strong></td><td>Third-party tracker — live/current only, no historical archive</td></tr>
+      <tr><td><strong>C</strong></td><td>Self-reported or press-reported with some date anchor</td></tr>
+      <tr><td><strong>D</strong></td><td>Secondhand / weakly dated / inconsistent across sources</td></tr>
+    </tbody>
+  </table>
+
+  <h4>Key sources</h4>
+  <ul class="src">
+    <li>YouTube subscriber series — 41 Wayback Machine snapshots of youtube.com/@mattpocockuk, Nov 2022–Oct 2026 (full list in <code>20_research/02a_pocock_numbers.md</code>)</li>
+    <li><a href="https://badass.dev/launch-of-a-developer-education-product" target="_blank" rel="noopener">badass.dev — "Launch of a Developer Education Product"</a> — Total TypeScript revenue/learner figures</li>
+    <li><a href="https://www.aihero.dev/" target="_blank" rel="noopener">aihero.dev</a> + Wayback snapshots (Apr 2025, May 2025) — AI Hero newsletter size, positioning</li>
+    <li><a href="https://www.mattpocock.com/" target="_blank" rel="noopener">mattpocock.com</a> — hub-site routing hierarchy (AI Hero now the lead CTA)</li>
+    <li><a href="https://github.com/mattpocock/skills" target="_blank" rel="noopener">github.com/mattpocock/skills</a> — repo creation date, star count (GitHub API, checked 2026-10-10)</li>
+    <li><a href="https://newsletter.pragmaticengineer.com/p/ai-skills-with-matt-pocock" target="_blank" rel="noopener">Pragmatic Engineer — "AI Skills with Matt Pocock"</a> — career/pivot narrative, $2.5M figure</li>
+    <li><a href="https://mer.vin/news/mattpocockuk-skills-the-skill-pack-topping-github-trending/" target="_blank" rel="noopener">mer.vin</a> — Sept 2026 GitHub Trending spike, confirmed</li>
+    <li><a href="https://www.linkedin.com/posts/gergelyorosz_pretty-incredible-how-the-skills-repo-activity-7506412040731779074-eDMt" target="_blank" rel="noopener">Gergely Orosz, LinkedIn</a> — third-party validation of skills-repo success</li>
+    <li>Full research trail: <code>20_research/02a_pocock_numbers.md</code>, <code>02b_pocock_strategy.md</code>, <code>02c_pocock_factcheck.md</code> (binding corrections), <code>01_audience_response_brief.md</code></li>
+  </ul>
+
+  <p style="margin-top:24px; font-size:11.5px; color:var(--ink-faint)">Built solo for the Jeremy Podcast project · charts hand-built inline SVG, no charting library, no CDN · theme follows system / toggle above.</p>
+
+</div>
+</div>
+
+<div class="tooltip" id="tooltip"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+
+/* ---------- theme toggle (house pattern) ---------- */
+document.getElementById('theme').onclick = function () {
+  var cur = document.documentElement.getAttribute('data-theme');
+  var next = cur === 'dark' ? 'light' : cur === 'light' ? 'dark'
+    : (matchMedia('(prefers-color-scheme:dark)').matches ? 'light' : 'dark');
+  document.documentElement.setAttribute('data-theme', next);
+};
+
+/* ---------- shared tooltip ---------- */
+var tipEl = document.getElementById('tooltip');
+function showTip(html, x, y) {
+  tipEl.innerHTML = html;
+  tipEl.style.left = (x + 14) + 'px';
+  tipEl.style.top = (y - 10) + 'px';
+  tipEl.classList.add('show');
+}
+function hideTip() { tipEl.classList.remove('show'); }
+
+var NS = 'http://www.w3.org/2000/svg';
+function svgEl(tag, attrs) {
+  var el = document.createElementNS(NS, tag);
+  for (var k in attrs) { el.setAttribute(k, attrs[k]); }
+  return el;
+}
+function fmt(n) { return n.toLocaleString('en-US'); }
+function fmtDate(iso) {
+  var d = new Date(iso + 'T00:00:00Z');
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+}
+
+/* ========== CHART A: YouTube subscribers, 2022-2026 ========== */
+var YT_DATA = [
+  ["2022-11-24",11900],["2022-11-27",12400],["2023-02-04",34400],["2023-02-25",38200],
+  ["2023-03-29",44100],["2023-04-23",51000],["2023-06-30",56700],["2023-07-19",66100],
+  ["2023-08-08",70200],["2023-09-14",76800],["2023-12-05",83300],["2023-12-17",84200],
+  ["2024-01-23",88800],["2024-03-15",95800],["2024-05-01",98000],["2024-05-26",99000],
+  ["2024-07-09",102000],["2024-08-22",104000],["2024-09-18",105000],["2024-11-19",107000],
+  ["2024-12-27",109000],["2025-02-12",111000],["2025-05-16",118000],["2025-06-13",124000],
+  ["2025-08-27",129000],["2025-10-28",137000],["2025-12-18",144000],["2026-01-02",145000],
+  ["2026-02-11",152000],["2026-03-29",169000],["2026-04-17",174000],["2026-05-02",194000],
+  ["2026-06-02",252000],["2026-07-09",292000],["2026-08-06",335000],["2026-09-14",381000],
+  ["2026-09-16",382000],["2026-09-20",379000],["2026-09-24",390000],["2026-09-27",392000],
+  ["2026-10-05",399000]
+];
+var ANNOTATIONS = [
+  { date: "2022-12-01", num: 1, label: "Total TypeScript launch window (pre-release push)" },
+  { date: "2025-07-14", num: 2, label: "AI Hero's first cohort starts (1,000 signups)" },
+  { date: "2026-02-03", num: 3, label: "mattpocock/skills repo created — precedes the inflection, weak mechanism pre-virality" },
+  { date: "2026-04-27", num: 4, label: "Skills repo's first viral spike, +5,551★/day (#1 trending) — postdates the inflection's Mar 29 start" },
+  { date: "2026-09-05", num: 5, label: "Skills repo hits #2 on GitHub Trending (+2,200★/day) — also postdates the start" }
+];
+
+function buildLineChart() {
+  var W = 960, H = 340, padL = 54, padR = 20, padT = 18, padB = 34;
+  var plotW = W - padL - padR, plotH = H - padT - padB;
+
+  var dates = YT_DATA.map(function (d) { return new Date(d[0] + 'T00:00:00Z').getTime(); });
+  var vals = YT_DATA.map(function (d) { return d[1]; });
+  var minX = Math.min.apply(null, dates), maxX = Math.max.apply(null, dates);
+  var maxY = 420000;
+
+  function xPos(t) { return padL + (t - minX) / (maxX - minX) * plotW; }
+  function yPos(v) { return padT + plotH - (v / maxY) * plotH; }
+
+  var svg = svgEl('svg', { viewBox: '0 0 ' + W + ' ' + H, preserveAspectRatio: 'xMidYMid meet', role: 'img', 'aria-label': 'YouTube subscriber growth, 2022 to 2026' });
+
+  // gridlines + y axis labels
+  var ticks = [0, 100000, 200000, 300000, 400000];
+  ticks.forEach(function (t) {
+    var y = yPos(t);
+    svg.appendChild(svgEl('line', { class: 'gridline', x1: padL, x2: W - padR, y1: y, y2: y }));
+    var txt = svgEl('text', { class: '', x: padL - 8, y: y + 3, 'text-anchor': 'end' });
+    txt.setAttribute('fill', 'var(--ink-faint)');
+    txt.setAttribute('font-family', 'var(--mono)');
+    txt.setAttribute('font-size', '9.5');
+    txt.textContent = t === 0 ? '0' : (t / 1000) + 'K';
+    svg.appendChild(txt);
+  });
+
+  // x axis year labels
+  var years = ['2023-01-01', '2024-01-01', '2025-01-01', '2026-01-01'];
+  years.forEach(function (y) {
+    var t = new Date(y + 'T00:00:00Z').getTime();
+    if (t < minX || t > maxX) return;
+    var x = xPos(t);
+    svg.appendChild(svgEl('line', { class: 'axis', x1: x, x2: x, y1: padT, y2: H - padB + 4 }));
+    var txt = svgEl('text', { x: x, y: H - padB + 18, 'text-anchor': 'middle' });
+    txt.setAttribute('fill', 'var(--ink-faint)');
+    txt.setAttribute('font-family', 'var(--mono)');
+    txt.setAttribute('font-size', '9.5');
+    txt.textContent = y.slice(0, 4);
+    svg.appendChild(txt);
+  });
+  svg.appendChild(svgEl('line', { class: 'axis', x1: padL, x2: W - padR, y1: H - padB, y2: H - padB }));
+
+  // line path
+  var pathD = YT_DATA.map(function (d, i) {
+    var x = xPos(new Date(d[0] + 'T00:00:00Z').getTime());
+    var y = yPos(d[1]);
+    return (i === 0 ? 'M' : 'L') + x.toFixed(1) + ',' + y.toFixed(1);
+  }).join(' ');
+  svg.appendChild(svgEl('path', { class: 'series-line', d: pathD }));
+
+  // annotation vertical markers (behind dots)
+  ANNOTATIONS.forEach(function (a) {
+    var t = new Date(a.date + 'T00:00:00Z').getTime();
+    var x = xPos(t);
+    svg.appendChild(svgEl('line', { class: 'ann-line', x1: x, x2: x, y1: padT, y2: H - padB }));
+    var g = svgEl('g', { class: 'ann-dot' });
+    g.appendChild(svgEl('circle', { class: 'ann-bg', cx: x, cy: padT - 2, r: 8 }));
+    var t2 = svgEl('text', { x: x, y: padT + 1, 'text-anchor': 'middle' });
+    t2.textContent = a.num;
+    g.appendChild(t2);
+    svg.appendChild(g);
+  });
+
+  // data point markers (hover targets)
+  YT_DATA.forEach(function (d) {
+    var x = xPos(new Date(d[0] + 'T00:00:00Z').getTime());
+    var y = yPos(d[1]);
+    var c = svgEl('circle', { class: 'series-dot', cx: x, cy: y, r: 5 });
+    c.addEventListener('mouseenter', function (e) {
+      showTip('<strong>' + fmtDate(d[0]) + '</strong><br>' + fmt(d[1]) + ' subscribers', e.clientX, e.clientY);
+    });
+    c.addEventListener('mousemove', function (e) { tipEl.style.left = (e.clientX + 14) + 'px'; tipEl.style.top = (e.clientY - 10) + 'px'; });
+    c.addEventListener('mouseleave', hideTip);
+    svg.appendChild(c);
+  });
+
+  document.getElementById('chart-line').appendChild(svg);
+
+  var legend = document.getElementById('line-legend');
+  ANNOTATIONS.forEach(function (a) {
+    var item = document.createElement('div');
+    item.className = 'lg-item';
+    item.innerHTML = '<span class="lg-num">' + a.num + '</span><span>' + fmtDate(a.date) + ' — ' + a.label + '</span>';
+    legend.appendChild(item);
+  });
+}
+
+/* ========== CHART B: growth by phase (bar) ========== */
+var PHASES = [
+  { name: 'Total TypeScript push', range: 'Nov 2022 – Sep 2023', months: 9.7, delta: 64900 },
+  { name: 'Steady-state TS educator', range: 'Jan 2024 – Jan 2026', months: 23.3, delta: 56200 },
+  { name: 'AI pivot inflection', range: 'Feb – Oct 2026', months: 7.8, delta: 247000 }
+];
+
+function buildBarChart() {
+  var W = 960, H = 220, padL = 20, padR = 20, padT = 20, padB = 20;
+  var plotW = W - padL - padR;
+  var gap = 28;
+  var barW = (plotW - gap * (PHASES.length - 1)) / PHASES.length;
+  var maxDelta = Math.max.apply(null, PHASES.map(function (p) { return p.delta; }));
+  var maxBarH = H - padT - padB - 36;
+
+  var svg = svgEl('svg', { viewBox: '0 0 ' + W + ' ' + H, preserveAspectRatio: 'xMidYMid meet', role: 'img', 'aria-label': 'Subscribers added per growth phase' });
+
+  PHASES.forEach(function (p, i) {
+    var x = padL + i * (barW + gap);
+    var bh = (p.delta / maxDelta) * maxBarH;
+    var y = H - padB - bh;
+    var rate = Math.round(p.delta / p.months);
+
+    var rect = svgEl('rect', { class: 'bar-rect', x: x, y: y, width: barW, height: bh, rx: 6, fill: 'var(--accent)' });
+    rect.addEventListener('mouseenter', function (e) {
+      showTip('<strong>' + p.name + '</strong><br>' + p.range + '<br>+' + fmt(p.delta) + ' subs (~' + fmt(rate) + '/mo)', e.clientX, e.clientY);
+    });
+    rect.addEventListener('mousemove', function (e) { tipEl.style.left = (e.clientX + 14) + 'px'; tipEl.style.top = (e.clientY - 10) + 'px'; });
+    rect.addEventListener('mouseleave', hideTip);
+    svg.appendChild(rect);
+
+    var lbl = svgEl('text', { class: 'bar-label', x: x + barW / 2, y: y - 8, 'text-anchor': 'middle' });
+    lbl.textContent = '+' + fmt(p.delta);
+    svg.appendChild(lbl);
+
+    var name = svgEl('text', { class: 'bar-sub', x: x + barW / 2, y: H - padB + 14, 'text-anchor': 'middle' });
+    name.textContent = p.name;
+    svg.appendChild(name);
+
+    var rng = svgEl('text', { class: 'bar-sub', x: x + barW / 2, y: H - padB + 27, 'text-anchor': 'middle' });
+    rng.setAttribute('font-size', '9.5');
+    rng.textContent = p.range;
+    svg.appendChild(rng);
+  });
+
+  document.getElementById('chart-bar').appendChild(svg);
+}
+
+/* ========== CHART C: skills repo vs React stars ========== */
+var STARS = [
+  { name: 'mattpocock/skills', value: 283910, color: 'var(--accent)' },
+  { name: 'facebook/react', value: 250819, color: 'var(--chart-blue)' }
+];
+
+function buildStarsChart() {
+  var W = 960, H = 160, padL = 20, padR = 20, padT = 16, padB = 16;
+  var plotW = W - padL - padR;
+  var maxV = Math.max.apply(null, STARS.map(function (s) { return s.value; }));
+  var rowH = (H - padT - padB) / STARS.length;
+  var barMax = plotW - 160;
+
+  var svg = svgEl('svg', { viewBox: '0 0 ' + W + ' ' + H, preserveAspectRatio: 'xMidYMid meet', role: 'img', 'aria-label': 'GitHub star comparison, skills repo vs React' });
+
+  STARS.forEach(function (s, i) {
+    var y = padT + i * rowH + rowH * 0.28;
+    var bh = rowH * 0.44;
+    var bw = (s.value / maxV) * barMax;
+
+    var label = svgEl('text', { x: padL, y: y - 6, 'font-family': 'var(--mono)', 'font-size': '11' });
+    label.setAttribute('fill', 'var(--ink-soft)');
+    label.textContent = s.name;
+    svg.appendChild(label);
+
+    var rect = svgEl('rect', { class: 'bar-rect', x: padL, y: y, width: Math.max(bw, 2), height: bh, rx: 5, fill: s.color });
+    rect.addEventListener('mouseenter', function (e) {
+      showTip('<strong>' + s.name + '</strong><br>' + fmt(s.value) + ' stars', e.clientX, e.clientY);
+    });
+    rect.addEventListener('mousemove', function (e) { tipEl.style.left = (e.clientX + 14) + 'px'; tipEl.style.top = (e.clientY - 10) + 'px'; });
+    rect.addEventListener('mouseleave', hideTip);
+    svg.appendChild(rect);
+
+    var val = svgEl('text', { class: 'bar-label', x: padL + bw + 10, y: y + bh / 2 + 4 });
+    val.textContent = fmt(s.value) + '★';
+    svg.appendChild(val);
+  });
+
+  document.getElementById('chart-stars').appendChild(svg);
+}
+
+buildLineChart();
+buildBarChart();
+buildStarsChart();
+</script>
+</body>
+</html>
