@@ -978,18 +978,19 @@ window.CONTENT_ROUND_3 = {
         }
       ],
       "vo_script": {
-        "intro": "This is \"In Practice with Jeremy and Turner\" -- three excerpts, pulled from a much longer conversation between Jeremy Hodge and Turner Tomlinson, voiced here by a synthetic narrator. Each chapter gets a deeper look in a Substack post of the same name, over at readlossy.substack.com. Here's the first one.",
+        "intro": "Hi — this is an AI narrator. I'm introducing a curated set of excerpts from a longer conversation between Jeremy Hodge and Turner Tomlinson. Each chapter gets a deeper look in a Substack post of the same name, over at readlossy.substack.com. Here's the first one.",
         "chapter1": "Chapter one: \"How to Defuse a Twenty-Seven-Page Slop Bomb.\" Turner gets handed a bloated AI report, and the two of them work out when fluency is actually substance.",
         "chapter2": "Chapter three: \"My 150 Apple Notes Became a Compost Heap.\" Turner's notes app as raw material, a riff engine, and simulated beta readers for the novel he's rebuilding.",
         "chapter3": "Chapter two: \"I Burned a Five-Hour Rate Limit in One Hour.\" A subagent bug burns through a rate limit -- the receipt for a bigger claim: you can't delegate what you can't verify."
       },
-      "vo_voice": "ElevenLabs Matilda (XrExE9yKIg1WjnnlVkGX), eleven_multilingual_v2 -- auditioned against River and George; picked for being an unmistakably non-host (female) voice against two male hosts, reinforcing the no-impersonation disclosure.",
+      "vo_voice": "PENDING OPERATOR PICK -- audition page live at 10_app/vo_auditions.html. Casting brief: warm, friendly, practical, efficient. Four candidates re-auditioned against that brief (Bella, Sarah, Chris, Matilda -- River and George dropped as sleepy-neutral/announcer-grand risks); Bella and Sarah are the two strongest textual fits and are the ones reading the full real intro script on the page. Matilda was the first-pass pick but was never actually listened to -- do not treat it as final.",
       "edit_id": "6acc15f6bd2b7feb98c7f836",
       "runtime": "20:47",
-      "status": "cut + VO assembled (draft, no export, no publish)",
+      "status": "cut (draft, no export, no publish) -- VO intentionally NOT inserted. An earlier pass guessed Matilda and inserted 4 VO clips (rev 11); those were removed (rev 12, Overlays track confirmed empty) once it was clear the voice brief and the AI-narrator-upfront disclosure were still unresolved. Audition page is up; once the operator names a voice, render the 4 finals and re-insert on the Overlays track at the same trackTime offsets (643331, 663289/Ch1 handoff already covered by intro overlay start, 284439, 467031 ms) with fade-in per the Ep1 pattern.",
       "notes": {
         "chapter_order_blocked": "Post-rank chapter order (p1,p2,p3 = Slop Bomb, Rate Limit, Apple Notes) was the goal but is NOT achievable via available Riverside MCP tools -- reorder_timeline and create_edit_from_segments are gated off for this account, and manual split+move surgery was assessed as unsafe (synced cuts are keyed to absolute timeline position, not content, so moving a clip does not move the cuts that hide the gaps around it). The edit instead plays in tape-chronological order: Slop Bomb, Apple Notes, Rate Limit. Manual fix: drag the Rate Limit chapter block to sit second in the Riverside web editor, then swap its VO handoff with Apple Notes' handoff. See 10_app/reports/ep03_chaptered_episode.md for full detail.",
-        "abandoned_scratch_edit": "6acc170e9762d63e7152a835 -- clone used only to test the reorder; left mid-surgery (tracks split, nothing moved), safe to discard, not used in the final deliverable."
+        "abandoned_scratch_edit": "6acc170e9762d63e7152a835 -- clone used only to test the reorder; left mid-surgery (tracks split, nothing moved), safe to discard, not used in the final deliverable.",
+        "vo_pending_pick": "See vo_voice above. 10_app/podcast_assets/ep03_vo/_pending_pick/ holds the quarantined first-pass Matilda renders (intro.mp3 text is now stale; chapter1-3.mp3 text still matches current scripts but voice is unconfirmed) -- not deleted, not used."
       }
     }
   ],
