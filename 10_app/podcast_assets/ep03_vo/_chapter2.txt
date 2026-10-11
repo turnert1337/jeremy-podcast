@@ -1,0 +1,1 @@
+Chapter two: "I Burned a Five-Hour Rate Limit in One Hour." A subagent bug burns through a rate limit -- the receipt for a bigger claim: you can't delegate what you can't verify.

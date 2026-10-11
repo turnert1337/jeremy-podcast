@@ -957,54 +957,40 @@ window.CONTENT_ROUND_3 = {
   "excerpts": [
     {
       "id": "excerpt_1",
-      "post_id": "p1",
-      "title": "How to Defuse a Twenty-Seven-Page Slop Bomb",
+      "post_ids": ["p1", "p3", "p2"],
+      "title": "The Cutting Room: Three Threads from Episode 3",
+      "comment": "ONE chaptered episode replacing the earlier three-standalone-excerpt plan (operator decision 2026-10-11). post_ids is in ACTUAL chapter-playback order (tape-chronological), which differs from post rank (p1,p2,p3) -- see notes.chapter_order_blocked below. Chapter names match the three Substack post titles exactly.",
       "ranges": [
         {
           "start": "9:56",
-          "end": "16:51",
-          "desc": "Opens on Turner's 'I wanna be allergic almost to understanding some of these details...' and runs through the decision-engine, slop-bomb, and disclosure arc, closing on 'they're avoiding conflict... everyone avoids conflict.' Both voices present; Jeremy's 'fifty to a hundred words' line lands at the midpoint."
-        }
-      ],
-      "vo_script": "Jeremy and I got into this during a much longer conversation about AI at work. I wrote up the full argument — two-page rule included — in a Substack post with this same title.",
-      "edit_id": "6aca53f8a995c7975123f90e",
-      "runtime": "6:20",
-      "status": "cut (draft, no export)",
-      "target_minutes": 7
-    },
-    {
-      "id": "excerpt_2",
-      "post_id": "p2",
-      "title": "I Burned a Five-Hour Rate Limit in One Hour",
-      "ranges": [
+          "end": "17:03",
+          "desc": "Chapter 1 -- How to Defuse a Twenty-Seven-Page Slop Bomb (post p1). Opens on Turner's 'I wanna be allergic almost to understanding some of these details...' and runs through the decision-engine, slop-bomb, and disclosure arc, closing on 'they're avoiding conflict... everyone avoids conflict.'"
+        },
+        {
+          "start": "23:11",
+          "end": "30:35",
+          "desc": "Chapter 2 -- My 150 Apple Notes Became a Compost Heap (post p3). Opens on Jeremy's 'Amazing, yeah, that's really cool, I was gonna ask you about your book,' runs through the compost heap, riff engine, nine-sentences framework, and simulated-beta-reader pitch, closing on Jeremy's ICP-simulation corroboration ('pretty wild for the cost there')."
+        },
         {
           "start": "38:13",
           "end": "44:22",
-          "desc": "Opens on Jeremy's 'we're seeing the harnesses are always changing,' runs through Gastown, 'two more things,' and the subagent/token-bug story, continuing into the skills-as-coaching resolution; closes on Turner's 'there's just no reason to,' a clean trail-off before a lighter beat. Jeremy drives the bug story, Turner drives the resolution."
+          "desc": "Chapter 3 -- I Burned a Five-Hour Rate Limit in One Hour (post p2). Opens on Jeremy's 'we're seeing the harnesses are always changing,' runs through Gastown, 'two more things,' and the subagent/token-bug story; closes on Turner's 'I'm also kinda trusting it.' Reframed per the t10 resolution: the token burn is the receipt, the thesis is general (agents make locally smart, globally expensive calls; you can't delegate what you can't verify)."
         }
       ],
-      "vo_script": "This clip comes from a longer talk Jeremy and I had about agents making decisions on their own. The full story is on Substack, same title as this episode.",
-      "edit_id": "6aca542691802d333619d575",
-      "runtime": "6:10",
-      "status": "cut (draft, no export)",
-      "target_minutes": 6
-    },
-    {
-      "id": "excerpt_3",
-      "post_id": "p3",
-      "title": "My 150 Apple Notes Became a Compost Heap",
-      "ranges": [
-        {
-          "start": "23:11",
-          "end": "29:16",
-          "desc": "Opens on Jeremy's 'Amazing, yeah, that's really cool, I was gonna ask you about your book,' runs through the compost heap, riff engine, nine-sentences framework, and simulated-beta-reader pitch, closing on Jeremy's affirming pivot into his own ICP-simulation parallel. Jeremy present throughout as questioner/validator; Turner drives the content."
-        }
-      ],
-      "vo_script": "This excerpt is pulled from a longer conversation Jeremy and I had about rebuilding my novel with AI. I dig deeper into the compost heap and riff engine in a Substack post with this same title.",
-      "edit_id": "6aca54af2ef1c0a2fcbaf7b7",
-      "runtime": "7:23",
-      "status": "cut (draft, no export)",
-      "target_minutes": 6
+      "vo_script": {
+        "intro": "This is \"In Practice with Jeremy and Turner\" -- three excerpts, pulled from a much longer conversation between Jeremy Hodge and Turner Tomlinson, voiced here by a synthetic narrator. Each chapter gets a deeper look in a Substack post of the same name, over at readlossy.substack.com. Here's the first one.",
+        "chapter1": "Chapter one: \"How to Defuse a Twenty-Seven-Page Slop Bomb.\" Turner gets handed a bloated AI report, and the two of them work out when fluency is actually substance.",
+        "chapter2": "Chapter three: \"My 150 Apple Notes Became a Compost Heap.\" Turner's notes app as raw material, a riff engine, and simulated beta readers for the novel he's rebuilding.",
+        "chapter3": "Chapter two: \"I Burned a Five-Hour Rate Limit in One Hour.\" A subagent bug burns through a rate limit -- the receipt for a bigger claim: you can't delegate what you can't verify."
+      },
+      "vo_voice": "ElevenLabs Matilda (XrExE9yKIg1WjnnlVkGX), eleven_multilingual_v2 -- auditioned against River and George; picked for being an unmistakably non-host (female) voice against two male hosts, reinforcing the no-impersonation disclosure.",
+      "edit_id": "6acc15f6bd2b7feb98c7f836",
+      "runtime": "20:47",
+      "status": "cut + VO assembled (draft, no export, no publish)",
+      "notes": {
+        "chapter_order_blocked": "Post-rank chapter order (p1,p2,p3 = Slop Bomb, Rate Limit, Apple Notes) was the goal but is NOT achievable via available Riverside MCP tools -- reorder_timeline and create_edit_from_segments are gated off for this account, and manual split+move surgery was assessed as unsafe (synced cuts are keyed to absolute timeline position, not content, so moving a clip does not move the cuts that hide the gaps around it). The edit instead plays in tape-chronological order: Slop Bomb, Apple Notes, Rate Limit. Manual fix: drag the Rate Limit chapter block to sit second in the Riverside web editor, then swap its VO handoff with Apple Notes' handoff. See 10_app/reports/ep03_chaptered_episode.md for full detail.",
+        "abandoned_scratch_edit": "6acc170e9762d63e7152a835 -- clone used only to test the reorder; left mid-surgery (tracks split, nothing moved), safe to discard, not used in the final deliverable."
+      }
     }
   ],
   "jeremy_crosscheck": "Jeremy's top 3 (Executive Judgment / Slop Bomb / Writing Infrastructure) overlaps substantially with mine but not exactly. Full agreement on Writing Infrastructure -- his #3 and my #3 (post p3) are the same cluster; I developed it further with the riff-engine build and simulated-beta-reader mechanism for a stronger 'concrete how.' Partial agreement, structural deviation, on Executive Judgment / Slop Bomb: he split these into two top-3 picks; I merged them into one post (p1) because on tape they are one continuous five-minute thread with a single scene and a single payoff -- split apart, Slop Bomb alone lacks a second concrete scene or receipt to reach 1,400 words without padding, which the brief's own checklist (#2) flags directly. No idea is lost in the merge, just the post boundary is redrawn. The real deviation: I dropped Slop Bomb as a standalone #2 slot in favor of the Gastown/token-bug cluster (p2), which is not in Jeremy's top 3 and not anywhere in Wispr Flow's full list of 10 topics either -- it only surfaces on a close read of the raw transcript. The argument for the swap: the brief's single most load-bearing requirement is receipts (a specific number, a named tool/API, or verbatim fragment before the halfway mark), and this segment has three hard numbers and one named real-world precedent in under four minutes of tape -- more technical specificity, in less space, than anywhere else in the episode. It also matches the brief's reverse-engineered HN pattern (a falsifiable, hands-on detail that converts readers into arguers) more directly than the Executive Judgment / Slop Bomb thesis, which is a mental-model shift rather than a falsifiable claim. Practically: p1's opinion stake sits close to the stake Round 10 already shipped for Episode 2's Cluster A post ('prompt engineering is a distraction from management engineering' / 'your harness is your taste, and taste compounds') -- running a second post this close in language right after it risks the newsletter reading as one idea repeated. The Gastown piece gives the series a second gear that isn't a restatement. Net read: 2 of 3 match Jeremy's picks substantively; the one clean swap is defensible on the brief's own terms, not a taste call."
