@@ -1,82 +1,144 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>VO Auditions — Ep 3 narrator</title>
 <style>
-  :root { --paper:#111113; --card:#1B1B1F; --ink:#EDEBE6; --muted:#9a948a;
-    --red:#D9220C; --line:rgba(237,235,230,.14); --ok:#5BB85B; }
-  * { box-sizing:border-box; }
-  body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-    background:var(--paper); color:var(--ink); min-height:100vh; padding:28px 20px 60px; }
-  #wrap { max-width:760px; margin:0 auto; }
-  .back { display:inline-block; color:var(--muted); text-decoration:none; font-size:.85rem;
-    margin-bottom:18px; } .back:hover { color:var(--ink); }
-  h1 { font-size:1.5rem; margin:0 0 6px; } h1 b { color:var(--red); }
-  .sub { color:var(--muted); font-size:.9rem; line-height:1.5; margin:0 0 24px; max-width:60ch; }
-  h2 { font-size:.8rem; text-transform:uppercase; letter-spacing:.12em; color:var(--muted);
-    margin:28px 0 12px; }
-  .voice { background:var(--card); border:1px solid var(--line); border-radius:12px;
-    padding:16px 18px; margin:0 0 12px; }
-  .voice.pick { border-color:var(--red); }
-  .vh { display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; margin-bottom:4px; }
-  .vh b { font-size:1.05rem; }
-  .tag { font-size:.7rem; text-transform:uppercase; letter-spacing:.08em; color:var(--paper);
-    background:var(--red); border-radius:99px; padding:2px 9px; font-weight:700; }
-  .vd { color:var(--muted); font-size:.85rem; line-height:1.45; margin:0 0 10px; }
-  audio { width:100%; height:40px; }
-  .note { background:var(--card); border:1px solid var(--line); border-left:3px solid var(--red);
-    border-radius:0 10px 10px 0; padding:12px 16px; font-size:.88rem; line-height:1.55;
-    color:var(--muted); margin:20px 0 0; }
-  .note b { color:var(--ink); }
+  :root{
+    --ground:#F3F4F6; --panel:#FFFFFF; --panel-2:#ECEEF1;
+    --ink:#1B1F26; --ink-soft:#5A6472; --ink-faint:#8A93A1;
+    --line:#E1E4E9; --line-strong:#C9CFD7;
+    --accent:#E0462A; --accent-ink:#FFFFFF; --brass:#8A6D1F;
+    --good:#25835A; --warn:#B07C22; --blue:#33619C;
+    --shadow:0 1px 2px rgba(20,25,35,.05), 0 4px 14px rgba(20,25,35,.05);
+    --radius:8px;
+    --mono:ui-monospace,"SF Mono","Cascadia Code",Menlo,Consolas,monospace;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --ground:#13161B; --panel:#1B1F26; --panel-2:#161A20;
+      --ink:#E5E8EC; --ink-soft:#9AA3B0; --ink-faint:#68717E;
+      --line:#272C34; --line-strong:#353C46;
+      --accent:#F05B3E; --accent-ink:#14100E; --brass:#C4A24A;
+      --good:#43A87A; --warn:#CE9A34; --blue:#6C95C8;
+      --shadow:0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.3);
+    }
+  }
+  :root[data-theme="light"]{
+    --ground:#F3F4F6; --panel:#FFFFFF; --panel-2:#ECEEF1;
+    --ink:#1B1F26; --ink-soft:#5A6472; --ink-faint:#8A93A1;
+    --line:#E1E4E9; --line-strong:#C9CFD7;
+    --accent:#E0462A; --accent-ink:#FFFFFF; --brass:#8A6D1F;
+    --good:#25835A; --warn:#B07C22; --blue:#33619C;
+  }
+  :root[data-theme="dark"]{
+    --ground:#13161B; --panel:#1B1F26; --panel-2:#161A20;
+    --ink:#E5E8EC; --ink-soft:#9AA3B0; --ink-faint:#68717E;
+    --line:#272C34; --line-strong:#353C46;
+    --accent:#F05B3E; --accent-ink:#14100E; --brass:#C4A24A;
+    --good:#43A87A; --warn:#CE9A34; --blue:#6C95C8;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--ground); color:var(--ink); font-family:var(--sans);
+    line-height:1.5; -webkit-font-smoothing:antialiased; min-height:100vh;
+    padding:28px 20px 60px;}
+  #wrap{max-width:760px; margin:0 auto}
+  .back{display:inline-block; color:var(--ink-faint); text-decoration:none; font-size:13px;
+    margin-bottom:18px; font-family:var(--mono);}
+  .back:hover{color:var(--accent)}
+  h1{font-size:19px; margin:0 0 6px; letter-spacing:-.01em}
+  h1 b{color:var(--accent)}
+  .sub{color:var(--ink-soft); font-size:13px; line-height:1.55; margin:0 0 22px; max-width:62ch}
+  .brief{display:inline-block; background:var(--panel-2); border:1px solid var(--line);
+    border-radius:99px; padding:3px 11px; font-size:11px; font-family:var(--mono);
+    color:var(--ink-soft); margin:2px 0 20px}
+  h2{font-size:11px; text-transform:uppercase; letter-spacing:.1em; color:var(--ink-faint);
+    margin:26px 0 10px; font-weight:650}
+  .voice{background:var(--panel); border:1px solid var(--line); border-radius:var(--radius);
+    padding:14px 16px; margin:0 0 10px; box-shadow:var(--shadow)}
+  .voice.pick{border-color:var(--accent)}
+  .vh{display:flex; align-items:baseline; gap:9px; flex-wrap:wrap; margin-bottom:3px}
+  .vh b{font-size:14.5px; font-weight:650}
+  .tag{font-size:10px; text-transform:uppercase; letter-spacing:.07em; color:var(--accent-ink);
+    background:var(--accent); border-radius:99px; padding:2px 8px; font-weight:700}
+  .vd{color:var(--ink-soft); font-size:12.5px; line-height:1.5; margin:0 0 9px; max-width:58ch}
+  audio{width:100%; height:38px}
+  .note{background:var(--panel-2); border:1px solid var(--line); border-left:3px solid var(--accent);
+    border-radius:0 var(--radius) var(--radius) 0; padding:12px 16px; font-size:12.5px;
+    line-height:1.55; color:var(--ink-soft); margin:22px 0 0}
+  .note b{color:var(--ink)}
+  .spend{font-family:var(--mono); font-size:11px; color:var(--ink-faint); margin-top:14px}
 </style>
 </head>
 <body>
 <div id="wrap">
-  <a class="back" href="index.html">← Control pane</a>
+  <a class="back" href="index.html">&larr; Control pane</a>
   <h1>🎙 VO Auditions — <b>Ep 3 chaptered episode narrator</b></h1>
-  <p class="sub">Casting brief: warm, friendly, practical, efficient. The narrator identifies
-  itself as synthetic up front, orients the listener, and gets out of the way. All three read
-  the same line below; the current pick also has the four final episode clips rendered.</p>
+  <p class="sub">Casting brief: <strong>warm, friendly, practical, efficient</strong> — not
+  announcer-grand, not sleepy-neutral, not quirky. The narrator identifies itself as an AI
+  narrator up front, briefly explains what it's doing, then gets out of the way for the tape.
+  All four candidates below read the same short line for a clean comparison; the two strongest
+  fits also read the actual episode intro so you can hear it for real.</p>
+  <span class="brief">clear American / neutral accent · practitioner podcast</span>
 
-  <h2>Round 1 — same line, three voices</h2>
-  <p class="sub" style="font-style:italic">“This is an excerpt from a conversation between Jeremy Hodge and Turner Tomlinson.”</p>
+  <h2>Round 1 — same line, four candidates</h2>
+  <p class="sub" style="font-style:italic; margin-bottom:14px">&ldquo;This is an excerpt from a conversation between Jeremy Hodge and Turner Tomlinson.&rdquo;</p>
 
-  <div class="voice pick">
-    <div class="vh"><b>Matilda</b><span class="tag">current pick</span></div>
-    <p class="vd">Knowledgeable, professional, American. Picked on reasoning, not by ear: a female
-    narrator is instantly distinct from both hosts — the "this isn't Jeremy or Turner" signal lands
-    before a single disclosure word is parsed.</p>
+  <div class="voice">
+    <div class="vh"><b>Bella</b><span class="tag">strong fit</span></div>
+    <p class="vd">Warm, bright, professional — American, informative/educational use case. The
+    closest textual match to the brief: "warm" and "bright" are in ElevenLabs' own description,
+    not something I'm reading into it.</p>
+    <audio controls preload="none" src="podcast_assets/ep03_vo/auditions/bella.mp3"></audio>
+  </div>
+  <div class="voice">
+    <div class="vh"><b>Sarah</b><span class="tag">strong fit</span></div>
+    <p class="vd">Confident, warm, reassuring — American. Slightly more "mature authority,"
+    slightly less "bright," than Bella. A good practical/efficient read without tipping into
+    announcer territory.</p>
+    <audio controls preload="none" src="podcast_assets/ep03_vo/auditions/sarah.mp3"></audio>
+  </div>
+  <div class="voice">
+    <div class="vh"><b>Chris</b></div>
+    <p class="vd">Charming, down-to-earth, casual — American, male. Warm and friendly, but male
+    narrating two male hosts gives up the free "this clearly isn't Jeremy or Turner" signal the
+    two women's voices get for free.</p>
+    <audio controls preload="none" src="podcast_assets/ep03_vo/auditions/chris.mp3"></audio>
+  </div>
+  <div class="voice">
+    <div class="vh"><b>Matilda</b><span class="tag">carried over</span></div>
+    <p class="vd">Knowledgeable, professional, upbeat — American. The original pick from the
+    first pass, kept here for a fair side-by-side now that there's an actual brief to judge
+    candidates against. Professional and efficient; reads less distinctly "warm/friendly" than
+    Bella or Sarah on paper.</p>
     <audio controls preload="none" src="podcast_assets/ep03_vo/auditions/matilda.mp3"></audio>
   </div>
-  <div class="voice">
-    <div class="vh"><b>River</b></div>
-    <p class="vd">Relaxed, neutral, informative. (Also the voice currently narrating the Drowning
-    Lessons session deck, if you want cross-project consistency.)</p>
-    <audio controls preload="none" src="podcast_assets/ep03_vo/auditions/river.mp3"></audio>
+
+  <h2>Round 2 — the real intro script, read by the two strongest fits</h2>
+  <p class="sub" style="margin-bottom:14px">Same text both times — the actual episode-opening
+  VO, AI-narrator disclosure and all. This is the one that matters most: it's the only clip every
+  listener hears regardless of which chapter they came for.</p>
+
+  <div class="voice pick">
+    <div class="vh"><b>Bella</b> <span class="vd" style="margin:0">— full intro, ~18s</span></div>
+    <audio controls preload="none" src="podcast_assets/ep03_vo/auditions/bella_intro.mp3"></audio>
   </div>
   <div class="voice">
-    <div class="vh"><b>George</b></div>
-    <p class="vd">Warm British storyteller. Warmest of the three, but male — a listener might take
-    a beat to register it isn't one of the hosts.</p>
-    <audio controls preload="none" src="podcast_assets/ep03_vo/auditions/george.mp3"></audio>
+    <div class="vh"><b>Sarah</b> <span class="vd" style="margin:0">— full intro, ~18s</span></div>
+    <audio controls preload="none" src="podcast_assets/ep03_vo/auditions/sarah_intro.mp3"></audio>
   </div>
 
-  <h2>Round 2 — the real clips (Matilda, as rendered into the episode)</h2>
-  <div class="voice"><div class="vh"><b>Episode intro</b> <span class="vd">~20s</span></div>
-    <audio controls preload="none" src="podcast_assets/ep03_vo/intro.mp3"></audio></div>
-  <div class="voice"><div class="vh"><b>Chapter handoff 1 — Slop Bomb</b></div>
-    <audio controls preload="none" src="podcast_assets/ep03_vo/chapter1.mp3"></audio></div>
-  <div class="voice"><div class="vh"><b>Chapter handoff 2</b></div>
-    <audio controls preload="none" src="podcast_assets/ep03_vo/chapter2.mp3"></audio></div>
-  <div class="voice"><div class="vh"><b>Chapter handoff 3</b></div>
-    <audio controls preload="none" src="podcast_assets/ep03_vo/chapter3.mp3"></audio></div>
-
-  <div class="note"><b>What your verdict triggers:</b> approve Matilda and the clips above go into
-  the episode as-is (plus the known 2-minute chapter-order drag in Riverside). Prefer River or
-  George and the four clips re-render (~1,100 characters of the ElevenLabs budget; ~5k remains).
-  The hosts' own audio is untouched either way.</div>
+  <div class="note"><b>What your pick triggers:</b> whichever voice you choose, I render the
+  four final clips (intro + 3 chapter handoffs) in that voice and wire them into the Riverside
+  edit. Nothing has been finalized with a guessed voice — the chaptered edit is cut and ready,
+  VO insertion is the one step waiting on you. Say the name (or "none of these, try &lt;voice&gt;")
+  and I'll take it from there.</div>
+  <p class="spend">Character spend this round: 4 × short line (82) + 2 × full intro (265) = 858
+  chars. Prior pass (now superseded, not reused): ~900 chars. Both well inside the 10,000/month
+  free tier.</p>
 </div>
 </body>
 </html>
