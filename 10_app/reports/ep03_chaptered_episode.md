@@ -1,8 +1,8 @@
 # Episode 3 — Chaptered Excerpt Episode: "The Cutting Room"
 
-Riverside edit (final, draft): `6acc15f6bd2b7feb98c7f836`, revision 12. Recording: `d8755698-79c8-4779-9aaa-8dfe734d559c` (In-Practice, Episode 3). Draft only — no export, no publish.
+Riverside edit (final, draft): `6acc15f6bd2b7feb98c7f836`, revision 16. Recording: `d8755698-79c8-4779-9aaa-8dfe734d559c` (In-Practice, Episode 3). Draft only — no export, no publish.
 
-**Status as of this revision: cut structure done, VO intentionally not inserted.** An earlier pass (rev 11) guessed a voice (Matilda) and inserted all 4 VO clips before the operator's casting brief (warm/friendly/practical/efficient) and the AI-narrator-upfront disclosure ruling arrived. Once those two directives landed, I pulled all 4 VO overlay clips back out (rev 12, confirmed by re-reading the timeline — the Overlays track is empty) rather than ship a guessed voice. An audition page is live at `10_app/vo_auditions.html` (card on `10_app/index.html` → 🎙 VO Auditions) with 4 re-cast candidates; the operator's pick is the one remaining step before the 4 finals get rendered and reinserted.
+**Status: FINAL for this round — cut structure and VO are both done.** History: an earlier pass (rev 11) guessed a voice (Matilda) and inserted all 4 VO clips before the operator's casting brief (warm/friendly/practical/efficient) and the AI-narrator-upfront disclosure ruling arrived. Those were pulled back out (rev 12, clean non-rippling `delete_clip`) rather than ship a guess. An audition page (`10_app/vo_auditions.html`) let the operator listen to 4 re-cast candidates and the real intro staged two ways; **he picked River** (`SAz9YHcvj6GT2YYXdXww`). The 4 finals were rendered in River, uploaded to Riverside's media library, and inserted via `insert_audio` with a 300ms fade-in each, taking the edit from rev 12 → rev 16. Verified by a full timeline read-back (below). Nothing left pending except his own optional manual chapter-order drag and a final human listen-through.
 
 ## Chapter order — IMPORTANT deviation from the post-rank plan
 
@@ -34,53 +34,61 @@ Exact millisecond boundaries (playable axis):
 
 Third-person narrator, no impersonation of either host. **Updated per the operator's second ruling**, which supersedes the original "light, one clause" instruction: the narrator identifies itself as an AI narrator up front, explains briefly, then gets straight into content. No re-disclosure in the chapter handoffs — the intro already established it.
 
-**Intro** (new text; not yet re-rendered into the final `intro.mp3` — rendered in Bella's and Sarah's voices only, for audition, at `10_app/podcast_assets/ep03_vo/auditions/{bella,sarah}_intro.mp3`):
+**Intro** (16.30s, River — final):
 > "Hi — this is an AI narrator. I'm introducing a curated set of excerpts from a longer conversation between Jeremy Hodge and Turner Tomlinson. Each chapter gets a deeper look in a Substack post of the same name, over at readlossy.substack.com. Here's the first one."
 
 The previous intro text (quoted below, for the record — no longer used) read "...voiced here by a synthetic narrator..." as a single light clause rather than an upfront self-identification:
 > ~~"This is 'In Practice with Jeremy and Turner' — three excerpts, pulled from a much longer conversation between Jeremy Hodge and Turner Tomlinson, voiced here by a synthetic narrator. Each chapter gets a deeper look in a Substack post of the same name, over at readlossy.substack.com. Here's the first one."~~
 
-**Chapter 1 handoff — Slop Bomb** (10.27s):
+**Chapter 1 handoff — Slop Bomb** (10.68s, River):
 > "Chapter one: 'How to Defuse a Twenty-Seven-Page Slop Bomb.' Turner gets handed a bloated AI report, and the two of them work out when fluency is actually substance."
 
-**Chapter 2 handoff — Apple Notes** (11.13s) *(plays second; file is named `chapter3.mp3` because it was scripted against post-rank p3 — see mapping note below)*:
+**Chapter 2 handoff — Apple Notes** (11.23s, River) *(plays second; file is named `chapter3.mp3` because it was scripted against post-rank p3 — see mapping note below)*:
 > "Chapter three: 'My 150 Apple Notes Became a Compost Heap.' Turner's notes app as raw material, a riff engine, and simulated beta readers for the novel he's rebuilding."
 
-**Chapter 3 handoff — Rate Limit** (11.94s) *(plays third; file is named `chapter2.mp3`)*:
+**Chapter 3 handoff — Rate Limit** (11.83s, River) *(plays third; file is named `chapter2.mp3`)*:
 > "Chapter two: 'I Burned a Five-Hour Rate Limit in One Hour.' A subagent bug burns through a rate limit -- the receipt for a bigger claim: you can't delegate what you can't verify." *(Reflects the operator's 2026-10-11 resolution of the t10 hold: the token burn is the receipt, the thesis is general.)*
 
 Character spend, this round: 4 × 82-char comparison line + 2 × 265-char full intro = 858 chars. First pass (superseded, not reused): ~900 chars (intro 306 + 3 chapter scripts 512 + 1 audition line × 3 voices 246). Both rounds combined stay well inside the 10,000/month free tier, with ~8,200 remaining.
 
-## Voice — PENDING OPERATOR PICK (not guessed)
+## Voice — FINAL: River (operator's pick, by ear)
 
-The first pass picked Matilda (`XrExE9yKIg1WjnnlVkGX`) without a listen, auditioned only against River and George. That pick is **not** carried forward as final per the operator's explicit instruction not to finalize VO insertion with a guessed voice. The audition page (`10_app/vo_auditions.html`, linked from `10_app/index.html` via the 🎙 VO Auditions card) reopens the casting question against a sharper brief: **warm, friendly, practical, efficient** — not announcer-grand, not sleepy-neutral, not quirky.
+**River** (`SAz9YHcvj6GT2YYXdXww`), ElevenLabs' relaxed/neutral/informative American voice, model `eleven_multilingual_v2`.
 
-Re-cast against that brief:
-- **Dropped:** River (risks reading as "sleepy-neutral," explicitly excluded) and George (risks reading as "announcer-grand," also excluded).
-- **Kept:** Matilda, as a carryover baseline for a fair side-by-side now that there's an actual brief.
-- **Added:** Bella (`hpp4J3VqNfWAUOO0d1Us` — ElevenLabs' own description: "warm, bright, and professional"), Sarah (`EXAVITQu4vr4xnSDxMaL` — "confident and warm, mature quality and reassuring"), Chris (`iP95p4xoKVk53GoZ742B` — "charming, down-to-earth, casual," male).
+Timeline: the first pass picked Matilda without a listen. That pick was not carried forward — the audition page (`10_app/vo_auditions.html`, linked from `10_app/index.html` via the 🎙 VO Auditions card) reopened casting against a sharper brief (warm, friendly, practical, efficient) and staged a three-voice comparison (River / Matilda / George) on a shared line plus the real intro script staged for review. The operator listened and **picked River**, and approved the staging format. This is a real pick, not a guess — the whole reason the audition page existed.
 
-Round 1 (page): all four read the same ~15-word comparison line. Round 2 (page): Bella and Sarah — the two strongest textual fits — read the actual, full intro script, so the operator hears the real thing rather than a generic sample. This is still reasoning from ElevenLabs' published persona descriptions, not an actual listen on my end — the operator's ear on the audition page is the real gate here, which is the whole point of building the page rather than guessing again.
+(Earlier reasoning that favored Bella/Sarah as "strongest textual fit" was based on ElevenLabs' published persona copy, not an actual listen, and didn't anticipate the operator hearing River and preferring it directly — a good example of why the page, not the reasoning, is the real gate.)
 
 ## Audio assets
 
 `10_app/podcast_assets/ep03_vo/`:
-- `_intro.txt`, `_chapter1.txt`, `_chapter2.txt`, `_chapter3.txt` — current scripts (intro updated for the AI-narrator-upfront disclosure; chapter handoffs unchanged).
-- `auditions/{bella,sarah,chris,matilda}.mp3` — Round 1 comparison line, 4 candidates.
-- `auditions/{bella,sarah}_intro.mp3` — Round 2 full intro, 2 strongest fits.
-- `_pending_pick/` — the first pass's 4 guessed-voice (Matilda) finals, quarantined with a README. `intro.mp3` there is stale (old text); `chapter1/2/3.mp3` still match the current chapter scripts text-wise but the voice is unconfirmed. Not deleted, not in use.
+- `_intro.txt`, `_chapter1.txt`, `_chapter2.txt`, `_chapter3.txt` — scripts as rendered (intro has the AI-narrator-upfront disclosure; chapter handoffs unchanged throughout).
+- `intro.mp3` (16.30s), `chapter1.mp3` (10.68s, Slop Bomb), `chapter2.mp3` (11.83s, Rate Limit), `chapter3.mp3` (11.23s, Apple Notes) — **FINAL, River voice.**
+- `auditions/{river,bella,sarah,chris,matilda}.mp3` — Round 1 comparison line, candidates auditioned.
+- `auditions/{bella,sarah}_intro.mp3` — Round 2 full intro staged for 2 candidates (operator ultimately picked River from Round 1 + the River/Matilda/George staged comparison, not from this pair).
+- `_pending_pick/` — the superseded first pass's 4 guessed-voice (Matilda) renders, quarantined with a README. Not deleted, not in use, kept for the record.
 
-No new finals have been uploaded to Riverside's media library this round — the 4 media assets from the first pass (ids below) remain in the library but are **no longer referenced on the timeline** (see Riverside edit state):
-- intro → `6acc1775c0c34ad4eb5cd2c3` (stale text)
-- chapter1/Slop Bomb → `6acc1776aa02c37a8336b9b4`
-- chapter2/Rate Limit → `6acc1777098605c865ed87b5`
-- chapter3/Apple Notes → `6acc1779c2b9f5651127a239`
+New media uploaded to Riverside's media library (production `6a92dea22730f08b525443e1`) this round, River voice:
+- intro → `6acd3f7ec2b9f5651127b1e2` (16.300s)
+- chapter1/Slop Bomb handoff → `6acd3f7f1965267d8a226a4e` (10.684s)
+- chapter2/Rate Limit handoff → `6acd3f817829066863757253` (11.833s)
+- chapter3/Apple Notes handoff → `6acd3f82943ad6b6fdd3ecfd` (11.233s)
+
+The 4 first-pass Matilda media assets (`6acc1775c0c34ad4eb5cd2c3`, `6acc1776aa02c37a8336b9b4`, `6acc1777098605c865ed87b5`, `6acc1779c2b9f5651127a239`) remain in the library but are no longer referenced on the timeline.
+
+Character spend, this render: 265 (intro) + 165 (ch1) + 179 (ch2) + 168 (ch3) = 777 chars, one render each, no waste. Running total across all rounds this episode (auditions + finals, both passes): roughly 777 + 858 + ~900 ≈ 2,535 chars — well inside the 10,000/month free tier.
 
 Visual "reserve" scenes at each VO point reuse the existing generic `interlude_10s.mp4` (mediaId `6a99bc27bce4129d3e74e12c`, already in the library from a prior episode), stretched/trimmed to each VO's exact duration — same mechanism the Ep1 precedent used (a title-card/black-frame scene to grow the timeline and push dialogue later, with the VO layered on top as an audio overlay, fading in from silence over 300ms).
 
 ## Riverside edit state
 
-- **Final deliverable edit:** `6acc15f6bd2b7feb98c7f836` ("Ep3 Excerpts — The Cutting Room (3 chapters)"), revision 12. Draft only, no export, no publish. Structure verified by reading the full timeline back: 4 synced cuts (head, two inter-excerpt gaps, tail) sum to exactly the expected removed duration; the 3 visual "reserve" scenes (Section track, uniqueId 11) are still in place at the correct positions. The Overlays track (uniqueId 17) is confirmed **empty** — the 4 VO audio clips inserted during the first pass (rev 11, Matilda, guessed) were deleted via `delete_clip` once the casting brief and disclosure ruling made that insertion premature. This was a clean, non-rippling removal (overlay track, no timeline-position side effects) — the cut structure and visual placeholders are untouched. VO insertion is the one documented remaining step, pending the operator's pick on the audition page. Once picked: render 4 finals, `insert_audio` onto track 17 at trackTime 643331 (intro, duration ≈ its own length), 643331+intro-length (Ch.1 handoff), 284439 (Ch.2/Apple Notes handoff), 467031 (Ch.3/Rate Limit handoff) ms, each with the same fade-in (0 → full volume over 300ms) as the first pass used.
+- **Final deliverable edit:** `6acc15f6bd2b7feb98c7f836` ("Ep3 Excerpts — The Cutting Room (3 chapters)"), **revision 16**. Draft only, no export, no publish. Verified by a full timeline read-back after insertion:
+  - 4 synced cuts intact, unchanged throughout this whole process (head, two inter-excerpt gaps, tail).
+  - 3 visual "reserve" scenes (Section track, uniqueId 11) unchanged, at their original positions/durations (30.225s, 11.129s, 11.938s) — not resized for the voice swap.
+  - Overlays track (uniqueId 17) now holds the 4 **River** VO clips: `clipId 37` (intro, source trackTime 643,331ms, 16.300s), `clipId 40` (Slop Bomb handoff, trackTime 659,631ms, 10.684s, starts right where intro ends), `clipId 43` (Apple Notes handoff, trackTime 284,439ms, 11.233s), `clipId 46` (Rate Limit handoff, trackTime 467,031ms, 11.833s). Each has the standard fade-in keyframe pair (volume multiplier 0 at clip start → full at +0.3s).
+  - Revision history this session: rev 11 (first-pass Matilda VO, guessed) → rev 12 (Matilda VO removed) → rev 13–16 (River's 4 clips inserted one at a time via `insert_audio`, each with `fadeInMs: 300`).
+  - **Timing note:** the reserve windows were sized to Matilda's original (slower) pace and weren't resized for River's faster read. Net effect: slightly more silence before Slop Bomb and Rate Limit content (3.24s and 0.1s respectively — harmless), and a **104ms overlap** where the Apple Notes handoff VO's tail runs 104ms past its reserved window into the start of the Apple Notes dialogue. This is likely sub-perceptible but is flagged here for the record rather than glossed over; a human can trim it in the Riverside web editor if it's audible on playback.
+  - **Total episode runtime is unchanged: 20:46.8 (1,246,819 ms)** — the reserve windows (which set the overall length) weren't touched, only the audio filling them changed.
 - **Abandoned scratch clone:** `6acc170e9762d63e7152a835` ("Ep3 Excerpts — reorder attempt (scratch)") — used only to test the post-rank reorder (see below), left mid-surgery (two tracks split at the two internal chapter boundaries, nothing moved or deleted yet). Not used further, safe to discard.
 - **Original three standalone single-range edits** (`6aca53f8a995c7975123f90e`, `6aca542691802d333619d575`, `6aca54af2ef1c0a2fcbaf7b7`) are untouched, as instructed — kept as reference.
 
@@ -92,7 +100,7 @@ I tested whether manual clip surgery (`split_clips_at_time` + `move_collapsed_cl
 
 **Manual fix (2 minutes in the Riverside web editor):** open edit `6acc15f6bd2b7feb98c7f836`, and drag the "Rate Limit" chapter block (currently third) to sit between "Slop Bomb" (first) and "Apple Notes" (currently second). The web UI's timeline supports arbitrary drag-reorder natively, even though that operation isn't exposed through the current MCP tool surface. After dragging, also swap the Ch.2/Ch.3 VO handoff clips to match (the Apple Notes handoff should move to third position, Rate Limit's handoff to second) — both VO clips already exist in the media library (ids above), so this is a reposition, not a re-render.
 
-**Not blocked, needs a human regardless:** the voice pick itself — go to `10_app/vo_auditions.html`, listen, and name a voice (or say "none of these, try X"). That's the one open item standing between this edit and a finished draft; everything else in this report is done. Also worth a human ear on the two chapter-break "interlude" title cards stretched beyond their native 10s (the Apple Notes card to 11.13s, Rate Limit to 11.94s) — slight stretch, should be fine but unverified visually.
+**Not blocked, needs a human regardless:** a final listen-through of the assembled draft before export/publish, since I can't play audio myself — specifically the 104ms Apple Notes handoff overlap noted above, and the two chapter-break "interlude" title cards stretched beyond their native 10s (now 11.23s and 11.83s under River's timing) — should be fine but unverified visually.
 
 ## Cross-link lattice (for the three Substack posts)
 
