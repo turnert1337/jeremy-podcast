@@ -1,9 +1,9 @@
 {
   "name": "Jeremy Podcast test",
   "stage": "ep3-content-round",
-  "note": "Ep3 recorded 10/10 (79 min, both tracks clean). Content Round 3 BUILT: 16 topics mapped, 9 post outlines, top-3 recommended (Slop Bomb / Rate Limit / Compost Heap), 3 excerpt edits cut in Riverside (drafts, no export) + VO scripts awaiting Turner's recording. Review at content_review.html \u2014 new reusable round surface. Round 10 (ep2) still awaiting annotations.",
-  "url": "http://127.0.0.1:4010/content_review.html?round=3",
+  "note": "Review Deck live at review_deck.html \u2014 single surface for every open decision this round: 3 post writing-plan locks (drafts are scaffolds, Turner writes the posts), episode export call (chapter drag pending), publish sequencing, stats-monitoring approach, 10 Pocock adoptions. Content Round 3 detail still at content_review.html?round=3. Round 10 (ep2) annotations still open.",
+  "url": "http://127.0.0.1:4010/review_deck.html",
   "car_url": "https://claude.ai/code/artifact/48b0b977-f764-4f57-9e74-93ff9bc81217",
   "launch": "python3 -m http.server 4010 --directory \"10_app\"",
-  "updated": "2026-10-10T15:10:00Z"
+  "updated": "2026-10-12T20:30:00Z"
 }

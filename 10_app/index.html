@@ -345,6 +345,14 @@
   <div class="home-body">
     <div class="home-inner">
       <div class="cards">
+        <button class="card b" id="go-reviewdeck">
+          <span class="ico">🧭</span>
+          <div class="ctxt">
+            <h3>Review Deck</h3>
+            <p>Everything awaiting your call, one decision per slide — 3 post writing-plan locks, episode export, publish sequencing, stats approach, Pocock adoptions.</p>
+          </div>
+          <span class="go">→</span>
+        </button>
         <button class="card a" id="go-research">
           <span class="ico">◪</span>
           <div class="ctxt">
@@ -821,6 +829,7 @@
   document.getElementById('go-round9').onclick = () => show('round9');
   document.getElementById('go-ep02sheet').onclick = () => show('ep02sheet');
   document.getElementById('go-round10').onclick = () => show('round10');
+  document.getElementById('go-reviewdeck').onclick = () => location.href = 'review_deck.html';
   document.getElementById('go-content').onclick = () => location.href = 'content_review.html';
   document.getElementById('go-voaud').onclick = () => location.href = 'vo_auditions.html';
   document.getElementById('go-pocock').onclick = () => location.href = 'pocock_study.html';

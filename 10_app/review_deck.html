@@ -1,0 +1,674 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Review Deck — Ep 3 round</title>
+<style>
+  :root{
+    --ground:#F3F4F6; --panel:#FFFFFF; --panel-2:#ECEEF1;
+    --ink:#1B1F26; --ink-soft:#5A6472; --ink-faint:#8A93A1;
+    --line:#E1E4E9; --line-strong:#C9CFD7;
+    --accent:#E0462A; --accent-ink:#FFFFFF; --brass:#8A6D1F;
+    --good:#25835A; --warn:#B07C22; --blue:#33619C;
+    --shadow:0 1px 2px rgba(20,25,35,.05), 0 4px 14px rgba(20,25,35,.05);
+    --radius:8px;
+    --mono:ui-monospace,"SF Mono","Cascadia Code",Menlo,Consolas,monospace;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --ground:#13161B; --panel:#1B1F26; --panel-2:#161A20;
+      --ink:#E5E8EC; --ink-soft:#9AA3B0; --ink-faint:#68717E;
+      --line:#272C34; --line-strong:#353C46;
+      --accent:#F05B3E; --accent-ink:#14100E; --brass:#C4A24A;
+      --good:#43A87A; --warn:#CE9A34; --blue:#6C95C8;
+      --shadow:0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.3);
+    }
+  }
+  :root[data-theme="light"]{
+    --ground:#F3F4F6; --panel:#FFFFFF; --panel-2:#ECEEF1;
+    --ink:#1B1F26; --ink-soft:#5A6472; --ink-faint:#8A93A1;
+    --line:#E1E4E9; --line-strong:#C9CFD7;
+    --accent:#E0462A; --accent-ink:#FFFFFF; --brass:#8A6D1F;
+    --good:#25835A; --warn:#B07C22; --blue:#33619C;
+  }
+  :root[data-theme="dark"]{
+    --ground:#13161B; --panel:#1B1F26; --panel-2:#161A20;
+    --ink:#E5E8EC; --ink-soft:#9AA3B0; --ink-faint:#68717E;
+    --line:#272C34; --line-strong:#353C46;
+    --accent:#F05B3E; --accent-ink:#14100E; --brass:#C4A24A;
+    --good:#43A87A; --warn:#CE9A34; --blue:#6C95C8;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0; height:100%}
+  body{background:var(--ground); color:var(--ink); font-family:var(--sans); line-height:1.5;
+    -webkit-font-smoothing:antialiased; height:100vh; overflow:hidden; display:flex; flex-direction:column}
+  button{font-family:inherit}
+
+  /* ---- top bar (house pattern) ---- */
+  .bar{display:flex; align-items:center; gap:12px; padding:8px clamp(12px,2.5vw,18px); flex:none;
+    background:var(--panel); border-bottom:1px solid var(--line); flex-wrap:wrap; z-index:5}
+  .eyebrow{font-family:var(--mono); font-size:9.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--accent)}
+  .htxt{display:flex; align-items:baseline; gap:8px; margin-right:auto}
+  .htxt h2{margin:0; font-size:13.5px; font-weight:640; letter-spacing:-.01em}
+  .icon-btn{appearance:none; border:1px solid var(--line-strong); background:var(--panel-2);
+    color:var(--ink-soft); height:26px; min-width:26px; padding:0 8px; border-radius:6px;
+    cursor:pointer; font-size:12px; display:inline-flex; align-items:center; gap:5px; justify-content:center;
+    transition:border-color .15s, color .15s; text-decoration:none}
+  .icon-btn:hover{border-color:var(--accent); color:var(--accent)}
+  .icon-btn:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+  .icon-btn.solid{background:var(--accent); border-color:var(--accent); color:var(--accent-ink)}
+  .icon-btn.solid:hover{filter:brightness(1.06); color:var(--accent-ink)}
+  .chip-count{font-family:var(--mono); font-size:11px; letter-spacing:.04em; display:inline-flex; align-items:center;
+    gap:7px; padding:5px 10px; border:1px solid var(--line-strong); border-radius:100px;
+    background:var(--panel-2); color:var(--ink-soft); font-variant-numeric:tabular-nums}
+
+  /* ---- deck ---- */
+  #deck{flex:1; overflow-y:auto; scroll-snap-type:y mandatory; scroll-behavior:smooth}
+  @media (prefers-reduced-motion:reduce){ #deck{scroll-behavior:auto} }
+  .slide{min-height:100%; scroll-snap-align:start; scroll-snap-stop:always;
+    display:flex; flex-direction:column; justify-content:center; gap:14px;
+    padding:56px clamp(18px,5vw,48px) 90px; max-width:760px; margin:0 auto; position:relative}
+  .sno{position:absolute; top:14px; right:clamp(18px,5vw,48px); font-family:var(--mono); font-size:12px;
+    font-weight:650; color:var(--accent); font-variant-numeric:tabular-nums}
+  .kicker{font-family:var(--mono); font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--accent); font-weight:650}
+  .slide h1{margin:0; font-size:clamp(22px,4vw,30px); font-weight:700; letter-spacing:-.015em; line-height:1.1}
+  .slide h2{margin:0; font-size:clamp(19px,3.4vw,25px); font-weight:700; letter-spacing:-.012em; line-height:1.15}
+  .slide .sub{margin:0; font-size:13.5px; color:var(--ink-soft); line-height:1.55; max-width:62ch}
+  .slide .body p{font-size:13.5px; line-height:1.62; color:var(--ink); margin:0 0 10px; max-width:64ch}
+  .slide .body p.lede{font-size:14.5px; color:var(--ink-soft)}
+  .slide .body strong{color:var(--ink)}
+
+  h3.lbl{font-family:var(--mono); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase;
+    color:var(--ink-faint); margin:14px 0 6px}
+  .kv{font-size:12.5px; color:var(--ink-soft); margin:0 0 6px}
+  .kv strong{color:var(--ink); font-weight:620}
+  ol.outline, ul.outline{margin:0 0 4px; padding-left:20px; font-size:13px; color:var(--ink); max-width:64ch}
+  ol.outline li, ul.outline li{margin-bottom:5px}
+  blockquote{margin:0 0 9px; padding:8px 12px; border-left:3px solid var(--line-strong);
+    font-size:12.5px; color:var(--ink-soft); background:var(--panel-2); border-radius:0 6px 6px 0; max-width:60ch}
+  blockquote cite{font-family:var(--mono); font-size:10.5px; color:var(--ink-faint); display:block; margin-top:2px}
+  .badge{font-family:var(--mono); font-size:10px; letter-spacing:.04em; padding:2px 7px; border-radius:100px;
+    border:1px solid var(--line-strong); background:var(--panel-2); color:var(--ink-soft); white-space:nowrap}
+  .badge.good{color:var(--good); border-color:color-mix(in srgb,var(--good) 45%,var(--line))}
+  .badge.warn{color:var(--warn); border-color:color-mix(in srgb,var(--warn) 45%,var(--line))}
+  .flag{background:var(--panel-2); border:1px solid var(--line); border-left:3px solid var(--warn);
+    border-radius:0 6px 6px 0; padding:9px 13px; font-size:12.5px; line-height:1.55; color:var(--ink-soft); margin:6px 0 10px; max-width:62ch}
+  .flag strong{color:var(--ink)}
+  .lockbox{background:color-mix(in srgb, var(--accent) 7%, var(--panel)); border:1px solid var(--accent);
+    border-radius:8px; padding:12px 15px; font-size:13px; line-height:1.55; max-width:62ch; margin:4px 0}
+  a{color:var(--blue)}
+  code{font-family:var(--mono); font-size:.92em; background:var(--panel-2); padding:1px 5px; border-radius:4px}
+
+  details.expand{margin:4px 0 8px; max-width:64ch}
+  details.expand summary{cursor:pointer; font-size:12px; color:var(--blue); list-style:none; font-family:var(--mono); letter-spacing:.02em}
+  details.expand summary::-webkit-details-marker{display:none}
+  details.expand summary::before{content:"▸ "}
+  details.expand[open] summary::before{content:"▾ "}
+  details.expand .inner{margin-top:8px; padding-top:8px; border-top:1px solid var(--line)}
+
+  /* ---- verdict chips (house pillrow pattern) ---- */
+  .pillrow{display:flex; flex-wrap:wrap; gap:7px; margin:10px 0 2px}
+  .pillrow button{appearance:none; cursor:pointer; font-family:var(--sans); font-size:12.5px;
+    padding:7px 13px; border-radius:100px; border:1px solid var(--line-strong);
+    background:var(--panel-2); color:var(--ink); transition:all .12s; font-weight:550}
+  .pillrow button:hover{border-color:var(--accent)}
+  .pillrow button.sel{background:var(--accent); border-color:var(--accent); color:var(--accent-ink); font-weight:650}
+  .decision-wrap{margin-top:8px}
+  .decision-wrap .dlabel{font-family:var(--mono); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-faint)}
+
+  .checklist{display:flex; flex-direction:column; gap:8px; margin:8px 0 4px; max-width:66ch}
+  .citem{background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:10px 13px; box-shadow:var(--shadow)}
+  .citem .chead{display:flex; align-items:baseline; gap:9px; flex-wrap:wrap; margin-bottom:3px}
+  .citem .cnum{font-family:var(--mono); color:var(--accent); font-weight:700; font-size:12px}
+  .citem h4{margin:0; font-size:13px; font-weight:620; flex:1; min-width:0}
+  .citem p{margin:0 0 7px; font-size:12px; color:var(--ink-soft); line-height:1.5}
+  .citem .pillrow{margin:4px 0 0}
+  .citem .pillrow button{padding:4px 11px; font-size:11.5px}
+
+  /* ---- note box ---- */
+  .snote{position:relative; margin-top:14px; max-width:64ch}
+  .snote textarea{display:block; width:100%; height:44px; min-height:44px; overflow:hidden;
+    font-family:var(--sans); font-size:13px; line-height:1.5; padding:11px 48px 11px 13px; resize:none;
+    border:1px solid var(--line); border-radius:8px; background:var(--ground); color:var(--ink)}
+  .snote textarea:focus{border-color:var(--accent); outline:none}
+  .snote textarea::placeholder{color:var(--ink-faint)}
+  .sb{position:absolute; right:5px; bottom:5px; width:32px; height:32px; padding:0;
+    display:inline-flex; align-items:center; justify-content:center; cursor:pointer;
+    border:1px solid var(--line-strong); border-radius:6px; background:var(--panel-2); color:var(--ink-faint)}
+  .sb:hover, .sb:focus-visible{color:var(--accent); border-color:var(--accent)}
+  .sb.ok{color:var(--good); border-color:var(--good)}
+
+  /* ---- next button ---- */
+  #next{position:fixed; right:18px; bottom:18px; z-index:30; width:48px; height:48px; border-radius:12px;
+    border:1px solid var(--line-strong); background:var(--panel); color:var(--accent); font-size:19px;
+    cursor:pointer; box-shadow:var(--shadow)}
+  #next:hover{border-color:var(--accent)}
+  #next:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+
+  .toast{position:fixed; bottom:20px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:var(--ink); color:var(--ground); font-size:12.5px; padding:9px 16px; border-radius:100px;
+    opacity:0; pointer-events:none; transition:opacity .2s, transform .2s; z-index:50; font-family:var(--mono); letter-spacing:.03em}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+
+  @media (max-width:640px){
+    .slide{padding:48px 18px 90px}
+  }
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <a class="icon-btn" href="index.html">← Control</a>
+  <div class="htxt">
+    <span class="eyebrow">Review Deck</span>
+    <h2>Episode 3 round — everything awaiting your call</h2>
+  </div>
+  <span class="chip-count" id="slide-counter">1 / 12</span>
+  <button class="icon-btn" id="theme" title="Toggle theme" aria-label="Toggle light/dark theme">◐</button>
+</div>
+
+<div id="deck">
+
+<!-- ========== SLIDE 1 ========== -->
+<section class="slide" id="s1">
+  <span class="sno">1 / 12</span>
+  <div class="kicker">How this works</div>
+  <h1>One decision per slide.</h1>
+  <div class="body">
+    <p class="lede">This deck is the single surface for everything in this round that's waiting on you. Scroll, or tap the ▼ bottom-right, to move through twelve slides &mdash; one topic each. Where there's a call to make, tap a chip; it saves instantly to this browser. Where there's just something to know, there's a note box if you want to leave yourself (or me) a line.</p>
+    <p><strong>The binding rule for this round: you write every Substack post yourself.</strong> The agent pipeline &mdash; mine &mdash; stops at outline, pull-quotes, and crafting direction. The three drafts sitting in <code>10_app/drafts/</code> are scaffolds and reference material, not deliverables. Every decision on a post slide below is &ldquo;lock the writing plan,&rdquo; never &ldquo;approve the draft.&rdquo;</p>
+    <p>At the end (slide 12) there's a <strong>Copy Annotations</strong> button. It copies everything you decide on this pass to your clipboard as one block &mdash; paste it into <code>review_deck_annotations.js</code> and tell the terminal &ldquo;process the review deck&rdquo; and I'll fold your calls into locked plans and next actions.</p>
+  </div>
+  <div class="snote">
+    <textarea id="ta-s1" data-note="s1" rows="1" placeholder="Anything to flag before we start…"></textarea>
+    <button class="sb" data-save="s1" type="button" aria-label="Save note" title="Save note">💾</button>
+  </div>
+</section>
+
+<!-- ========== SLIDE 2 ========== -->
+<section class="slide" id="s2">
+  <span class="sno">2 / 12</span>
+  <div class="kicker">At a glance</div>
+  <h2>What's done, what's open.</h2>
+  <div class="body">
+    <ul class="outline">
+      <li><span class="badge good">locked</span> &nbsp;3 post writing plans locked &mdash; <em>Fluency vs. Substance</em>, <em>My Agent Made a Smart Call I Never Approved</em>, <em>My 150 Apple Notes Became a Compost Heap</em>. Pending your writing. Scaffolds live in <code>drafts/</code>.</li>
+      <li><span class="badge good">cut + VO'd</span> &nbsp;Episode &mdash; &ldquo;The Cutting Room,&rdquo; Riverside edit rev 16, 20:46.8 runtime. Draft only, nothing exported.</li>
+      <li><span class="badge warn">pending</span> &nbsp;Manual chapter drag &mdash; a 2-minute fix in the Riverside web editor (slide 8).</li>
+      <li><span class="badge warn">unreviewed</span> &nbsp;Pocock growth-playbook study built &mdash; 10 adoption calls waiting on you (slide 10).</li>
+    </ul>
+    <p class="sub">Also still open from before this round &mdash; Round 10 (Episode 2) annotations and the Plaud Ep2 track recovery. Neither blocks this round; both get a line on slide 11.</p>
+  </div>
+  <div class="snote">
+    <textarea id="ta-s2" data-note="s2" rows="1" placeholder="Notes…"></textarea>
+    <button class="sb" data-save="s2" type="button" aria-label="Save note" title="Save note">💾</button>
+  </div>
+</section>
+
+<!-- ========== SLIDE 3 — POST 1 ========== -->
+<section class="slide" id="s3">
+  <span class="sno">3 / 12</span>
+  <div class="kicker">Post 1 of 3 · Managing Agents, Part 1</div>
+  <h2>Fluency vs. Substance</h2>
+  <p class="sub">&ldquo;A twenty-seven-page report, a job that's reverting to something older than it looks, and the no-free-lunches problem of delegating what you don't understand.&rdquo;</p>
+  <div class="body">
+    <p class="kv">Alt titles considered: <em>How to Defuse a Twenty-Seven-Page Slop Bomb</em> (original working title) &middot; <em>I Got Handed a Slop Bomb in a Meeting</em> &middot; <em>My Two-Page Rule for Every AI Report</em>.</p>
+
+    <h3 class="lbl">Locked outline</h3>
+    <ol class="outline">
+      <li>The scene: the 27-page report, read cold, in real time, by a room that can't yet tell polish from substance.</li>
+      <li>The stall it reveals: stakes are low in the sense everyone's experimenting, but a slop bomb still soaks up real time before anyone catches it.</li>
+      <li>The mechanism (3&ndash;5 bullets): cap agent output at two pages as a forcing function; be the filter, not the forwarder; the deck-guy analogy; reframe the job as a decision engine.</li>
+      <li>The outside evidence: Jeremy's independently-arrived-at version of the same rule &mdash; &ldquo;fifty to a hundred words.&rdquo;</li>
+      <li>The opinion stake: the executive job isn't disappearing into AI &mdash; it's reverting to what it was before the internet made everyone their own analyst.</li>
+    </ol>
+
+    <h3 class="lbl">Pull-quotes</h3>
+    <blockquote>&ldquo;I am not gonna ask anyone to read anything that I have not read word for word.&rdquo;</blockquote>
+    <blockquote>&ldquo;It was people in suits sitting there reading memo after memo after memo, being a decision engine for team after team after team.&rdquo;</blockquote>
+    <blockquote>&ldquo;Say, hey agent &mdash; max two pages. How hard is that?&rdquo;</blockquote>
+
+    <h3 class="lbl">Excerpt &amp; numbers</h3>
+    <p class="kv">Episode 3 excerpt, Chapter 1 (tape 9:56&ndash;17:03) &mdash; deep-links to episode timestamp <strong>0:30</strong> once the episode exports. Target <strong>1,900 words</strong> (drafted at 1,631). Scaffold: <a href="drafts/ep03_post1_fluency-vs-substance.md" target="_blank" rel="noopener"><code>drafts/ep03_post1_fluency-vs-substance.md</code></a>.</p>
+
+    <details class="expand"><summary>Crafting direction</summary><div class="inner">
+      <p class="kv">Highest risk of AI-polished cadence because the thesis is about AI-polished output &mdash; avoid &ldquo;it's not X, it's Y&rdquo; constructions and tidy triads while writing about that exact failure mode. The pre-internet-executive line is strong enough to carry the essay on its own &mdash; no outside historical citation needed.</p>
+    </div></details>
+
+    <div class="flag"><strong>Least confident call (from drafts/README):</strong> the title alone no longer signals the slop-bomb scene the way the original working title did, since you asked specifically for &ldquo;Fluency vs. Substance.&rdquo; Worth a gut check on whether the title still earns the open on its own.</div>
+  </div>
+  <div class="decision-wrap">
+    <span class="dlabel">Decision</span>
+    <div class="pillrow" data-key="p1_plan">
+      <button data-v="lock">Lock plan</button>
+      <button data-v="revise">Revise angle</button>
+      <button data-v="park">Park</button>
+    </div>
+  </div>
+  <div class="snote">
+    <textarea id="ta-s3" data-note="s3" rows="1" placeholder="Your spin…"></textarea>
+    <button class="sb" data-save="s3" type="button" aria-label="Save note" title="Save note">💾</button>
+  </div>
+</section>
+
+<!-- ========== SLIDE 4 — POST 2 ========== -->
+<section class="slide" id="s4">
+  <span class="sno">4 / 12</span>
+  <div class="kicker">Post 2 of 3 · Managing Agents, Part 2</div>
+  <h2>My Agent Made a Smart Call I Never Approved</h2>
+  <p class="sub">&ldquo;A five-hour rate limit burned in an hour, and the real lesson about delegating decisions you can't verify.&rdquo;</p>
+  <div class="body">
+    <p class="kv">Title is agent-invented, not operator-supplied. Alt titles considered: <em>I Burned a Five-Hour Rate Limit in One Hour</em> (Round 3's working title) &middot; <em>The Day &ldquo;Two More Things&rdquo; Ate My Token Budget</em> &middot; <em>My Agent's &ldquo;Clever&rdquo; Shortcut Cost Me 700,000 Tokens</em>.</p>
+
+    <h3 class="lbl">Locked outline</h3>
+    <ol class="outline">
+      <li>The scene: Jeremy's agent writes its own rule into the spec file &mdash; don't use new subagents, reuse the existing one.</li>
+      <li>The stall it reveals: looks clever (context should already be cached) but isn't, once the cache resets the next day.</li>
+      <li>The receipt: a five-hour rate-limit window burned in about an hour, across two parallel projects.</li>
+      <li>The named precedent and outside evidence: the Gastown shutdown, plus the &ldquo;two more things&rdquo; Opus quirk.</li>
+      <li>The fix actually being reached for: role-scoped system prompts (architect, builder personas) instead of a generic session start.</li>
+      <li>The opinion stake: unaudited model &ldquo;cleverness&rdquo; isn't efficiency &mdash; it's just unaudited.</li>
+    </ol>
+
+    <h3 class="lbl">Pull-quotes</h3>
+    <blockquote>&ldquo;Two more things &mdash; at the very end of every bit of work, it would say: and two more things.&rdquo;</blockquote>
+    <blockquote>&ldquo;I was running through my five hour window in like an hour.&rdquo;</blockquote>
+    <blockquote>&ldquo;It's not micromanaging if you do it one time to coach. It's micromanaging if you&hellip; override when it's perfectly good already.&rdquo;</blockquote>
+
+    <h3 class="lbl">Excerpt &amp; numbers</h3>
+    <p class="kv">Episode 3 excerpt, Chapter 3 (tape 38:13&ndash;44:22) &mdash; deep-links to episode timestamp <strong>14:37</strong> once the episode exports. Target <strong>1,700 words</strong> (drafted at 1,588). Scaffold: <a href="drafts/ep03_post2_agent-decision-i-never-approved.md" target="_blank" rel="noopener"><code>drafts/ep03_post2_agent-decision-i-never-approved.md</code></a>.</p>
+
+    <details class="expand"><summary>Crafting direction</summary><div class="inner">
+      <p class="kv">Leanest, most technical post of the three &mdash; lean into that rather than padding. Audience skews practitioner/eng-leader; define &ldquo;subagent&rdquo; and &ldquo;context window&rdquo; in one tight clause each, then move on. Don't paraphrase &ldquo;and two more things&rdquo; into something tamer &mdash; it should survive as direct dialogue.</p>
+    </div></details>
+
+    <div class="flag"><strong>Least confident call:</strong> the title is invented, not operator-supplied. Also worth checking whether folding in the skills/micromanaging material dilutes the &ldquo;leanest, most technical post of the three&rdquo; note from the original brief.</div>
+  </div>
+  <div class="decision-wrap">
+    <span class="dlabel">Decision</span>
+    <div class="pillrow" data-key="p2_plan">
+      <button data-v="lock">Lock plan</button>
+      <button data-v="revise">Revise angle</button>
+      <button data-v="park">Park</button>
+    </div>
+  </div>
+  <div class="snote">
+    <textarea id="ta-s4" data-note="s4" rows="1" placeholder="Your spin…"></textarea>
+    <button class="sb" data-save="s4" type="button" aria-label="Save note" title="Save note">💾</button>
+  </div>
+</section>
+
+<!-- ========== SLIDE 5 — POST 3 ========== -->
+<section class="slide" id="s5">
+  <span class="sno">5 / 12</span>
+  <div class="kicker">Post 3 of 3 · Writing Infrastructure</div>
+  <h2>My 150 Apple Notes Became a Compost Heap</h2>
+  <p class="sub">&ldquo;Building a custom riff engine for a novel nobody ghostwrote, and what AI actually replaced in the process.&rdquo;</p>
+  <div class="body">
+    <p class="kv">Approved enthusiastically as-is &mdash; no structural reframe. Alt titles considered: <em>I Built a Riff Engine for My Own Novel</em> &middot; <em>AI Didn't Ghostwrite My Book &mdash; It Drew the Blueprint</em>.</p>
+
+    <h3 class="lbl">Locked outline</h3>
+    <ol class="outline">
+      <li>The scene: 150 Apple Notes, tagged #CH, each a fragment, described explicitly as a &ldquo;compost heap.&rdquo;</li>
+      <li>The stall: the old process worked but was slow and manual &mdash; &ldquo;spaghetti against the wall&rdquo; with a &ldquo;nice trellis.&rdquo;</li>
+      <li>The mechanism (3&ndash;5 bullets): a custom riff engine, not a chat window; follows the work across Tesla/iPad/iPhone; targets Larry Brooks's &ldquo;nine sentences&rdquo; framework; runs the draft through simulated beta readers and critics before a human developmental editor.</li>
+      <li>The outside evidence: Jeremy's convergent ICP-simulation practice for sharpening sales offers.</li>
+      <li>The honest tension: is tuning to simulated-reader feedback just writing to genre?</li>
+      <li>The opinion stake: AI didn't ghostwrite anything &mdash; it replaced the infrastructure of writing a novel, not the authorship.</li>
+    </ol>
+
+    <h3 class="lbl">Pull-quotes</h3>
+    <blockquote>&ldquo;Treat the Apple Notes as like a compost heap for all my stories.&rdquo;</blockquote>
+    <blockquote>&ldquo;Let's make a riff engine &mdash; bring up one of the Apple Notes on the left, and just give me a box on the right to riff on it.&rdquo;</blockquote>
+    <blockquote>&ldquo;I can go ahead and send this out to simulated beta readers, simulated critics, and start getting a workshop sort of feedback report back.&rdquo;</blockquote>
+
+    <h3 class="lbl">Excerpt &amp; numbers</h3>
+    <p class="kv">Episode 3 excerpt, Chapter 2 (tape 23:12&ndash;30:35) &mdash; deep-links to episode timestamp <strong>7:02</strong> once the episode exports. Target <strong>2,100 words</strong> (drafted at 1,720). Scaffold: <a href="drafts/ep03_post3_apple-notes-compost-heap.md" target="_blank" rel="noopener"><code>drafts/ep03_post3_apple-notes-compost-heap.md</code></a>. The Carbon Chicken Project mention near the close is a marked placeholder/joke &mdash; nothing about it was invented beyond the name.</p>
+
+    <details class="expand"><summary>Crafting direction</summary><div class="inner">
+      <p class="kv">Most personal and narrative-driven of the three, and easiest to flatten into &ldquo;notes from our podcast&rdquo; &mdash; every beat should read as your own essay about your own process. Preserve &ldquo;compost heap&rdquo; and &ldquo;riff engine&rdquo; exactly as spoken. Resist pulling in the Stephen King pantser/plotter tangent &mdash; too general, dilutes the single stake.</p>
+    </div></details>
+
+    <div class="flag"><strong>Least confident call:</strong> the draft's paragraph referencing &ldquo;the first simulated workshop report later today&rdquo; borrows present-tense timing from the recording day &mdash; it will read stale once this publishes. Needs you to cut it, generalize the tense, or confirm the timeline. Also worth a direct gut check on the Carbon Chicken joke's tone.</div>
+  </div>
+  <div class="decision-wrap">
+    <span class="dlabel">Decision</span>
+    <div class="pillrow" data-key="p3_plan">
+      <button data-v="lock">Lock plan</button>
+      <button data-v="revise">Revise angle</button>
+      <button data-v="park">Park</button>
+    </div>
+  </div>
+  <div class="snote">
+    <textarea id="ta-s5" data-note="s5" rows="1" placeholder="Your spin…"></textarea>
+    <button class="sb" data-save="s5" type="button" aria-label="Save note" title="Save note">💾</button>
+  </div>
+</section>
+
+<!-- ========== SLIDE 6 — WRITER'S BRIEFING ========== -->
+<section class="slide" id="s6">
+  <span class="sno">6 / 12</span>
+  <div class="kicker">No decision · acknowledge only</div>
+  <h2>You're writing these yourself. Here's the game.</h2>
+  <div class="body">
+    <p class="lede">Condensed from the audience-response brief (<code>20_research/01_audience_response_brief.md</code>) &mdash; the checklist to run against each post as you write it.</p>
+    <ol class="outline">
+      <li><strong>Scene-first open.</strong> First ~150 words are the concrete moment from the tape, not a framing paragraph. Delete any &ldquo;In the age of AI&hellip;&rdquo; sentence.</li>
+      <li><strong>1,400&ndash;2,200 words.</strong> If a draft runs short, add a second concrete scene or receipt &mdash; not padding. If long, cut setup, not evidence.</li>
+      <li><strong>Zero AI-polished cadence.</strong> No em-dash chains, no &ldquo;it's not X, it's Y&rdquo; constructions, no tidy triads. Roughen the prose back toward how it was actually said.</li>
+      <li><strong>Opinion stake is a claim, not a hedge.</strong> Read it aloud &mdash; if everyone would agree with it, rewrite it to be arguable.</li>
+      <li><strong>Receipts before the halfway mark.</strong> At least one specific number, named tool/API, or verbatim transcript fragment.</li>
+      <li><strong>2&ndash;3 pull-quotes marked</strong> that would survive as standalone X/LinkedIn posts with zero surrounding context.</li>
+      <li><strong>Never frame it as &ldquo;notes from our podcast.&rdquo;</strong> If a sentence refers to &ldquo;this episode&rdquo; instead of stating the finding directly, rewrite it as a finding.</li>
+      <li><strong>Embed the excerpt chapter after the hook,</strong> not before it &mdash; the reader should already be hooked by prose before being offered the option to listen.</li>
+      <li><strong>Title rules:</strong> 5&ndash;13 words, first-person where natural, no &ldquo;X Is All You Need&rdquo; snowclone, no question-mark ending.</li>
+      <li><strong>Cover image mandatory</strong> &mdash; a real still from the actual session, not stock or generated art.</li>
+    </ol>
+  </div>
+  <div class="decision-wrap">
+    <span class="dlabel">Acknowledge</span>
+    <div class="pillrow" data-key="writer_brief_ack">
+      <button data-v="ack">Got it</button>
+    </div>
+  </div>
+  <div class="snote">
+    <textarea id="ta-s6" data-note="s6" rows="1" placeholder="Questions on the brief…"></textarea>
+    <button class="sb" data-save="s6" type="button" aria-label="Save note" title="Save note">💾</button>
+  </div>
+</section>
+
+<!-- ========== SLIDE 7 — STATS & MONITORING ========== -->
+<section class="slide" id="s7">
+  <span class="sno">7 / 12</span>
+  <div class="kicker">Decision</div>
+  <h2>What to watch when posts go live.</h2>
+  <div class="body">
+    <h3 class="lbl">First 48 hours, per post</h3>
+    <p class="kv">Views, open rate (if emailed), new free subs attributed, restacks/Notes shares, X referral clicks.</p>
+    <h3 class="lbl">Weekly</h3>
+    <p class="kv">Subscriber delta, which post converts visitors &rarr; subs, traffic sources.</p>
+    <h3 class="lbl">Monthly</h3>
+    <p class="kv">Cohort retention, top-of-funnel mix.</p>
+    <h3 class="lbl">Where</h3>
+    <p>Substack's own <strong>Stats tab</strong> (post stats + subscriber chart + traffic sources) plus <strong>X analytics</strong>. Being honest: Substack has no public API, so day-one monitoring is their dashboard, full stop. The DCC-side option is a <strong>manual weekly tracker page</strong> in this project &mdash; something I'd build and you'd update by hand on your own cadence.</p>
+  </div>
+  <div class="decision-wrap">
+    <span class="dlabel">Decision &mdash; dashboard approach</span>
+    <div class="pillrow" data-key="stats_approach">
+      <button data-v="a">A) Substack native only, for now</button>
+      <button data-v="b">B) Build a weekly manual tracker page</button>
+      <button data-v="c">C) Defer until 5+ posts live</button>
+    </div>
+  </div>
+  <div class="snote">
+    <textarea id="ta-s7" data-note="s7" rows="1" placeholder="Notes…"></textarea>
+    <button class="sb" data-save="s7" type="button" aria-label="Save note" title="Save note">💾</button>
+  </div>
+</section>
+
+<!-- ========== SLIDE 8 — EPISODE DRAG ========== -->
+<section class="slide" id="s8">
+  <span class="sno">8 / 12</span>
+  <div class="kicker">Decision</div>
+  <h2>&ldquo;The Cutting Room&rdquo; &mdash; one manual step left.</h2>
+  <div class="body">
+    <p class="kv">Edit <code>6acc15f6bd2b7feb98c7f836</code>, revision 16. 4 synced cuts + 4 River VO clips confirmed via a full timeline read-back. Runtime 20:46.8. It currently plays in <strong>tape-chronological order</strong> (Slop Bomb &rarr; Apple Notes &rarr; Rate Limit) because Riverside's reorder tools are gated off for this account, and manual clip surgery was assessed unsafe &mdash; synced cuts are keyed to absolute timeline position, not content.</p>
+
+    <h3 class="lbl">The fix (about 2 minutes, Riverside web editor)</h3>
+    <ol class="outline">
+      <li>Open edit <code>6acc15f6bd2b7feb98c7f836</code>.</li>
+      <li>Drag the &ldquo;Rate Limit&rdquo; chapter block (currently third) to sit between &ldquo;Slop Bomb&rdquo; (first) and &ldquo;Apple Notes&rdquo; (currently second).</li>
+      <li>Swap the Ch.2/Ch.3 VO handoff clips to match &mdash; Apple Notes' handoff moves to third, Rate Limit's handoff moves to second. Both clips already exist in the media library, so this is a reposition, not a re-render.</li>
+    </ol>
+
+    <div class="flag"><strong>Also flagged:</strong> a 104ms overlap where the Apple Notes handoff VO's tail runs past its reserved window into the start of the Apple Notes dialogue. Likely sub-perceptible, but worth an ear during the listen-through.</div>
+
+    <p>Then: a full human listen-through before export &mdash; I can't play audio myself to verify it.</p>
+  </div>
+  <div class="decision-wrap">
+    <span class="dlabel">Decision &mdash; after the drag + listen</span>
+    <div class="pillrow" data-key="episode_export">
+      <button data-v="export">Export</button>
+      <button data-v="hold">Hold</button>
+    </div>
+  </div>
+  <div class="snote">
+    <textarea id="ta-s8" data-note="s8" rows="1" placeholder="Notes…"></textarea>
+    <button class="sb" data-save="s8" type="button" aria-label="Save note" title="Save note">💾</button>
+  </div>
+</section>
+
+<!-- ========== SLIDE 9 — PUBLISH SEQUENCING ========== -->
+<section class="slide" id="s9">
+  <span class="sno">9 / 12</span>
+  <div class="kicker">Decision</div>
+  <h2>The lattice: episode first, then one post a day.</h2>
+  <div class="body">
+    <p>Episode publishes first, then Post A &rarr; Post B &rarr; Post C, one per day. Each post deep-links its own chapter's content-start timestamp in the (currently chronological) episode: <em>Fluency vs. Substance</em> &rarr; 0:30, <em>My 150 Apple Notes Became a Compost Heap</em> &rarr; 7:02, <em>My Agent Made a Smart Call I Never Approved</em> &rarr; 14:37. Each post's footer links the full episode; the episode's show notes link all three posts in chapter-playback order &mdash; which differs from post rank unless the drag on slide 8 happens first. Every surface routes back to <strong>readlossy.substack.com</strong>.</p>
+  </div>
+  <div class="decision-wrap">
+    <span class="dlabel">Decision</span>
+    <div class="pillrow" data-key="publish_sequence">
+      <button data-v="adopt">Adopt this sequence</button>
+      <button data-v="stagger">Stagger differently</button>
+      <button data-v="later">Decide after writing</button>
+    </div>
+  </div>
+  <div class="snote">
+    <textarea id="ta-s9" data-note="s9" rows="1" placeholder="Notes…"></textarea>
+    <button class="sb" data-save="s9" type="button" aria-label="Save note" title="Save note">💾</button>
+  </div>
+</section>
+
+<!-- ========== SLIDE 10 — POCOCK ADOPTIONS ========== -->
+<section class="slide" id="s10">
+  <span class="sno">10 / 12</span>
+  <div class="kicker">Checklist · not a single decision</div>
+  <h2>What transfers from Matt Pocock's playbook.</h2>
+  <div class="body">
+    <p class="kv">Full study: <a href="pocock_study.html" target="_blank" rel="noopener">pocock_study.html</a> §5, &ldquo;What Transfers to Turner.&rdquo; Each row below gets its own adopt/park call.</p>
+    <div class="checklist">
+      <div class="citem">
+        <div class="chead"><span class="cnum">1</span><h4>Single-concept tip &rarr; pull-quotes &amp; excerpt chapters</h4><span class="badge good">already underway</span></div>
+        <p>Keep treating each pull-quote and excerpt chapter as a complete, isolated unit, not a highlight reel.</p>
+        <div class="pillrow" data-key="pocock_1"><button data-v="adopt">Adopt</button><button data-v="park">Park</button></div>
+      </div>
+      <div class="citem">
+        <div class="chead"><span class="cnum">2</span><h4>Evergreen master-thread &rarr; a running &ldquo;signals we're tracking&rdquo; note</h4><span class="badge">medium effort</span></div>
+        <p>A lower-commitment, frequently-updated format (X thread or Substack Note) so cadence doesn't depend entirely on full-essay production.</p>
+        <div class="pillrow" data-key="pocock_2"><button data-v="adopt">Adopt</button><button data-v="park">Park</button></div>
+      </div>
+      <div class="citem">
+        <div class="chead"><span class="cnum">3</span><h4>Newsletter as connective tissue &rarr; every surface routes to readlossy</h4><span class="badge good">already underway</span></div>
+        <p>The cross-link lattice already does this &mdash; discipline ask is never skipping the explicit &ldquo;subscribe&rdquo; close.</p>
+        <div class="pillrow" data-key="pocock_3"><button data-v="adopt">Adopt</button><button data-v="park">Park</button></div>
+      </div>
+      <div class="citem">
+        <div class="chead"><span class="cnum">4</span><h4>Controversy as content &mdash; scoped away from Walmart</h4><span class="badge warn">⚠ employer-discretion flag</span></div>
+        <p>Adopt the pattern (arguable stakes), not any specific stance about your employer. &ldquo;Could this read as about Walmart&rdquo; stays a standing filter.</p>
+        <div class="pillrow" data-key="pocock_4"><button data-v="adopt">Adopt</button><button data-v="park">Park</button></div>
+      </div>
+      <div class="citem">
+        <div class="chead"><span class="cnum">5</span><h4>Code-repo-as-content &mdash; not DCC itself</h4><span class="badge warn">⚠ IP-lock flag · high effort</span></div>
+        <p>A small shareable asset off the podcast's build-your-own-harness thread &mdash; explicitly not the Dev Command Center frame, which stays outbound-donations-only.</p>
+        <div class="pillrow" data-key="pocock_5"><button data-v="adopt">Adopt</button><button data-v="park">Park</button></div>
+      </div>
+      <div class="citem">
+        <div class="chead"><span class="cnum">6</span><h4>Platform-role separation</h4><span class="badge good">already underway</span></div>
+        <p>X carries essays/pull-quotes, LinkedIn is dead weight, the podcast is the authority surface, Substack is the owned layer &mdash; discipline ask, not new building.</p>
+        <div class="pillrow" data-key="pocock_6"><button data-v="adopt">Adopt</button><button data-v="park">Park</button></div>
+      </div>
+      <div class="citem">
+        <div class="chead"><span class="cnum">7</span><h4>Free-forever foundational asset &mdash; the essay archive itself</h4><span class="badge">high effort · later</span></div>
+        <p>Keep the entire readlossy archive free-forever; consider a compiled reference once there are enough posts. Premature to build now.</p>
+        <div class="pillrow" data-key="pocock_7"><button data-v="adopt">Adopt</button><button data-v="park">Park</button></div>
+      </div>
+      <div class="citem">
+        <div class="chead"><span class="cnum">8</span><h4>Naming the pivot &mdash; let &ldquo;taste compounds&rdquo; do the work</h4><span class="badge">medium effort</span></div>
+        <p>Deliberately repeat &ldquo;taste compounds&rdquo; / &ldquo;the floor&rdquo; across the series and track whether anyone cites it unprompted.</p>
+        <div class="pillrow" data-key="pocock_8"><button data-v="adopt">Adopt</button><button data-v="park">Park</button></div>
+      </div>
+      <div class="citem">
+        <div class="chead"><span class="cnum">9</span><h4>Cadence discipline &mdash; the one-extra-post-a-week rule</h4><span class="badge">medium effort · ongoing</span></div>
+        <p>The audience brief's own highest-leverage cadence variable. Treat as load-bearing, not optional.</p>
+        <div class="pillrow" data-key="pocock_9"><button data-v="adopt">Adopt</button><button data-v="park">Park</button></div>
+      </div>
+      <div class="citem">
+        <div class="chead"><span class="cnum">10</span><h4>Cohort / live format</h4><span class="badge">high effort · not urgent</span></div>
+        <p>A plausible eventual monetization step once a real list exists &mdash; premature now, flagged for a future round.</p>
+        <div class="pillrow" data-key="pocock_10"><button data-v="adopt">Adopt</button><button data-v="park">Park</button></div>
+      </div>
+    </div>
+  </div>
+  <div class="snote">
+    <textarea id="ta-s10" data-note="s10" rows="1" placeholder="Notes on the adoptions…"></textarea>
+    <button class="sb" data-save="s10" type="button" aria-label="Save note" title="Save note">💾</button>
+  </div>
+</section>
+
+<!-- ========== SLIDE 11 — LOOSE ENDS ========== -->
+<section class="slide" id="s11">
+  <span class="sno">11 / 12</span>
+  <div class="kicker">Note only</div>
+  <h2>Still open, from before this round.</h2>
+  <div class="body">
+    <ul class="outline">
+      <li><strong>Round 10 (Episode 2):</strong> 3 Substack clusters + a 25-minute excerpt episode are still awaiting your annotations at <a href="index.html">Control &rarr; Round 10</a>. Nothing in this round depends on it, but it's been open since mid-September.</li>
+      <li><strong>Plaud Ep2 recovery:</strong> Episode 2 recorded 9/13 &mdash; Jeremy's track is safe, your track was lost in upload. Recovery is still pending.</li>
+      <li>Nothing else is flagged open in <code>cc-status.json</code> beyond what's already covered on slides 2, 8, and 10.</li>
+    </ul>
+  </div>
+  <div class="snote">
+    <textarea id="ta-s11" data-note="s11" rows="1" placeholder="Anything else to flag…"></textarea>
+    <button class="sb" data-save="s11" type="button" aria-label="Save note" title="Save note">💾</button>
+  </div>
+</section>
+
+<!-- ========== SLIDE 12 — CLOSE ========== -->
+<section class="slide" id="s12">
+  <span class="sno">12 / 12</span>
+  <div class="kicker">Close</div>
+  <h2>You write. I process.</h2>
+  <div class="body">
+    <p>Everything you just decided lives in this browser's local storage. Tap <strong>Copy Annotations</strong> below to copy it as one block, then paste it into <code>review_deck_annotations.js</code> and tell the terminal &ldquo;process the review deck&rdquo; &mdash; I'll fold your calls into locked writing plans, the stats-monitoring approach, the episode export call, the publish sequencing, and the Pocock adoptions, and update the loose ends.</p>
+    <div class="lockbox">Nothing publishes, nothing exports, and no post gets written by me. That's still entirely yours.</div>
+  </div>
+  <div class="decision-wrap">
+    <button class="icon-btn solid" id="send-ann" style="height:38px; font-size:13.5px; padding:0 16px">📤 Copy annotations</button>
+  </div>
+  <div class="snote">
+    <textarea id="ta-s12" data-note="s12" rows="1" placeholder="Final thoughts…"></textarea>
+    <button class="sb" data-save="s12" type="button" aria-label="Save note" title="Save note">💾</button>
+  </div>
+</section>
+
+</div>
+
+<button id="next" type="button" aria-label="Next slide">▼</button>
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+const deck = document.getElementById('deck');
+const slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+const TOTAL = slides.length;
+
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+/* ---------- theme toggle (house pattern) ---------- */
+document.getElementById('theme').onclick = () => {
+  const cur = document.documentElement.getAttribute('data-theme');
+  const next = cur === 'dark' ? 'light' : cur === 'light' ? 'dark'
+    : (matchMedia('(prefers-color-scheme:dark)').matches ? 'light' : 'dark');
+  document.documentElement.setAttribute('data-theme', next);
+};
+
+/* ---------- slide counter + next button ---------- */
+const counter = document.getElementById('slide-counter');
+let current = 0;
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if(e.isIntersecting && e.intersectionRatio > 0.5){
+      current = slides.indexOf(e.target);
+      counter.textContent = (current + 1) + ' / ' + TOTAL;
+    }
+  });
+}, { root: deck, threshold: [0.5] });
+slides.forEach(s => io.observe(s));
+
+document.getElementById('next').onclick = () => {
+  const target = slides[Math.min(current + 1, TOTAL - 1)];
+  target.scrollIntoView({ behavior: 'smooth' });
+};
+document.addEventListener('keydown', (e) => {
+  if(e.target && (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT')) return;
+  if(e.key === 'ArrowDown' || e.key === 'PageDown'){
+    e.preventDefault();
+    slides[Math.min(current + 1, TOTAL - 1)].scrollIntoView({ behavior: 'smooth' });
+  } else if(e.key === 'ArrowUp' || e.key === 'PageUp'){
+    e.preventDefault();
+    slides[Math.max(current - 1, 0)].scrollIntoView({ behavior: 'smooth' });
+  }
+});
+
+/* ---------- verdict chips (localStorage, keyed rd3_v_<key>) ---------- */
+document.querySelectorAll('.pillrow[data-key]').forEach(row => {
+  const key = 'rd3_v_' + row.dataset.key;
+  const saved = localStorage.getItem(key);
+  row.querySelectorAll('button').forEach(b => {
+    if(saved === b.dataset.v) b.classList.add('sel');
+    b.onclick = () => {
+      row.querySelectorAll('button').forEach(x => x.classList.remove('sel'));
+      b.classList.add('sel');
+      localStorage.setItem(key, b.dataset.v);
+    };
+  });
+});
+
+/* ---------- note boxes (localStorage, keyed rd3_n_<slide id>), auto-grow + floppy save ---------- */
+function grow(t){ if(!t) return; t.style.height = 'auto'; t.style.height = Math.max(t.scrollHeight, 44) + 'px'; }
+document.querySelectorAll('.snote textarea[data-note]').forEach(t => {
+  const key = 'rd3_n_' + t.dataset.note;
+  t.value = localStorage.getItem(key) || '';
+  grow(t);
+  t.addEventListener('input', () => { localStorage.setItem(key, t.value); grow(t); });
+});
+document.querySelectorAll('.sb[data-save]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const id = btn.dataset.save;
+    const ta = document.getElementById('ta-' + id);
+    localStorage.setItem('rd3_n_' + id, ta.value);
+    const original = btn.textContent;
+    btn.textContent = '✓'; btn.classList.add('ok');
+    setTimeout(() => { btn.textContent = original; btn.classList.remove('ok'); }, 1400);
+  });
+});
+
+/* ---------- copy annotations export ---------- */
+function annCollect(){
+  const out = { savedAt: new Date().toISOString(), verdicts: {}, notes: {} };
+  const vPrefix = 'rd3_v_', nPrefix = 'rd3_n_';
+  for(let i = 0; i < localStorage.length; i++){
+    const k = localStorage.key(i);
+    if(k.startsWith(vPrefix)) out.verdicts[k.slice(vPrefix.length)] = localStorage.getItem(k);
+    if(k.startsWith(nPrefix)) out.notes[k.slice(nPrefix.length)] = localStorage.getItem(k);
+  }
+  return out;
+}
+const sendBtn = document.getElementById('send-ann');
+if(sendBtn) sendBtn.onclick = () => {
+  const data = annCollect();
+  const text = 'window.REVIEW_DECK_R3_ANNOTATIONS = ' + JSON.stringify(data, null, 1) + ';\n';
+  try{ navigator.clipboard.writeText(text); }catch(e){}
+  console.log("CC_VIZSAVE::" + JSON.stringify({ file: 'review_deck_annotations.js', payload: data }));
+  toast('Copied REVIEW_DECK_R3_ANNOTATIONS — paste into review_deck_annotations.js');
+};
+</script>
+</body>
+</html>
