@@ -1,8 +1,8 @@
 {
   "name": "Jeremy Podcast test",
   "stage": "ep3-final-edit-review",
-  "note": "HANDOFF to the podcast-management session: read HANDOFF_podcast_management.md first. Ep1 published, Ep2 written off (track lost, operator call 2026-10-13), Ep3 in FINAL EDIT/REVIEW (Riverside edit 6acc15f6 rev 16, 20:47, River AI narrator). Operator annotations landed: publish sequence adopted, 4 Pocock adoptions, ep2 closed. MAIN WORK ORDER: build the podcast processing visualizer + Substack desk (spec = note s12 in 10_app/content_rounds/review_deck_annotations.js). RULE: Turner writes the posts himself; agents outline/plan only.",
-  "url": "http://127.0.0.1:4010/review_deck.html",
+  "note": "HANDOFF RECEIVED (podcast-management session). The Podcast Machine is built: machine.html = main page (buttons) + podcast flow + Substack desk + per-post drafting views + Riverside walkthrough (s8). s4 research done: 20_research/03_opus_two_more_things.md. Ep3 waiting on Turner's walkthrough (reorder, ear-check, listen) then 'export ep 3'. Posts p1-p3 at outlining, locks pending. RULE: Turner writes the posts himself.",
+  "url": "http://127.0.0.1:4010/machine.html",
   "car_url": "https://claude.ai/code/artifact/48b0b977-f764-4f57-9e74-93ff9bc81217",
   "launch": "python3 -m http.server 4010 --directory \"10_app\"",
   "updated": "2026-10-13T01:10:00Z"

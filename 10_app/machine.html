@@ -1,0 +1,399 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Podcast Machine</title>
+<style>
+  :root{
+    --ground:#F3F4F6; --panel:#FFFFFF; --panel-2:#ECEEF1;
+    --ink:#1B1F26; --ink-soft:#5A6472; --ink-faint:#8A93A1;
+    --line:#E1E4E9; --line-strong:#C9CFD7;
+    --accent:#E0462A; --accent-ink:#FFFFFF; --brass:#8A6D1F;
+    --good:#25835A; --warn:#B07C22; --blue:#33619C;
+    --shadow:0 1px 2px rgba(20,25,35,.05), 0 4px 14px rgba(20,25,35,.05);
+    --radius:8px;
+    --mono:ui-monospace,"SF Mono","Cascadia Code",Menlo,Consolas,monospace;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --ground:#13161B; --panel:#1B1F26; --panel-2:#161A20;
+      --ink:#E5E8EC; --ink-soft:#9AA3B0; --ink-faint:#68717E;
+      --line:#272C34; --line-strong:#353C46;
+      --accent:#F05B3E; --accent-ink:#14100E; --brass:#C4A24A;
+      --good:#43A87A; --warn:#CE9A34; --blue:#6C95C8;
+      --shadow:0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.3);
+    }
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0; height:100%}
+  body{background:var(--ground); color:var(--ink); font-family:var(--sans);
+    line-height:1.5; -webkit-font-smoothing:antialiased; height:100vh; overflow:hidden}
+  button{font-family:inherit}
+  .view{display:none; height:100vh; flex-direction:column}
+  .view.active{display:flex}
+
+  .bar{display:flex; align-items:center; gap:12px; padding:8px clamp(12px,2.5vw,18px);
+    flex:none; background:var(--panel); border-bottom:1px solid var(--line)}
+  .tally{display:inline-flex; align-items:center; gap:7px; font-family:var(--mono);
+    font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-soft);
+    padding:3px 9px 3px 7px; border:1px solid var(--line-strong); border-radius:100px; background:var(--panel-2)}
+  .dot{width:9px; height:9px; border-radius:50%; background:var(--accent); animation:pulse 2.4s ease-out infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--accent) 55%,transparent)}
+    70%{box-shadow:0 0 0 7px transparent}100%{box-shadow:0 0 0 0 transparent}}
+  @media (prefers-reduced-motion:reduce){.dot{animation:none}}
+  .title{display:flex; align-items:baseline; gap:8px; margin-right:auto; min-width:0}
+  .title h1{margin:0; font-size:13.5px; font-weight:640; letter-spacing:-.01em; white-space:nowrap}
+  .title .sub{font-family:var(--mono); font-size:10px; color:var(--ink-faint); white-space:nowrap}
+  .icon-btn{appearance:none; border:1px solid var(--line-strong); background:var(--panel-2);
+    color:var(--ink-soft); height:26px; min-width:26px; padding:0 9px; border-radius:6px; cursor:pointer;
+    font-size:12px; display:inline-flex; align-items:center; gap:5px; justify-content:center;
+    transition:border-color .15s,color .15s}
+  .icon-btn:hover{border-color:var(--accent); color:var(--accent)}
+  .icon-btn:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+  .icon-btn.solid{background:var(--accent); border-color:var(--accent); color:var(--accent-ink)}
+  .icon-btn.solid:hover{filter:brightness(1.06); color:var(--accent-ink)}
+
+  .body{flex:1; overflow-y:auto; padding:clamp(12px,2vw,20px)}
+  .inner{max-width:900px; margin:0 auto}
+  .inner.wide{max-width:1100px}
+
+  h2.sec{font-family:var(--mono); font-size:11px; letter-spacing:.13em; text-transform:uppercase;
+    color:var(--ink-soft); margin:22px 0 10px; padding-bottom:7px; border-bottom:1px solid var(--line)}
+  h2.sec:first-child{margin-top:0}
+
+  /* home buttons */
+  .btngrid{display:grid; gap:8px; grid-template-columns:repeat(auto-fill,minmax(210px,1fr))}
+  .mbtn{display:flex; flex-direction:column; gap:3px; text-align:left; appearance:none; cursor:pointer;
+    background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow);
+    padding:11px 13px; color:var(--ink); text-decoration:none; transition:border-color .13s}
+  .mbtn:hover{border-color:var(--accent)}
+  .mbtn:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+  .mbtn b{font-size:13px; font-weight:630; letter-spacing:-.01em}
+  .mbtn span{font-size:11.5px; color:var(--ink-soft); line-height:1.4}
+  .mbtn.big{border-left:3px solid var(--accent)}
+  .mbtn .why{font-size:11px; color:var(--ink-faint); font-style:italic}
+
+  /* episode lines */
+  .epline{background:var(--panel); border:1px solid var(--line); border-radius:var(--radius);
+    box-shadow:var(--shadow); padding:13px 15px; margin-bottom:10px}
+  .epline .toprow{display:flex; align-items:baseline; gap:10px; flex-wrap:wrap}
+  .epline h3{margin:0; font-size:13.5px; font-weight:640; margin-right:auto}
+  .chip{font-family:var(--mono); font-size:9.5px; font-weight:700; letter-spacing:.08em;
+    text-transform:uppercase; padding:3px 9px; border-radius:100px; color:#fff; flex:none}
+  .chip.pub{background:var(--good)} .chip.rev{background:var(--warn)}
+  .chip.dead{background:var(--ink-faint)} .chip.idea{background:var(--blue)}
+  .chip.out{background:var(--warn)} .chip.draft{background:var(--accent)}
+  .stages{display:flex; gap:4px; margin:9px 0 4px; flex-wrap:wrap}
+  .stg{font-family:var(--mono); font-size:9.5px; letter-spacing:.06em; text-transform:uppercase;
+    padding:3px 8px; border-radius:5px; border:1px solid var(--line); color:var(--ink-faint); background:var(--panel-2)}
+  .stg.done{border-color:var(--good); color:var(--good)}
+  .stg.now{border-color:var(--warn); color:var(--warn); font-weight:700}
+  .stg.dead{border-color:var(--ink-faint); text-decoration:line-through}
+  .epline p{margin:7px 0 0; font-size:12.5px; color:var(--ink-soft); line-height:1.55}
+  .eplinks{display:flex; gap:7px; flex-wrap:wrap; margin-top:9px}
+  .eplinks a,.eplinks button{font-size:11.5px; text-decoration:none; color:var(--blue);
+    border:1px solid var(--line); background:var(--panel-2); border-radius:6px; padding:4px 9px; cursor:pointer}
+  .eplinks a:hover,.eplinks button:hover{border-color:var(--accent); color:var(--accent)}
+  .spawn{margin-top:9px; font-size:12px; color:var(--ink-soft)}
+  .spawn b{color:var(--ink)}
+  .spawn a{color:var(--blue); text-decoration:none}
+  .spawn a:hover{color:var(--accent)}
+
+  /* desk */
+  .postrow{display:flex; align-items:center; gap:10px; background:var(--panel); border:1px solid var(--line);
+    border-radius:var(--radius); padding:10px 13px; margin-bottom:7px; cursor:pointer; box-shadow:var(--shadow);
+    transition:border-color .13s; appearance:none; width:100%; text-align:left; color:var(--ink)}
+  .postrow:hover{border-color:var(--accent)}
+  .postrow .pt{min-width:0; flex:1}
+  .postrow b{font-size:13px; font-weight:630; display:block}
+  .postrow span{font-size:11.5px; color:var(--ink-soft); display:block; line-height:1.4}
+  .postrow .src{font-family:var(--mono); font-size:9.5px; color:var(--ink-faint); flex:none}
+
+  /* drafting view */
+  .split{display:grid; grid-template-columns:1fr 1fr; gap:14px; align-items:start}
+  @media (max-width:860px){.split{grid-template-columns:1fr}}
+  .pane{background:var(--panel); border:1px solid var(--line); border-radius:var(--radius);
+    box-shadow:var(--shadow); padding:15px 17px}
+  .pane h4{margin:0 0 4px; font-family:var(--mono); font-size:10px; letter-spacing:.12em;
+    text-transform:uppercase; color:var(--accent)}
+  .pane h5{margin:14px 0 5px; font-size:12px; font-weight:700}
+  .pane p,.pane li{font-size:12.5px; line-height:1.6; color:var(--ink)}
+  .pane ul,.pane ol{margin:4px 0; padding-left:20px}
+  .pane .quote{border-left:3px solid var(--brass); padding:6px 10px; margin:7px 0;
+    background:var(--panel-2); border-radius:0 6px 6px 0; font-size:12px; font-style:italic}
+  .pane .meta{font-family:var(--mono); font-size:10.5px; color:var(--ink-faint); margin-top:2px}
+  .pane textarea{width:100%; min-height:380px; resize:vertical; background:var(--panel-2);
+    border:1px solid var(--line-strong); border-radius:6px; color:var(--ink); padding:10px 12px;
+    font-family:var(--sans); font-size:13px; line-height:1.6}
+  .pane textarea:focus-visible{outline:2px solid var(--accent); outline-offset:1px}
+  .stagectl{display:flex; gap:7px; flex-wrap:wrap; margin:10px 0 4px}
+  .stagectl button{font-size:11.5px; border:1px solid var(--line-strong); background:var(--panel-2);
+    color:var(--ink-soft); border-radius:100px; padding:5px 12px; cursor:pointer}
+  .stagectl button.on{border-color:var(--accent); color:var(--accent); font-weight:700}
+  .savebar{display:flex; gap:8px; align-items:center; margin-top:10px; flex-wrap:wrap}
+  .savebar .hint{font-size:11px; color:var(--ink-faint)}
+
+  /* walkthrough */
+  .step{display:flex; gap:12px; background:var(--panel); border:1px solid var(--line); border-radius:var(--radius);
+    box-shadow:var(--shadow); padding:13px 15px; margin-bottom:9px}
+  .step input[type=checkbox]{width:19px; height:19px; margin-top:2px; accent-color:var(--accent); flex:none; cursor:pointer}
+  .step .st{min-width:0}
+  .step b{font-size:13px; font-weight:650; display:block; margin-bottom:3px}
+  .step p{margin:0 0 5px; font-size:12.5px; color:var(--ink-soft); line-height:1.6}
+  .step p:last-child{margin:0}
+  .step code{font-family:var(--mono); font-size:11px; background:var(--panel-2);
+    border:1px solid var(--line); border-radius:4px; padding:1px 5px}
+  .step.done{opacity:.55}
+
+  .toast{position:fixed; bottom:18px; left:50%; transform:translateX(-50%);
+    background:var(--ink); color:var(--ground); font-size:12px; padding:8px 16px;
+    border-radius:100px; opacity:0; transition:opacity .25s; pointer-events:none; z-index:50}
+  .toast.show{opacity:1}
+  .rulebox{border:1px dashed var(--line-strong); border-radius:var(--radius); background:var(--panel-2);
+    padding:10px 14px; margin-top:18px}
+  .rulebox p{margin:2px 0; font-size:11.5px; color:var(--ink-soft)}
+  .rulebox p::before{content:"— "; color:var(--accent)}
+</style>
+</head>
+<body>
+
+<div class="view active" id="view-root">
+  <div class="bar">
+    <span class="tally"><span class="dot"></span>MACHINE</span>
+    <div class="title"><h1 id="bar-title">The Jeremy/Turner Podcast Machine</h1><span class="sub" id="bar-sub">in practice · readlossy</span></div>
+    <button class="icon-btn" id="btn-back" style="display:none">← Back</button>
+  </div>
+  <div class="body"><div class="inner" id="content"></div></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="machine_data.js"></script>
+<script>
+const M = window.MACHINE;
+const $ = sel => document.querySelector(sel);
+const content = $('#content');
+let round3 = null;   // lazy-loaded post plans
+
+function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show');
+  clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'),1800); }
+window.toast = toast;
+
+function esc(s){ return String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+/* ---------- stage persistence (operator escalations live in localStorage,
+     exported via the copy button; I fold exports back into machine_data.js) ---------- */
+function postStage(p){ return localStorage.getItem('machine.stage.'+p.id) || p.stage; }
+function setStage(id, s){ localStorage.setItem('machine.stage.'+id, s); }
+
+const STAGE_CHIP = { idea:'idea', outlining:'out', drafting:'draft', published:'pub' };
+
+/* ================= HOME ================= */
+function renderHome(){
+  $('#bar-title').textContent = 'The Jeremy/Turner Podcast Machine';
+  $('#bar-sub').textContent = 'in practice · readlossy';
+  let h = '';
+  h += `<h2 class="sec">The two flows</h2><div class="btngrid">
+    <a class="mbtn big" href="?view=podcast"><b>🎙 Podcast flow</b><span>Episodes, stage by stage. Ep 3 is in final edit/review — the walkthrough is waiting for you.</span></a>
+    <a class="mbtn big" href="?view=desk"><b>✍️ Substack desk</b><span>Every post, ideation → outlining → drafting. Three Ep-3 plans ready to lock; four ideas banked.</span></a>
+    <a class="mbtn big" href="?view=walkthrough"><b>⚑ Riverside walkthrough</b><span>The 4 remaining manual steps on Ep 3, guided — reorder, ear-check, listen, export call.</span></a>
+  </div>`;
+  h += `<h2 class="sec">Substack — quick links</h2><div class="btngrid">` +
+    M.quicklinks.substack.map(l=>`<a class="mbtn" href="${l.href}" target="_blank" rel="noopener"><b>${esc(l.label)}</b></a>`).join('') + `</div>`;
+  h += `<h2 class="sec">Riverside</h2><div class="btngrid">` +
+    M.quicklinks.riverside.map(l=>`<a class="mbtn" href="${l.href}" target="_blank" rel="noopener"><b>${esc(l.label)}</b></a>`).join('') + `</div>`;
+  h += `<h2 class="sec">Jeremy's links</h2><div class="btngrid">
+    <div class="mbtn" style="cursor:default"><b>Nothing on file — deliberately</b>
+    <span>I don't invent URLs. Tell me his links (Thrive Consulting site, LinkedIn, anything you send people) and I'll wire them here. Same moment is the right one to finally add him to the people list — say the word.</span></div></div>`;
+  h += `<h2 class="sec">North-star posts — check your form against these</h2><div class="btngrid">` +
+    M.quicklinks.northstars.map(l=>`<a class="mbtn" href="${l.href}" target="_blank" rel="noopener"><b>${esc(l.label)}</b><span class="why">${esc(l.why)}</span></a>`).join('') + `</div>`;
+  h += `<h2 class="sec">Other surfaces</h2><div class="btngrid">` +
+    M.quicklinks.surfaces.map(l=>`<a class="mbtn" href="${l.href}" ${/^http/.test(l.href)?'target="_blank" rel="noopener"':''}><b>${esc(l.label)}</b></a>`).join('') + `</div>`;
+  h += `<div class="rulebox">` + M.rules.map(r=>`<p>${esc(r)}</p>`).join('') + `</div>`;
+  content.innerHTML = h; content.classList.remove('wide');
+}
+
+/* ================= PODCAST FLOW ================= */
+function renderPodcast(){
+  $('#bar-title').textContent = 'Podcast flow';
+  $('#bar-sub').textContent = 'recording → processing → final edit/review → published';
+  let h = '';
+  for(const ep of M.episodes){
+    const chip = ep.stage==='published' ? '<span class="chip pub">published</span>'
+               : ep.stage==='cancelled' ? '<span class="chip dead">cancelled · data lost</span>'
+               : '<span class="chip rev">'+esc(ep.stage)+'</span>';
+    const stages = ep.stages.map((s,i)=>{
+      let cls='stg';
+      if(ep.stage==='cancelled') cls+=' dead';
+      else if(i<ep.stageIndex) cls+=' done';
+      else if(i===ep.stageIndex) cls+=(ep.stage==='published'?' done':' now');
+      return `<span class="${cls}">${esc(s)}</span>`;
+    }).join('');
+    const spawned = (ep.posts&&ep.posts.length)
+      ? `<div class="spawn"><b>${ep.posts.length} Substack post${ep.posts.length>1?'s':''} spawned:</b> ` +
+        ep.posts.map(pid=>{const p=M.posts.find(x=>x.id===pid);
+          return `<a href="?view=post&id=${pid}">${esc(p.title)}</a> <span style="color:var(--ink-faint)">(${postStage(p)})</span>`;}).join(' · ') + `</div>`
+      : (ep.ideaBank ? `<div class="spawn"><b>${ep.ideaBank.length} ideas banked</b> (episode lost, ideas survive): ` +
+          ep.ideaBank.map(pid=>{const p=M.posts.find(x=>x.id===pid);
+          return `<a href="?view=post&id=${pid}">${esc(p.title)}</a>`;}).join(' · ') + `</div>`
+      : `<div class="spawn"><b>0 posts spawned</b> — show notes only.</div>`);
+    const links = (ep.links||[]).map(l=> l.view
+      ? `<button onclick="location.search='?view=${l.view}'">${esc(l.label)}</button>`
+      : `<a href="${l.href}" ${/^http/.test(l.href)?'target="_blank" rel="noopener"':''}>${esc(l.label)}</a>`).join('');
+    h += `<div class="epline"><div class="toprow"><h3>${esc(ep.title)}</h3>
+      <span class="sub" style="font-family:var(--mono);font-size:10px;color:var(--ink-faint)">rec ${ep.recorded} · ${esc(ep.runtime)}</span>${chip}</div>
+      <div class="stages">${stages}</div><p>${esc(ep.note)}</p>
+      ${links?`<div class="eplinks">${links}</div>`:''}${spawned}</div>`;
+  }
+  content.innerHTML = h; content.classList.remove('wide');
+}
+
+/* ================= SUBSTACK DESK ================= */
+function renderDesk(){
+  $('#bar-title').textContent = 'Substack desk';
+  $('#bar-sub').textContent = 'ideation → outlining → drafting · you write, I coach';
+  const order = {drafting:0, outlining:1, idea:2, published:3};
+  const posts = [...M.posts].sort((a,b)=>order[postStage(a)]-order[postStage(b)]);
+  let h = `<h2 class="sec">Posts</h2>`;
+  for(const p of posts){
+    const st = postStage(p);
+    h += `<button class="postrow" onclick="location.search='?view=post&id=${p.id}'">
+      <span class="chip ${STAGE_CHIP[st]||'idea'}">${esc(st)}</span>
+      <span class="pt"><b>${esc(p.title)}</b><span>${esc(p.summary)}</span></span>
+      <span class="src">${p.source==='ep3'?'← ep 3':p.source==='ep2'?'← ep 2 (lost)':'standalone'}</span></button>`;
+  }
+  h += `<h2 class="sec">New idea</h2>
+    <div class="pane"><p>Posts don't have to come from episodes. Park anything here; it lands in my next sweep and I'll register it properly (id, record, coaching panel) — then it escalates to outlining when you say so.</p>
+    <textarea id="ideabox" style="min-height:90px" placeholder="One idea per line…"></textarea>
+    <div class="savebar"><button class="icon-btn solid" id="idea-save">📋 Copy for Claude</button>
+    <span class="hint">saves locally + copies a paste-ready block</span></div></div>`;
+  h += `<h2 class="sec">Check your form</h2><div class="btngrid">` +
+    M.quicklinks.northstars.map(l=>`<a class="mbtn" href="${l.href}" target="_blank" rel="noopener"><b>${esc(l.label)}</b><span class="why">${esc(l.why)}</span></a>`).join('') + `</div>`;
+  h += `<h2 class="sec">Substack quick links</h2><div class="btngrid">` +
+    M.quicklinks.substack.map(l=>`<a class="mbtn" href="${l.href}" target="_blank" rel="noopener"><b>${esc(l.label)}</b></a>`).join('') + `</div>`;
+  content.innerHTML = h; content.classList.remove('wide');
+  const box = $('#ideabox'); box.value = localStorage.getItem('machine.ideas')||'';
+  box.oninput = ()=>localStorage.setItem('machine.ideas', box.value);
+  $('#idea-save').onclick = ()=>{ localStorage.setItem('machine.ideas', box.value);
+    navigator.clipboard.writeText('NEW POST IDEAS (from the Substack desk):\n'+box.value).then(()=>toast('Copied — paste it to me in chat')); };
+}
+
+/* ================= POST DRAFTING VIEW ================= */
+async function renderPost(id){
+  const p = M.posts.find(x=>x.id===id);
+  if(!p){ renderDesk(); return; }
+  $('#bar-title').textContent = p.title;
+  $('#bar-sub').textContent = (p.source==='ep3'?'from episode 3':'idea bank · from episode 2 (lost)');
+  const st = postStage(p);
+
+  /* left pane: the suggestion/plan */
+  let left = `<div class="pane"><h4>My side — the writing plan</h4>`;
+  if(p.planFrom==='round3'){
+    if(!round3){ try{ round3 = await (await fetch('content_rounds/round3_content.json')).json(); }catch(e){ round3=null; } }
+    const plan = round3 && round3.posts.find(x=>x.id===p.planId);
+    if(plan){
+      left += `<p class="meta">plan source: content_rounds/round3_content.json · ${esc(plan.size_words||'')} words target</p>`;
+      if(plan.hook) left += `<h5>The hook</h5><p>${esc(plan.hook)}</p>`;
+      if(plan.outline&&plan.outline.length) left += `<h5>Outline beats</h5><ol>`+plan.outline.map(o=>`<li>${esc(typeof o==='string'?o:(o.beat||JSON.stringify(o)))}</li>`).join('')+`</ol>`;
+      if(plan.pull_quotes&&plan.pull_quotes.length) left += `<h5>Pull-quotes (travel on their own)</h5>`+plan.pull_quotes.map(q=>`<div class="quote">${esc(typeof q==='string'?q:(q.text||''))}${q.who?`<span class="meta"> — ${esc(q.who)}${q.t?' · '+esc(q.t):''}</span>`:''}</div>`).join('');
+      if(plan.crafting) left += `<h5>Crafting direction</h5><p>${esc(plan.crafting)}</p>`;
+      if(plan.why) left += `<h5>Why this post, in full</h5><p>${esc(plan.why)}</p>`;
+      if(plan.alt_titles&&plan.alt_titles.length) left += `<h5>Alternate titles considered</h5><ul>`+plan.alt_titles.map(t=>`<li>${esc(t)}</li>`).join('')+`</ul>`;
+    } else left += `<p>Couldn't load the round-3 plan (content_rounds/round3_content.json). The scaffold link below still works.</p>`;
+  } else {
+    left += `<p>${esc(p.summary)}</p><p>This one is still an idea — no plan built yet. Say "escalate ${p.id}" and I'll build the full writing plan (hook, beats, pull-quotes, crafting direction) against the audience brief, and it moves to outlining.</p>`;
+  }
+  left += `<h5>Reference</h5><ul>`;
+  if(p.scaffold) left += `<li><a href="${p.scaffold}" target="_blank" rel="noopener">Scaffold draft</a> — reference only, never the deliverable. You write the post.</li>`;
+  if(p.research) left += `<li><a href="${p.research}" target="_blank" rel="noopener">Research brief (s4: the "two more things" behavior)</a></li>`;
+  if(p.chapterLink) left += `<li>Excerpt deep link: ${esc(p.chapterLink)}</li>`;
+  left += `<li><a href="../20_research/01_audience_response_brief.md" target="_blank" rel="noopener">Audience brief + 12-point crafting checklist</a></li></ul></div>`;
+
+  /* right pane: his annotation/editing box */
+  const right = `<div class="pane"><h4>Your side — annotations &amp; the actual writing</h4>
+    <p class="meta">${esc(p.gate||'')}</p>
+    <div class="stagectl" role="group" aria-label="stage">
+      ${['idea','outlining','drafting'].map(s=>`<button data-s="${s}" class="${s===st?'on':''}">${s}</button>`).join('')}
+    </div>
+    <textarea id="draftbox" placeholder="Everything you write here persists locally. Notes on the plan, title verdicts, paragraphs of the actual draft — this is your box.&#10;&#10;When you want my eyes: hit copy and paste it to me in chat.">${esc(localStorage.getItem('machine.notes.'+p.id)||'')}</textarea>
+    <div class="savebar">
+      <button class="icon-btn solid" id="copy-post">📋 Copy annotations for Claude</button>
+      <span class="hint">autosaves on every keystroke · stage changes save too</span>
+    </div></div>`;
+
+  content.innerHTML = `<div class="split">${left}${right}</div>`;
+  content.classList.add('wide');
+  const box = $('#draftbox');
+  box.oninput = ()=>localStorage.setItem('machine.notes.'+p.id, box.value);
+  content.querySelectorAll('.stagectl button').forEach(b=>{
+    b.onclick = ()=>{ setStage(p.id, b.dataset.s);
+      content.querySelectorAll('.stagectl button').forEach(x=>x.classList.toggle('on',x===b));
+      toast('Stage → '+b.dataset.s+' (saved locally — export to make it durable)'); };
+  });
+  $('#copy-post').onclick = ()=>{
+    const payload = { post:p.id, title:p.title, stage:postStage(p),
+      savedAt:new Date().toISOString(), notes:box.value };
+    navigator.clipboard.writeText('POST ANNOTATIONS ('+p.id+' — '+p.title+'):\n'+JSON.stringify(payload,null,2))
+      .then(()=>toast('Copied — paste it to me in chat'));
+  };
+}
+
+/* ================= RIVERSIDE WALKTHROUGH (s8) ================= */
+function renderWalkthrough(){
+  $('#bar-title').textContent = 'Riverside walkthrough — Ep 3 final edit';
+  $('#bar-sub').textContent = 'edit 6acc15f6… · rev 16 · 20:46.8';
+  const steps = [
+    { id:'w1', title:'Open the edit in Riverside',
+      body:`<p>Open <a href="https://riverside.com/dashboard/studios/turner-tomlinsons-studio/projects" target="_blank" rel="noopener">your studio projects</a> → project <b>In-Practice, Episode 3</b> → edit <b>"Ep3 Excerpts — The Cutting Room (3 chapters)"</b> (revision 16). Ignore the one called <code>reorder attempt (scratch)</code> — that's an abandoned test clone, safe to delete whenever.</p>` },
+    { id:'w2', title:'Drag the Rate Limit chapter into second position',
+      body:`<p><b>What:</b> the episode currently plays in tape order — Slop Bomb, Apple Notes, Rate Limit. Your post ranking wants Rate Limit second. On the timeline, select the Rate Limit chapter block (currently the third content block, <code>14:25–20:47</code>) and drag it to sit between Slop Bomb and Apple Notes.</p>
+      <p><b>Why you and not me:</b> Riverside's reorder API is gated off for this account, and I verified that manual clip surgery through the MCP tools would desync the synced cuts (they're pinned to absolute timeline positions, not to clips) — it could silently expose or hide the wrong seconds of tape. The web editor's drag handles do this safely in about two minutes.</p>` },
+    { id:'w3', title:'Swap the two VO handoff clips to match',
+      body:`<p>After the drag, the narrator would announce chapters in the wrong order. On the overlays track, move the <b>Rate Limit handoff</b> VO clip (11.8s, says "Chapter two: I Burned a Five-Hour Rate Limit…") into the second handoff slot, and the <b>Apple Notes handoff</b> (11.2s, "Chapter three: My 150 Apple Notes…") into the third. Both clips already exist on the timeline — this is repositioning, not re-rendering, so it costs nothing from the ElevenLabs budget.</p>` },
+    { id:'w4', title:'Ear-check one seam: the Apple Notes handoff tail',
+      body:`<p>The Apple Notes handoff VO runs <b>104 milliseconds</b> past its reserved silence window into the first breath of dialogue. That's probably imperceptible — but "probably" isn't a listen. Scrub to that handoff boundary and play across it. If you hear the narrator clip the first word of conversation, trim the VO clip's tail slightly in the editor; if it sounds clean, leave it and check this box.</p>` },
+    { id:'w5', title:'Full listen-through',
+      body:`<p>20 minutes 47 seconds, start to finish. You're the only one of us with ears. Besides overall flow, two specific things to confirm: the two chapter-break title cards were stretched past their native 10 seconds (to 11.2s and 11.8s) to fit River's pacing — confirm they don't look frozen; and the intro VO's AI-narrator disclosure should feel matter-of-fact, not apologetic.</p>` },
+    { id:'w6', title:'The export call is yours',
+      body:`<p>When it all passes: say <b>"export ep 3"</b> in chat. I run the export through the MCP, wait out the render, recompute the three Substack deep-link timestamps against the new chapter order (Slop Bomb stays 0:30, Rate Limit moves to ~6:51, Apple Notes to ~14:3x — I'll read the exact boundaries off the final timeline), and stage the Substack episode draft. Nothing publishes without your word, as always.</p>` }
+  ];
+  let h = steps.map(s=>`<div class="step" id="${s.id}">
+      <input type="checkbox" aria-label="done" ${localStorage.getItem('machine.wt.'+s.id)==='1'?'checked':''}>
+      <div class="st"><b>${esc(s.title)}</b>${s.body}</div></div>`).join('');
+  h += `<div class="savebar" style="margin-top:14px"><button class="icon-btn solid" id="wt-copy">📋 Copy progress for Claude</button>
+    <span class="hint">checkboxes persist locally</span></div>`;
+  content.innerHTML = h; content.classList.remove('wide');
+  content.querySelectorAll('.step').forEach(el=>{
+    const cb = el.querySelector('input'); const sync=()=>el.classList.toggle('done',cb.checked);
+    sync();
+    cb.onchange = ()=>{ localStorage.setItem('machine.wt.'+el.id, cb.checked?'1':'0'); sync(); };
+  });
+  $('#wt-copy').onclick = ()=>{
+    const state = steps.map(s=>s.id+': '+(localStorage.getItem('machine.wt.'+s.id)==='1'?'done':'open')).join('\n');
+    navigator.clipboard.writeText('RIVERSIDE WALKTHROUGH PROGRESS (ep3):\n'+state).then(()=>toast('Copied — paste it to me in chat'));
+  };
+}
+
+/* ================= ROUTER ================= */
+function route(){
+  const q = new URLSearchParams(location.search);
+  const v = q.get('view')||'home';
+  $('#btn-back').style.display = v==='home'?'none':'inline-flex';
+  try{
+    if(v==='podcast') renderPodcast();
+    else if(v==='desk') renderDesk();
+    else if(v==='post') renderPost(q.get('id'));
+    else if(v==='walkthrough') renderWalkthrough();
+    else renderHome();
+  }catch(e){ renderHome(); }
+}
+$('#btn-back').onclick = ()=>{
+  const q = new URLSearchParams(location.search);
+  location.search = q.get('view')==='post' ? '?view=desk' : '';
+};
+document.addEventListener('keydown', e=>{ if(e.key==='Escape' && location.search) location.search=''; });
+route();
+</script>
+</body>
+</html>

@@ -345,6 +345,14 @@
   <div class="home-body">
     <div class="home-inner">
       <div class="cards">
+        <button class="card b" id="go-machine">
+          <span class="ico">⚙</span>
+          <div class="ctxt">
+            <h3>The Podcast Machine</h3>
+            <p>The new front door: podcast flow (ep 1–3 stages), Substack desk (ideation → outlining → drafting), Riverside walkthrough, and every management link.</p>
+          </div>
+          <span class="go">→</span>
+        </button>
         <button class="card b" id="go-reviewdeck">
           <span class="ico">🧭</span>
           <div class="ctxt">
@@ -829,6 +837,7 @@
   document.getElementById('go-round9').onclick = () => show('round9');
   document.getElementById('go-ep02sheet').onclick = () => show('ep02sheet');
   document.getElementById('go-round10').onclick = () => show('round10');
+  document.getElementById('go-machine').onclick = () => location.href = 'machine.html';
   document.getElementById('go-reviewdeck').onclick = () => location.href = 'review_deck.html';
   document.getElementById('go-content').onclick = () => location.href = 'content_review.html';
   document.getElementById('go-voaud').onclick = () => location.href = 'vo_auditions.html';
