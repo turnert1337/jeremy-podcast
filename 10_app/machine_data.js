@@ -64,6 +64,14 @@ window.MACHINE = {
       scaffold: "drafts/ep03_post1_fluency-vs-substance.md",
       chapterLink: "episode timestamp 0:30 (Slop Bomb chapter) — becomes a real link at publish",
       research: null,
+      similar: [
+        { label: "The Article Sounded Right but Had No Ground Under It — Yuzheng Sun",
+          href: "https://yuzheng.substack.com/p/the-article-sounded-right-but-had",
+          why: "First-person: the author catches their own AI-assisted piece being structurally fluent and hollow — your thesis, but from the writer's seat instead of the meeting room. Good for calibrating how the confession register reads." },
+        { label: "The post-AI internet needs a different kind of literacy — Robots Ate My Homework",
+          href: "https://robotsatemyhomework.substack.com/p/post-ai-internet-literacy",
+          why: "The professor's-eye version: 'perfectly vapid' essays and six markers for spotting emptiness. Useful as a foil — yours is the manager's version, and your mechanism (the two-page rule, read-it-word-for-word) is what this one lacks." }
+      ],
       summary: "Decision engine → coaching agents → no free lunches; the 27-page slop-bomb scene stays the cold open. Title is the operator's own."
     },
     {
@@ -74,6 +82,14 @@ window.MACHINE = {
       scaffold: "drafts/ep03_post2_agent-decision-i-never-approved.md",
       chapterLink: "episode timestamp 14:37 (Rate Limit chapter; ~6:51 if you do the reorder) — real link at publish",
       research: "../20_research/03_opus_two_more_things.md",
+      similar: [
+        { label: "The AI Didn't Go Rogue. Authority Failed. — Alan Paris",
+          href: "https://alanparis.substack.com/p/the-ai-didnt-go-rogue-authority-failed",
+          why: "Makes the same reframe you're making — not disobedience, mis-scoped authority — off the recent OpenAI/Anthropic incidents. Watch how he keeps the incident subordinate to the governance claim; that's the structure your post wants." },
+        { label: "The Permission Problem — Dr. Rockmore",
+          href: "https://drrockmore.substack.com/p/the-permission-problem",
+          why: "The permission/verification gap as its own subject. Your edge over both of these: a first-person receipt (the 5-hour limit gone in one hour) that neither has — they argue from the news, you argue from your own logs." }
+      ],
       summary: "The token-burn story is the receipt, not the subject. Thesis: agents make locally smart, globally expensive calls; you can't delegate what you can't verify. Title is mine, not yours — flag from the drafts README: approve or rename."
     },
     {
@@ -84,6 +100,14 @@ window.MACHINE = {
       scaffold: "drafts/ep03_post3_apple-notes-compost-heap.md",
       chapterLink: "episode timestamp 7:02 (Apple Notes chapter; ~14:3x after reorder) — real link at publish",
       research: null,
+      similar: [
+        { label: "The Writer's Compost Heap — Katya Andresen",
+          href: "https://katyaandresen.substack.com/p/the-writers-compost-heap",
+          why: "The closest metaphor match on the platform: unused writing as compost, decomposition → recomposition as the creative cycle. Check what your riff engine adds that her hand-worked version can't do — that delta is your post." },
+        { label: "Don't Let The Notes App Become a Digital Graveyard — The Creative Lifestyle",
+          href: "https://thecreativelifestyle.substack.com/p/dont-let-the-notes-app-become-a-digital",
+          why: "Your exact problem statement (notes app as graveyard of good ideas) without your solution. Yours is this post plus a working machine — the 150 #CH notes, the riff engine, the simulated beta readers." }
+      ],
       summary: "The #CH notes, the riff engine, the nine-sentence framework; Carbon Chicken plug placeholder you'll tune."
     },
 

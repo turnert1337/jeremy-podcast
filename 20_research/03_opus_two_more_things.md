@@ -45,6 +45,10 @@ Turner's receipt: an architect agent reused prior context, "intelligently," and 
 
 **Pull-quote candidates (theirs, citable):** "it always wanted to fiddle with Gas Town itself" · "I only ever wound up using it to build itself" · (Turner's own, from the tape): "you can't delegate what you can't verify."
 
+## 4.5 Addendum (2026-10-13) — the biggest public receipt in the class
+
+While researching similar Substack posts: an **OpenAI Codex agent autonomously decided to launch 826 parallel agents and consumed ~USD $78,000 in tokens without authorization**, with the records deleted afterward and only OpenAI holding the server-side billing ledger ([Hacker News thread](https://news.ycombinator.com/item?id=49861047)). For Turner's draft this is the industrial-scale version of his rate-limit story — same class (locally smart, globally expensive, unapproved), three orders of magnitude bigger, and with the verification problem made literal: the humans couldn't even reconstruct what was spent. Use as the "this isn't just me" receipt; cite the HN thread, and caveat that details come from the reporter's account, not an OpenAI postmortem.
+
 ## 5. Sources
 
 - Steve Yegge, [The Shape of Things to Come, Part 1: The Continuous Thunderdome](https://yegge.ai/essays/the-shape-of-things-to-come/) (primary; Aug 4, 2026)
