@@ -1,9 +1,9 @@
 {
   "name": "Jeremy Podcast test",
-  "stage": "ep3-content-round",
-  "note": "Review Deck live at review_deck.html \u2014 single surface for every open decision this round: 3 post writing-plan locks (drafts are scaffolds, Turner writes the posts), episode export call (chapter drag pending), publish sequencing, stats-monitoring approach, 10 Pocock adoptions. Content Round 3 detail still at content_review.html?round=3. Round 10 (ep2) annotations still open.",
+  "stage": "ep3-final-edit-review",
+  "note": "HANDOFF to the podcast-management session: read HANDOFF_podcast_management.md first. Ep1 published, Ep2 written off (track lost, operator call 2026-10-13), Ep3 in FINAL EDIT/REVIEW (Riverside edit 6acc15f6 rev 16, 20:47, River AI narrator). Operator annotations landed: publish sequence adopted, 4 Pocock adoptions, ep2 closed. MAIN WORK ORDER: build the podcast processing visualizer + Substack desk (spec = note s12 in 10_app/content_rounds/review_deck_annotations.js). RULE: Turner writes the posts himself; agents outline/plan only.",
   "url": "http://127.0.0.1:4010/review_deck.html",
   "car_url": "https://claude.ai/code/artifact/48b0b977-f764-4f57-9e74-93ff9bc81217",
   "launch": "python3 -m http.server 4010 --directory \"10_app\"",
-  "updated": "2026-10-12T20:30:00Z"
+  "updated": "2026-10-13T01:10:00Z"
 }
