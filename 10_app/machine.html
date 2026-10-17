@@ -268,6 +268,30 @@
   .plan-fold summary:hover{color:var(--accent)}
   .plan-fold[open] summary{margin-bottom:6px}
 
+
+  /* comps gate (the research minigame) */
+  .cg{border:1.5px solid var(--c-out-ink); border-radius:12px; background:var(--c-out-bg);
+    padding:11px 13px; margin-bottom:12px}
+  .cg.cg-open{border-color:var(--c-done-ink); background:var(--c-done-bg)}
+  .cg-head{display:flex; align-items:center; gap:8px}
+  .cg-head b{font-family:var(--display); font-size:12.5px; color:var(--c-out-ink)}
+  .cg.cg-open .cg-head b{color:var(--c-done-ink)}
+  .cg-progress{margin-left:auto; font-family:var(--mono); font-size:11px; font-weight:700;
+    color:var(--c-out-ink)}
+  .cg.cg-open .cg-progress{color:var(--c-done-ink)}
+  .cg-sub{margin:5px 0 8px; font-size:11.5px; color:var(--c-out-ink); line-height:1.5}
+  .cg-row{display:flex; align-items:center; gap:10px; padding:5px 0; border-top:1px solid color-mix(in srgb,var(--c-out-ink) 18%,transparent)}
+  .cg-row a{font-size:12px; font-weight:600; color:var(--c-out-ink); text-decoration:underline; min-width:0; flex:1}
+  .cg.cg-open .cg-row a, .cg-row.done a{color:var(--c-done-ink)}
+  .cg-row.done a{text-decoration:none; opacity:.75}
+  .cg-check{display:inline-flex; align-items:center; gap:5px; font-size:11px; color:var(--c-out-ink); flex:none; cursor:pointer}
+  .cg.cg-open .cg-check, .cg-row.done .cg-check{color:var(--c-done-ink)}
+  .cg-check input{accent-color:var(--c-done-ink); width:15px; height:15px; cursor:pointer}
+  .cg-check input:disabled{cursor:not-allowed}
+
+  /* locked desk */
+  #draftzone.locked{pointer-events:none; filter:blur(2px) saturate(.6); opacity:.5; user-select:none}
+
   .toast{position:fixed; bottom:18px; left:50%; transform:translateX(-50%);
     background:var(--ink); color:var(--ground); font-size:12px; padding:9px 17px;
     border-radius:100px; opacity:0; transition:opacity .25s; pointer-events:none; z-index:50}
@@ -539,7 +563,8 @@ async function renderPost(id){
   const draftPane = `<div class="pane">
     <h4>Your side — the draft, block by block</h4>
     <p class="meta">${esc(p.gate||'')}</p>
-    <div id="blocks"></div>
+    <div id="compsgate"></div>
+    <div id="draftzone"><div id="blocks"></div>
     <div class="savebar">
       <button class="icon-btn" id="add-block">＋ Add section</button>
     </div>
@@ -550,11 +575,52 @@ async function renderPost(id){
       <button class="icon-btn solid" id="copy-feedback">📤 Send draft for feedback (copy)</button>
       <button class="icon-btn" id="copy-grim">⚙ Send to GRIM (copy)</button>
       <span class="hint">autosaves every keystroke</span>
-    </div>
+    </div></div>
   </div>`;
 
   content.innerHTML = `<div class="meterwrap"><div class="pane" id="wordmeter"></div></div><div class="split">${planPane}${draftPane}</div>`;
   content.classList.add('wide');
+
+  /* ---- the research gate: the writing desk stays locked until every comp
+          has been opened AND marked reviewed. Reading the terrain first is
+          how he earns the best seat to interpret the plan. ---- */
+  const comps = p.similar || [];
+  function gateState(){
+    try{ return JSON.parse(localStorage.getItem('machine.comps.'+p.id)||'{}'); }catch(e){ return {}; }
+  }
+  function gateSave(s){ localStorage.setItem('machine.comps.'+p.id, JSON.stringify(s)); }
+  function gateDone(){ return comps.every((s,i)=>gateState()['r'+i]); }
+  function renderGate(){
+    const el = $('#compsgate'); if(!el) return;
+    if(!comps.length){ el.innerHTML=''; applyLock(); return; }
+    const st = gateState();
+    const done = comps.filter((s,i)=>st['r'+i]).length;
+    const all = gateDone();
+    el.innerHTML = `<div class="cg ${all?'cg-open':''}">
+      <div class="cg-head"><span class="cg-lock">${all?'🔓':'🔒'}</span>
+        <b>${all?'Research complete — the desk is yours':'Read the terrain to unlock the desk'}</b>
+        <span class="cg-progress">${done}/${comps.length}</span></div>
+      ${all?'':'<p class="cg-sub">Open each comp, actually read it, then mark it reviewed. Having walked the terrain, you will interpret the plan better than I can summarize it.</p>'}
+      ${comps.map((s,i)=>`<div class="cg-row ${st['r'+i]?'done':''}">
+        <a href="${s.href}" target="_blank" rel="noopener" data-open="${i}">${esc(s.label)} ↗</a>
+        <label class="cg-check"><input type="checkbox" data-rev="${i}" ${st['r'+i]?'checked':''} ${st['o'+i]||st['r'+i]?'':'disabled title="Open it first"'}> reviewed</label>
+      </div>`).join('')}
+    </div>`;
+    el.querySelectorAll('[data-open]').forEach(a=>a.addEventListener('click', ()=>{
+      const s = gateState(); s['o'+a.dataset.open] = true; gateSave(s);
+      setTimeout(renderGate, 150);   // re-enable this row's checkbox after the tab opens
+    }));
+    el.querySelectorAll('[data-rev]').forEach(c=>c.addEventListener('change', ()=>{
+      const s = gateState(); s['r'+c.dataset.rev] = c.checked; gateSave(s);
+      const was = all; renderGate();
+      if(!was && gateDone()) toast('🔓 All comps reviewed — write it in your own voice');
+    }));
+    applyLock();
+  }
+  function applyLock(){
+    const z = $('#draftzone'); if(!z) return;
+    z.classList.toggle('locked', comps.length>0 && !gateDone());
+  }
 
   let blocks = loadBlocks(p, plan);
   const blocksEl = $('#blocks');
@@ -587,7 +653,7 @@ async function renderPost(id){
       };
     });
   }
-  drawBlocks(); renderMeter(p, blocks);
+  drawBlocks(); renderMeter(p, blocks); renderGate();
 
   $('#add-block').onclick = ()=>{
     blocks.push({label:'', text:'', fixed:false});
