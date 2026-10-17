@@ -289,6 +289,7 @@
   .cg-check input{accent-color:var(--c-done-ink); width:15px; height:15px; cursor:pointer}
   .cg-check input:disabled{cursor:not-allowed}
 
+  .cg-openall{margin:2px 0 8px}
   /* locked desk */
   #draftzone.locked{pointer-events:none; filter:blur(2px) saturate(.6); opacity:.5; user-select:none}
 
@@ -601,11 +602,25 @@ async function renderPost(id){
         <b>${all?'Research complete — the desk is yours':'Read the terrain to unlock the desk'}</b>
         <span class="cg-progress">${done}/${comps.length}</span></div>
       ${all?'':'<p class="cg-sub">Open each comp, actually read it, then mark it reviewed. Having walked the terrain, you will interpret the plan better than I can summarize it.</p>'}
+      ${all?'':`<div class="cg-openall"><button class="icon-btn" id="cg-all">↗ Open all ${comps.length} in the browser</button></div>`}
       ${comps.map((s,i)=>`<div class="cg-row ${st['r'+i]?'done':''}">
         <a href="${s.href}" target="_blank" rel="noopener" data-open="${i}">${esc(s.label)} ↗</a>
         <label class="cg-check"><input type="checkbox" data-rev="${i}" ${st['r'+i]?'checked':''} ${st['o'+i]||st['r'+i]?'':'disabled title="Open it first"'}> reviewed</label>
       </div>`).join('')}
     </div>`;
+    const allBtn = el.querySelector('#cg-all');
+    if(allBtn) allBtn.onclick = ()=>{
+      const q = comps.map(s=>'u='+encodeURIComponent(s.href)).join('&');
+      fetch('/open?'+q).then(r=>r.json()).then(r=>{
+        const s = gateState(); comps.forEach((c,i)=>s['o'+i]=true); gateSave(s);
+        renderGate();
+        toast('Opened '+r.opened+' in your browser — read, then come back and mark them reviewed');
+      }).catch(()=>{ // server without the /open endpoint: fall back to tabs here
+        comps.forEach(s=>window.open(s.href,'_blank','noopener'));
+        const s = gateState(); comps.forEach((c,i)=>s['o'+i]=true); gateSave(s);
+        renderGate();
+      });
+    };
     el.querySelectorAll('[data-open]').forEach(a=>a.addEventListener('click', ()=>{
       const s = gateState(); s['o'+a.dataset.open] = true; gateSave(s);
       setTimeout(renderGate, 150);   // re-enable this row's checkbox after the tab opens
