@@ -137,7 +137,8 @@ These skills are part of the frame and should be invoked by name. Each skill is 
 
 | Skill | File | When to invoke |
 |-------|------|----------------|
-| _(none yet)_ | _(add here)_ | _(add here)_ |
+| `/substack-drafting-flow` | `99_project_skills/01_substack_drafting_flow.md` | Any work on a Substack post record (plans, locks, feedback rounds, targets). Binding: Turner writes; agents plan/coach only. Read BEFORE touching `machine_data.js` posts or answering a drafting-view export. |
+| `/grim` | `99_project_skills/02_grim_reencode.md` | Operator pastes a "GRIM — THE GREAT RE-ENCODE INTO MARKDOWN" export or says "run GRIM": verbatim port of his final blocks into Substack-ready markdown. Re-encoder, never an editor. |
 
 > Project skills are searched AFTER frame-shipped skills. If a project skill and a frame skill share a name, the **frame skill wins** — name your project skills to avoid collisions.
 

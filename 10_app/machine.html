@@ -219,6 +219,55 @@
     border:1px solid var(--line); border-radius:5px; padding:1px 5px}
   .step.done{opacity:.55}
 
+
+  /* word meter */
+  .meterwrap{max-width:1100px; margin:0 auto 16px}
+  #wordmeter{padding:13px 17px}
+  .wm-row{display:flex; align-items:baseline; gap:10px; flex-wrap:wrap}
+  .wm-count{font-family:var(--display); font-size:22px; font-weight:700; font-variant-numeric:tabular-nums}
+  .wm-label{font-size:11.5px; color:var(--ink-soft)}
+  .wm-zone{margin-left:auto; font-size:11px; font-weight:650; padding:3px 10px; border-radius:100px}
+  .wm-zone.under{background:var(--c-idea-bg); color:var(--c-idea-ink)}
+  .wm-zone.in{background:var(--c-done-bg); color:var(--c-done-ink)}
+  .wm-zone.over{background:var(--c-draft-bg); color:var(--c-draft-ink)}
+  .wm-bar{position:relative; height:10px; border-radius:100px; background:var(--panel-2);
+    border:1px solid var(--line); margin:9px 0 7px; overflow:hidden}
+  .wm-band{position:absolute; top:0; bottom:0; background:color-mix(in srgb,var(--c-done-bg) 55%,transparent)}
+  .wm-fill{position:absolute; left:0; top:0; bottom:0; border-radius:100px; transition:width .2s}
+  .wm-fill.under{background:var(--c-idea-ink)}
+  .wm-fill.in{background:var(--c-done-ink)}
+  .wm-fill.over{background:var(--c-draft-ink)}
+  .wm-tick{position:absolute; top:-2px; bottom:-2px; width:2px; background:var(--ink)}
+  .wm-why{margin:4px 0 0; font-size:11px; color:var(--ink-faint); line-height:1.5}
+
+  /* writing blocks */
+  .wblock{border:1px solid var(--line); border-radius:12px; background:var(--panel-2);
+    padding:9px 11px 11px; margin-bottom:10px}
+  .wb-head{display:flex; align-items:center; gap:9px; margin-bottom:7px}
+  .wb-label{font-family:var(--display); font-size:12px; font-weight:700}
+  .wb-label-in{flex:1; min-width:0; font-family:var(--display); font-size:12px; font-weight:700;
+    border:none; border-bottom:1px dashed var(--line-strong); background:transparent; color:var(--ink); padding:2px 0}
+  .wb-label-in:focus-visible{outline:none; border-bottom-color:var(--accent)}
+  .wb-count{margin-left:auto; font-family:var(--mono); font-size:10px; color:var(--ink-faint); font-variant-numeric:tabular-nums}
+  .wb-del{appearance:none; border:1px solid var(--line-strong); background:var(--panel); color:var(--ink-soft);
+    width:22px; height:22px; border-radius:50%; cursor:pointer; font-size:14px; line-height:1; flex:none}
+  .wb-del:hover{border-color:var(--c-draft-ink); color:var(--c-draft-ink)}
+  .wb-text{width:100%; resize:vertical; background:var(--panel); border:1px solid var(--line);
+    border-radius:8px; color:var(--ink); padding:9px 11px; font-family:var(--sans); font-size:13px; line-height:1.65}
+  .wb-text:focus-visible{outline:2px solid var(--accent); outline-offset:1px}
+
+  /* feedback + plan fold */
+  .fb-empty{font-size:12.5px; color:var(--ink-soft); line-height:1.6; background:var(--panel-2);
+    border:1px dashed var(--line-strong); border-radius:10px; padding:11px 13px}
+  .fb-item{border-left:3px solid var(--c-done-ink); background:var(--panel-2);
+    border-radius:0 10px 10px 0; padding:8px 12px; margin:8px 0}
+  .fb-item b{font-family:var(--display); font-size:12px}
+  .fb-item p{margin:3px 0 0; font-size:12.5px}
+  .plan-fold{margin-top:16px; border-top:1px solid var(--line); padding-top:10px}
+  .plan-fold summary{font-family:var(--display); font-size:12.5px; font-weight:700; cursor:pointer; color:var(--ink-soft)}
+  .plan-fold summary:hover{color:var(--accent)}
+  .plan-fold[open] summary{margin-bottom:6px}
+
   .toast{position:fixed; bottom:18px; left:50%; transform:translateX(-50%);
     background:var(--ink); color:var(--ground); font-size:12px; padding:9px 17px;
     border-radius:100px; opacity:0; transition:opacity .25s; pointer-events:none; z-index:50}
@@ -361,69 +410,188 @@ function renderDesk(){
     navigator.clipboard.writeText('NEW POST IDEAS (from the Substack desk):\n'+box.value).then(()=>toast('Copied — paste it to me in chat')); };
 }
 
-/* ================= POST DRAFTING VIEW ================= */
-async function renderPost(id){
-  const p = M.posts.find(x=>x.id===id);
-  if(!p){ renderDesk(); return; }
-  $('#bar-title').textContent = p.title;
-  $('#bar-sub').textContent = (p.source==='ep3'?'from episode 3':'idea bank · from episode 2 (lost)');
-  const st = postStage(p);
+/* ================= POST DRAFTING VIEW =================
+   Left → right: YOUR writing (blocks) → my plan + feedback.
+   Blocks persist in localStorage ('machine.blocks.<id>' as JSON [{label,text,fixed}]).
+   Word meter at top; target per post from machine_data targetWords (comps-informed).
+   Flow doc: 99_project_skills/01_substack_drafting_flow.md · GRIM: 02_grim_reencode.md */
 
-  /* left pane: the suggestion/plan */
-  let left = `<div class="pane"><h4>My side — the writing plan</h4>`;
-  if(p.planFrom==='round3'){
-    if(!round3){ try{ round3 = await (await fetch('content_rounds/round3_content.json')).json(); }catch(e){ round3=null; } }
-    const plan = round3 && round3.posts.find(x=>x.id===p.planId);
-    if(plan){
-      left += `<p class="meta">plan source: content_rounds/round3_content.json · ${esc(plan.size_words||'')} words target</p>`;
-      if(plan.hook) left += `<h5>The hook</h5><p>${esc(plan.hook)}</p>`;
-      if(plan.outline&&plan.outline.length) left += `<h5>Outline beats</h5><ol>`+plan.outline.map(o=>`<li>${esc(typeof o==='string'?o:(o.beat||JSON.stringify(o)))}</li>`).join('')+`</ol>`;
-      if(plan.pull_quotes&&plan.pull_quotes.length) left += `<h5>Pull-quotes (travel on their own)</h5>`+plan.pull_quotes.map(q=>`<div class="quote">${esc(typeof q==='string'?q:(q.text||''))}${q.who?`<span class="meta"> — ${esc(q.who)}${q.t?' · '+esc(q.t):''}</span>`:''}</div>`).join('');
-      if(plan.crafting) left += `<h5>Crafting direction</h5><p>${esc(plan.crafting)}</p>`;
-      if(plan.why) left += `<h5>Why this post, in full</h5><p>${esc(plan.why)}</p>`;
-      if(plan.alt_titles&&plan.alt_titles.length) left += `<h5>Alternate titles considered</h5><ul>`+plan.alt_titles.map(t=>`<li>${esc(t)}</li>`).join('')+`</ul>`;
-    } else left += `<p>Couldn't load the round-3 plan (content_rounds/round3_content.json). The scaffold link below still works.</p>`;
+function countWords(s){ return (s.match(/\S+/g)||[]).length; }
+
+function loadBlocks(p){
+  try{
+    const raw = localStorage.getItem('machine.blocks.'+p.id);
+    if(raw){ const b = JSON.parse(raw); if(Array.isArray(b)&&b.length) return b; }
+  }catch(e){}
+  const seed = [ {label:'Title', text:'', fixed:true}, {label:'Intro paragraph', text:'', fixed:true} ];
+  const old = localStorage.getItem('machine.notes.'+p.id);
+  if(old && old.trim()) seed.push({label:'Notes (migrated from the old box)', text:old, fixed:false});
+  return seed;
+}
+function saveBlocks(p, blocks){ localStorage.setItem('machine.blocks.'+p.id, JSON.stringify(blocks)); }
+
+function renderMeter(p, blocks){
+  const el = document.getElementById('wordmeter');
+  if(!el) return;
+  const words = blocks.reduce((n,b)=>n+countWords(b.text), 0);
+  const t = p.targetWords;
+  if(!t){
+    el.innerHTML = `<div class="wm-row"><b class="wm-count">${words.toLocaleString()}</b><span class="wm-label">words — no target set for this one yet (it's still an idea; escalate it and a comps-informed target gets built)</span></div>`;
+    return;
+  }
+  const [lo,hi] = t.band;
+  const pct = Math.min(100, Math.round(words / hi * 100));
+  const zone = words < lo ? 'under' : (words <= hi ? 'in' : 'over');
+  const zoneWord = zone==='under' ? `${(lo-words).toLocaleString()} to the floor` :
+                   zone==='in'    ? 'in the band' : `${(words-hi).toLocaleString()} over the ceiling — cut setup, not evidence`;
+  el.innerHTML = `
+    <div class="wm-row">
+      <b class="wm-count">${words.toLocaleString()}</b>
+      <span class="wm-label">of ${t.target.toLocaleString()} target · band ${lo.toLocaleString()}–${hi.toLocaleString()}</span>
+      <span class="wm-zone ${zone}">${zoneWord}</span>
+    </div>
+    <div class="wm-bar" role="img" aria-label="${words} of ${hi} words">
+      <span class="wm-band" style="left:${Math.round(lo/hi*100)}%; right:0"></span>
+      <span class="wm-fill ${zone}" style="width:${pct}%"></span>
+      <span class="wm-tick" style="left:${Math.round(t.target/hi*100)}%"></span>
+    </div>
+    <p class="wm-why">${esc(t.rationale)}</p>`;
+}
+
+function planHTML(p, plan){
+  let h = '';
+  if(plan){
+    h += `<p class="meta">${plan===p.planInline?'plan source: machine_data.js (staged from '+(p.research||'research')+')':'plan source: content_rounds/round3_content.json'} · ${esc(plan.size_words||'')} words target</p>`;
+    if(plan.hook) h += `<h5>The hook</h5><p>${esc(plan.hook)}</p>`;
+    if(plan.outline&&plan.outline.length) h += `<h5>Outline beats</h5><ol>`+plan.outline.map(o=>`<li>${esc(typeof o==='string'?o:(o.beat||JSON.stringify(o)))}</li>`).join('')+`</ol>`;
+    if(plan.pull_quotes&&plan.pull_quotes.length) h += `<h5>Pull-quotes (travel on their own)</h5>`+plan.pull_quotes.map(q=>`<div class="quote">${esc(typeof q==='string'?q:(q.text||''))}${q.who?`<span class="meta"> — ${esc(q.who)}${q.t?' · '+esc(q.t):''}</span>`:''}</div>`).join('');
+    if(plan.crafting) h += `<h5>Crafting direction</h5><p>${esc(plan.crafting)}</p>`;
+    if(plan.why) h += `<h5>Why this post, in full</h5><p>${esc(plan.why)}</p>`;
+    if(plan.alt_titles&&plan.alt_titles.length) h += `<h5>Alternate titles considered</h5><ul>`+plan.alt_titles.map(t=>`<li>${esc(t)}</li>`).join('')+`</ul>`;
+  } else if(p.planFrom==='round3'){
+    h += `<p>Couldn't load the round-3 plan (content_rounds/round3_content.json). The reference links below still work.</p>`;
   } else {
-    left += `<p>${esc(p.summary)}</p><p>This one is still an idea — no plan built yet. Say "escalate ${p.id}" and I'll build the full writing plan (hook, beats, pull-quotes, crafting direction) against the audience brief, and it moves to outlining.</p>`;
+    h += `<p>${esc(p.summary)}</p><p>This one is still an idea — no plan built yet. Say "escalate ${p.id}" and I'll build the full writing plan (hook, beats, pull-quotes, crafting direction, comps-informed word target) and it moves to outlining.</p>`;
   }
   if(p.similar&&p.similar.length){
-    left += `<h5>Similar posts on Substack — see the terrain, then start</h5>` +
+    h += `<h5>Similar posts on Substack — see the terrain, then start</h5>` +
       p.similar.map(s=>`<div class="quote" style="font-style:normal">
         <a href="${s.href}" target="_blank" rel="noopener"><b>${esc(s.label)}</b></a><br>
         <span style="font-size:11.5px; color:var(--ink-soft)">${esc(s.why)}</span></div>`).join('');
   }
-  left += `<h5>Reference</h5><ul>`;
-  if(p.scaffold) left += `<li><a href="${p.scaffold}" target="_blank" rel="noopener">Scaffold draft</a> — reference only, never the deliverable. You write the post.</li>`;
-  if(p.research) left += `<li><a href="${p.research}" target="_blank" rel="noopener">Research brief (s4: the "two more things" behavior)</a></li>`;
-  if(p.chapterLink) left += `<li>Excerpt deep link: ${esc(p.chapterLink)}</li>`;
-  left += `<li><a href="../20_research/01_audience_response_brief.md" target="_blank" rel="noopener">Audience brief + 12-point crafting checklist</a></li></ul></div>`;
+  h += `<h5>Reference</h5><ul>`;
+  if(p.scaffold) h += `<li><a href="${p.scaffold}" target="_blank" rel="noopener">Scaffold draft</a> — reference only, never the deliverable. You write the post.</li>`;
+  if(p.research) h += `<li><a href="${p.research}" target="_blank" rel="noopener">Research brief</a></li>`;
+  if(p.chapterLink) h += `<li>Excerpt deep link: ${esc(p.chapterLink)}</li>`;
+  h += `<li><a href="../20_research/01_audience_response_brief.md" target="_blank" rel="noopener">Audience brief + 12-point crafting checklist</a></li></ul>`;
+  return h;
+}
 
-  /* right pane: his annotation/editing box */
-  const right = `<div class="pane"><h4>Your side — annotations &amp; the actual writing</h4>
+function feedbackHTML(p){
+  if(p.feedback && p.feedback.length){
+    return p.feedback.map(f=>`<div class="fb-item"><b>${esc(f.block)}</b><p>${esc(f.recommendation)}</p></div>`).join('');
+  }
+  return `<p class="fb-empty">No feedback round yet. Write in the blocks on the left, then hit <b>Send draft for feedback</b> below them and paste it to me in chat — I'll come back with per-block recommendations here (reasoning in full prose, your text never rewritten for you), and you decide the final post. When it's final, <b>Send to GRIM</b> ports your words verbatim into clean, Substack-ready markdown.</p>`;
+}
+
+async function renderPost(id){
+  const p = M.posts.find(x=>x.id===id);
+  if(!p){ renderDesk(); return; }
+  $('#bar-title').textContent = p.title;
+  $('#bar-sub').textContent = (p.source==='ep3'?'from episode 3':p.source==='ep2'?'idea bank · from episode 2 (lost)':'standalone');
+  const st = postStage(p);
+
+  let plan = null;
+  if(p.planInline){ plan = p.planInline; }
+  else if(p.planFrom==='round3'){
+    if(!round3){ try{ round3 = await (await fetch('content_rounds/round3_content.json')).json(); }catch(e){ round3=null; } }
+    plan = round3 && round3.posts.find(x=>x.id===p.planId);
+  }
+
+  const right = `<div class="pane">
+    <h4>My side — feedback</h4>
+    <div id="fb-zone">${feedbackHTML(p)}</div>
+    <details class="plan-fold" open><summary>The writing plan</summary>${planHTML(p, plan)}</details>
+  </div>`;
+
+  const left = `<div class="pane">
+    <h4>Your side — the draft, block by block</h4>
     <p class="meta">${esc(p.gate||'')}</p>
+    <div id="blocks"></div>
+    <div class="savebar">
+      <button class="icon-btn" id="add-block">＋ Add section</button>
+    </div>
     <div class="stagectl" role="group" aria-label="stage">
       ${['idea','outlining','drafting'].map(s=>`<button data-s="${s}" class="${s===st?'on':''}">${s}</button>`).join('')}
     </div>
-    <textarea id="draftbox" placeholder="Everything you write here persists locally. Notes on the plan, title verdicts, paragraphs of the actual draft — this is your box.&#10;&#10;When you want my eyes: hit copy and paste it to me in chat.">${esc(localStorage.getItem('machine.notes.'+p.id)||'')}</textarea>
     <div class="savebar">
-      <button class="icon-btn solid" id="copy-post">📋 Copy annotations for Claude</button>
-      <span class="hint">autosaves on every keystroke · stage changes save too</span>
-    </div></div>`;
+      <button class="icon-btn solid" id="copy-feedback">📤 Send draft for feedback (copy)</button>
+      <button class="icon-btn" id="copy-grim">⚙ Send to GRIM (copy)</button>
+      <span class="hint">autosaves every keystroke</span>
+    </div>
+  </div>`;
 
-  content.innerHTML = `<div class="split">${left}${right}</div>`;
+  content.innerHTML = `<div class="meterwrap"><div class="pane" id="wordmeter"></div></div><div class="split">${left}${right}</div>`;
   content.classList.add('wide');
-  const box = $('#draftbox');
-  box.oninput = ()=>localStorage.setItem('machine.notes.'+p.id, box.value);
+
+  let blocks = loadBlocks(p);
+  const blocksEl = $('#blocks');
+
+  function drawBlocks(){
+    blocksEl.innerHTML = blocks.map((b,i)=>`
+      <div class="wblock" data-i="${i}">
+        <div class="wb-head">
+          ${b.fixed ? `<span class="wb-label">${esc(b.label)}</span>`
+                    : `<input class="wb-label-in" value="${esc(b.label)}" aria-label="section label" placeholder="Section label…">`}
+          <span class="wb-count">${countWords(b.text).toLocaleString()} w</span>
+          ${b.fixed ? '' : `<button class="wb-del" title="Remove section">−</button>`}
+        </div>
+        <textarea class="wb-text" style="min-height:${b.label==='Title'?'44':'110'}px"
+          placeholder="${b.label==='Title'?'The title — 5–13 words, concrete noun, no snowclone, no question mark…':'Your words. The plan is on the right; the writing is yours…'}">${esc(b.text)}</textarea>
+      </div>`).join('');
+    blocksEl.querySelectorAll('.wblock').forEach(el=>{
+      const i = +el.dataset.i;
+      el.querySelector('.wb-text').addEventListener('input', e=>{
+        blocks[i].text = e.target.value; saveBlocks(p, blocks);
+        el.querySelector('.wb-count').textContent = countWords(blocks[i].text).toLocaleString()+' w';
+        renderMeter(p, blocks);
+      });
+      const lab = el.querySelector('.wb-label-in');
+      if(lab) lab.addEventListener('input', e=>{ blocks[i].label = e.target.value; saveBlocks(p, blocks); });
+      const del = el.querySelector('.wb-del');
+      if(del) del.onclick = ()=>{
+        if(blocks[i].text.trim() && !confirm(`Remove "${blocks[i].label||'this section'}" and its ${countWords(blocks[i].text)} words?`)) return;
+        blocks.splice(i,1); saveBlocks(p, blocks); drawBlocks(); renderMeter(p, blocks);
+      };
+    });
+  }
+  drawBlocks(); renderMeter(p, blocks);
+
+  $('#add-block').onclick = ()=>{
+    blocks.push({label:'', text:'', fixed:false});
+    saveBlocks(p, blocks); drawBlocks(); renderMeter(p, blocks);
+    const last = blocksEl.querySelector('.wblock:last-child .wb-label-in'); if(last) last.focus();
+  };
+
   content.querySelectorAll('.stagectl button').forEach(b=>{
     b.onclick = ()=>{ setStage(p.id, b.dataset.s);
       content.querySelectorAll('.stagectl button').forEach(x=>x.classList.toggle('on',x===b));
       toast('Stage → '+b.dataset.s+' (saved locally — export to make it durable)'); };
   });
-  $('#copy-post').onclick = ()=>{
-    const payload = { post:p.id, title:p.title, stage:postStage(p),
-      savedAt:new Date().toISOString(), notes:box.value };
-    navigator.clipboard.writeText('POST ANNOTATIONS ('+p.id+' — '+p.title+'):\n'+JSON.stringify(payload,null,2))
-      .then(()=>toast('Copied — paste it to me in chat'));
+
+  function exportPayload(purpose){
+    return { purpose, post:p.id, title:p.title, stage:postStage(p),
+      target:p.targetWords||null, words: blocks.reduce((n,b)=>n+countWords(b.text),0),
+      savedAt:new Date().toISOString(),
+      blocks: blocks.map(b=>({label:b.label, words:countWords(b.text), text:b.text})) };
+  }
+  $('#copy-feedback').onclick = ()=>{
+    navigator.clipboard.writeText('DRAFT FOR FEEDBACK ROUND ('+p.id+' — '+p.title+'). Protocol: 99_project_skills/01_substack_drafting_flow.md — per-block recommendations in full prose, never rewrite my text.\n'+JSON.stringify(exportPayload('feedback'),null,2))
+      .then(()=>toast('Copied — paste it to me in chat for the feedback round'));
+  };
+  $('#copy-grim').onclick = ()=>{
+    navigator.clipboard.writeText('GRIM — THE GREAT RE-ENCODE INTO MARKDOWN ('+p.id+' — '+p.title+'). Protocol: 99_project_skills/02_grim_reencode.md — verbatim port of my prose into Substack-ready markdown, formatting only, no rewriting.\n'+JSON.stringify(exportPayload('grim'),null,2))
+      .then(()=>toast('Copied — paste it to me (or any agent) to run GRIM'));
   };
 }
 
