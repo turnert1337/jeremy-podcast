@@ -418,12 +418,34 @@ function renderDesk(){
 
 function countWords(s){ return (s.match(/\S+/g)||[]).length; }
 
-function loadBlocks(p){
+function shortLabel(s){
+  const cut = s.split(/[:.(]/)[0].trim();
+  return cut.length>46 ? cut.slice(0,44).trim()+'…' : (cut || 'Section');
+}
+/* Seed the writing rail from the plan: Title + Intro fixed, then one suggested
+   (removable, relabelable) block per outline beat, with the beat as the
+   placeholder hint. His words only ever go IN the boxes — hints never become text.
+   Stored blocks win once he's typed anything; an untouched seed refreshes from
+   the latest plan each open. */
+function loadBlocks(p, plan){
+  let stored = null;
   try{
     const raw = localStorage.getItem('machine.blocks.'+p.id);
-    if(raw){ const b = JSON.parse(raw); if(Array.isArray(b)&&b.length) return b; }
+    if(raw){ const b = JSON.parse(raw); if(Array.isArray(b)&&b.length) stored = b; }
   }catch(e){}
-  const seed = [ {label:'Title', text:'', fixed:true}, {label:'Intro paragraph', text:'', fixed:true} ];
+  if(stored && stored.some(b=>b.text && b.text.trim())) return stored;
+  const seed = [
+    {label:'Title', text:'', fixed:true,
+     hint: plan&&plan.alt_titles&&plan.alt_titles.length ? 'Candidates from the plan: '+plan.alt_titles.join(' · ') : undefined},
+    {label:'Intro paragraph', text:'', fixed:true,
+     hint: plan&&plan.hook ? 'The plan\'s hook: '+plan.hook : undefined}
+  ];
+  if(plan && plan.outline && plan.outline.length){
+    plan.outline.forEach(o=>{
+      const t = typeof o==='string' ? o : (o.beat||'');
+      if(t) seed.push({label: shortLabel(t), text:'', fixed:false, hint:'Plan beat: '+t});
+    });
+  }
   const old = localStorage.getItem('machine.notes.'+p.id);
   if(old && old.trim()) seed.push({label:'Notes (migrated from the old box)', text:old, fixed:false});
   return seed;
@@ -508,13 +530,13 @@ async function renderPost(id){
     plan = round3 && round3.posts.find(x=>x.id===p.planId);
   }
 
-  const right = `<div class="pane">
-    <h4>My side — feedback</h4>
+  const planPane = `<div class="pane">
+    <h4>My side — plan &amp; feedback</h4>
     <div id="fb-zone">${feedbackHTML(p)}</div>
     <details class="plan-fold" open><summary>The writing plan</summary>${planHTML(p, plan)}</details>
   </div>`;
 
-  const left = `<div class="pane">
+  const draftPane = `<div class="pane">
     <h4>Your side — the draft, block by block</h4>
     <p class="meta">${esc(p.gate||'')}</p>
     <div id="blocks"></div>
@@ -531,10 +553,10 @@ async function renderPost(id){
     </div>
   </div>`;
 
-  content.innerHTML = `<div class="meterwrap"><div class="pane" id="wordmeter"></div></div><div class="split">${left}${right}</div>`;
+  content.innerHTML = `<div class="meterwrap"><div class="pane" id="wordmeter"></div></div><div class="split">${planPane}${draftPane}</div>`;
   content.classList.add('wide');
 
-  let blocks = loadBlocks(p);
+  let blocks = loadBlocks(p, plan);
   const blocksEl = $('#blocks');
 
   function drawBlocks(){
@@ -547,7 +569,7 @@ async function renderPost(id){
           ${b.fixed ? '' : `<button class="wb-del" title="Remove section">−</button>`}
         </div>
         <textarea class="wb-text" style="min-height:${b.label==='Title'?'44':'110'}px"
-          placeholder="${b.label==='Title'?'The title — 5–13 words, concrete noun, no snowclone, no question mark…':'Your words. The plan is on the right; the writing is yours…'}">${esc(b.text)}</textarea>
+          placeholder="${b.hint ? esc(b.hint) : (b.label==='Title'?'The title — 5–13 words, concrete noun, no snowclone, no question mark…':'Your words. The plan is on the left; the writing is yours…')}">${esc(b.text)}</textarea>
       </div>`).join('');
     blocksEl.querySelectorAll('.wblock').forEach(el=>{
       const i = +el.dataset.i;
