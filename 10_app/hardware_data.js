@@ -28,14 +28,15 @@ window.HARDWARE = {
       role: "Your camera",
       status: "attention",
       path: "Camera → USB-C to USB-C cable → Mac directly",
-      firmware: "unknown — USB bcdDevice 0x0017; Logitech's firmware version is only readable in Logi Tune (not installed)",
+      firmware: "v2.0.28 (read by Logi Tune 3.14.72) — update v2.0.64 available, optional (not required)",
       link: "480 Mb/s — USB 2.0 speed. The Brio is a 5 Gb/s USB 3 camera.",
       serial: "4EC1B308",
       verdict: "Works: 1080p30 frames come through sharp and well exposed. Two issues. (1) The USB 2.0 link means no 4K mode is offered at all — almost always a USB-C cable that's charge-grade (USB 2 data only). For Riverside this isn't blocking; 1080p is plenty for a podcast. (2) It's aimed far too low: the test frame showed torso and hand at desk height, not your face.",
       todo: [
         "Re-aim: mount it on top of the ultrawide, lens at eye level, face centered with a little headroom.",
         "Want 4K later? Swap to a USB 3 / 5 Gb/s-rated USB-C cable (or the one from the box), then re-probe — the link should read 5 Gb/s.",
-        "Install Logi Tune to read and update the firmware."
+        "Logi Tune is installed (3.14.72). Firmware 2.0.28 → 2.0.64 update offered (optional): run it in Logi Tune with Riverside closed, then re-probe.",
+        "Framing: in Logi Tune set field of view to 65°, add zoom only to taste (≤2× stays sharp at 1080p)."
       ]
     },
     {
@@ -65,6 +66,16 @@ window.HARDWARE = {
   ],
 
   checks: [
+    {
+      date: "2026-10-30",
+      summary: "Logi Tune installed; Brio firmware read.",
+      results: [
+        "Logi Tune 3.14.72 installed via Homebrew cask (installer signed Logitech Inc. QED4VVPZWA, Apple-notarized).",
+        "Brio firmware v2.0.28; Logitech's manifest offers v2.0.64 (update optional, not required).",
+        "Zoom / field-of-view (90/78/65°) controls live in Logi Tune, not in Riverside's web app.",
+        "Link still 480 Mb/s (USB 2.0 cable)."
+      ]
+    },
     {
       date: "2026-10-30",
       summary: "First full probe after the Brio + RØDE setup.",
