@@ -1,9 +1,9 @@
 {
   "name": "Jeremy Podcast test",
-  "stage": "ep3-final-edit-review",
-  "note": "HANDOFF RECEIVED (podcast-management session). The Podcast Machine is built: machine.html = main page (buttons) + podcast flow + Substack desk + per-post drafting views + Riverside walkthrough (s8). s4 research done: 20_research/03_opus_two_more_things.md. Ep3 waiting on Turner's walkthrough (reorder, ear-check, listen) then 'export ep 3'. Posts p1-p3 at outlining, locks pending. RULE: Turner writes the posts himself.",
-  "url": "http://127.0.0.1:4010/machine.html",
+  "stage": "hardware-check",
+  "note": "Hardware probe 2026-10-30: R\u00d8DE PodMic USB ready through the MSI hub (fw v1.1.9 current, test peak -11.6 dBFS); Brio works at 1080p but USB 2.0 link (no 4K) + aimed too low; macOS default input still laptop mic. Hardware view: machine.html?view=hardware. Next: Riverside test recording for Jeremy.",
+  "url": "http://127.0.0.1:4010/machine.html?view=hardware",
   "car_url": "https://claude.ai/code/artifact/48b0b977-f764-4f57-9e74-93ff9bc81217",
   "launch": "python3 -m http.server 4010 --directory \"10_app\"",
-  "updated": "2026-10-13T01:10:00Z"
+  "updated": "2026-10-30T17:05:00Z"
 }

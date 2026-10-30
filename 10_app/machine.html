@@ -293,6 +293,9 @@
   /* locked desk */
   #draftzone.locked{pointer-events:none; filter:blur(2px) saturate(.6); opacity:.5; user-select:none}
 
+  .hw-meta{font-family:var(--mono); font-size:10.5px; color:var(--ink-faint); line-height:1.6; margin-top:8px}
+  .hw-todo{margin:8px 0 0; padding-left:20px}
+  .hw-todo li{font-size:12.5px; color:var(--ink); line-height:1.55; margin-bottom:3px}
   .toast{position:fixed; bottom:18px; left:50%; transform:translateX(-50%);
     background:var(--ink); color:var(--ground); font-size:12px; padding:9px 17px;
     border-radius:100px; opacity:0; transition:opacity .25s; pointer-events:none; z-index:50}
@@ -316,6 +319,7 @@
 <div class="toast" id="toast"></div>
 
 <script src="machine_data.js"></script>
+<script src="hardware_data.js"></script>
 <script>
 const M = window.MACHINE;
 const $ = sel => document.querySelector(sel);
@@ -344,6 +348,7 @@ function renderHome(){
     <a class="mbtn big" href="?view=podcast"><b>🎙 Podcast flow</b><span>Episodes, stage by stage. Ep 3 is in final edit/review — the walkthrough is waiting for you.</span></a>
     <a class="mbtn big" href="?view=desk"><b>✍️ Substack desk</b><span>Every post, ideation → outlining → drafting. Three Ep-3 plans ready to lock; four ideas banked.</span></a>
     <a class="mbtn big" href="?view=walkthrough"><b>⚑ Riverside walkthrough</b><span>The 4 remaining manual steps on Ep 3, guided — reorder, ear-check, listen, export call.</span></a>
+    <a class="mbtn big" href="?view=hardware"><b>🎚 Hardware</b><span>Mic, camera, monitor hub — status, firmware, link speeds, and the Riverside device checklist.</span></a>
   </div>`;
   h += `<h2 class="sec">Substack — quick links</h2><div class="btngrid">` +
     M.quicklinks.substack.map(l=>`<a class="mbtn" href="${l.href}" target="_blank" rel="noopener"><b>${esc(l.label)}</b></a>`).join('') + `</div>`;
@@ -734,6 +739,29 @@ function renderWalkthrough(){
   };
 }
 
+/* ================= HARDWARE ================= */
+function renderHardware(){
+  const H = window.HARDWARE;
+  $('#bar-title').textContent = 'Hardware';
+  $('#bar-sub').textContent = 'last probe ' + (H ? H.lastProbe : '—');
+  if(!H){ content.innerHTML = '<div class="pane"><p>hardware_data.js did not load.</p></div>'; return; }
+  const chip = { ready:'<span class="chip pub">ready</span>', attention:'<span class="chip out">needs attention</span>', warning:'<span class="chip draft">watch out</span>' };
+  let h = `<h2 class="sec">Devices</h2>`;
+  for(const d of H.devices){
+    h += `<div class="epline"><div class="toprow"><h3>${esc(d.name)}</h3>${chip[d.status]||''}</div>
+      <p><b>${esc(d.role)}</b></p>
+      <p>${esc(d.verdict)}</p>
+      <p class="hw-meta">Path: ${esc(d.path)}<br>Firmware: ${esc(d.firmware)}<br>Link: ${esc(d.link)}</p>
+      ${d.todo&&d.todo.length?`<ul class="hw-todo">${d.todo.map(t=>`<li>${esc(t)}</li>`).join('')}</ul>`:''}</div>`;
+  }
+  h += `<h2 class="sec">Riverside device setup — every session</h2>` +
+    H.riversideSetup.map((s,i)=>`<div class="step"><div class="st"><b>Step ${i+1}</b><p>${esc(s)}</p></div></div>`).join('');
+  h += `<h2 class="sec">Probe history</h2>` + H.checks.map(c=>`<div class="epline"><div class="toprow"><h3>${esc(c.date)}</h3></div>
+      <p>${esc(c.summary)}</p><ul class="hw-todo">${c.results.map(r=>`<li>${esc(r)}</li>`).join('')}</ul></div>`).join('');
+  h += `<p class="hw-meta">Host: ${esc(H.host)} · re-probe recipe: 99_project_skills/03_hardware_check.md</p>`;
+  content.innerHTML = h; content.classList.remove('wide');
+}
+
 /* ================= ROUTER ================= */
 function route(){
   const q = new URLSearchParams(location.search);
@@ -744,6 +772,7 @@ function route(){
     else if(v==='desk') renderDesk();
     else if(v==='post') renderPost(q.get('id'));
     else if(v==='walkthrough') renderWalkthrough();
+    else if(v==='hardware') renderHardware();
     else renderHome();
   }catch(e){ renderHome(); }
 }
