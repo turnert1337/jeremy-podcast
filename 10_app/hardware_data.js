@@ -68,8 +68,9 @@ window.HARDWARE = {
   checks: [
     {
       date: "2026-10-30",
-      summary: "Logi Tune installed; Brio firmware read.",
+      summary: "Logi Tune + Riverside Studio Mac app installed; Brio firmware read.",
       results: [
+        "Riverside Studio 1.33.2 installed via Homebrew cask (signed RIVERSIDEFM, INC LH94UTHM4U, Apple-notarized) so recordings survive a closed tab (a full episode was once lost to the browser).",
         "Logi Tune 3.14.72 installed via Homebrew cask (installer signed Logitech Inc. QED4VVPZWA, Apple-notarized).",
         "Brio firmware v2.0.28; Logitech's manifest offers v2.0.64 (update optional, not required).",
         "Zoom / field-of-view (90/78/65°) controls live in Logi Tune, not in Riverside's web app.",
@@ -90,6 +91,7 @@ window.HARDWARE = {
   ],
 
   riversideSetup: [
+    "Record in the Riverside Studio Mac app (/Applications, installed 2026-10-30), not a browser tab. A browser tab's unfinished upload is lost if the tab or browser data goes; the app keeps it on disk and resumes on relaunch. Never log out of or uninstall the app before upload hits 100%.",
     "Open the studio → before joining, open the device menu.",
     "Camera: Logitech BRIO. Microphone: RØDE PodMic USB. Speaker: your headphones (not the monitor, not the laptop speakers).",
     "Talk and watch Riverside's level meter bounce — speaking voice should sit mostly in the green/yellow.",
