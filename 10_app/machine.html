@@ -320,6 +320,146 @@
     background:var(--ink); color:var(--ground); font-size:12px; padding:9px 17px;
     border-radius:100px; opacity:0; transition:opacity .25s; pointer-events:none; z-index:50}
   .toast.show{opacity:1}
+  [hidden]{display:none !important}
+
+  /* ---- post view: Write (plan | your blocks | editorial rail) or Page preview ---- */
+  .inner.xwide{max-width:2300px}
+  .modebar{display:flex; gap:6px; align-items:center; flex-wrap:wrap; margin-top:10px}
+  .modebar button{appearance:none; border:1px solid var(--line-strong); background:var(--panel); color:var(--ink-soft);
+    font-family:var(--display); font-weight:650; font-size:12.5px; padding:6px 14px; border-radius:100px; cursor:pointer}
+  .modebar button:hover{border-color:var(--accent); color:var(--accent)}
+  .modebar button.on{background:var(--ink); color:var(--panel); border-color:var(--ink)}
+  .modehint{font-size:11px; color:var(--ink-faint); margin-left:4px}
+  .split3{grid-template-columns:minmax(260px,.75fr) minmax(420px,1.25fr) minmax(340px,1fr)}
+  @media (max-width:1450px){ .split3{grid-template-columns:minmax(0,1.25fr) minmax(320px,1fr)} .split3 > .planpane{grid-column:1/-1} }
+  @media (max-width:900px){ .split3{grid-template-columns:1fr} }
+  .flash{animation:flash 1.3s ease-out}
+  @keyframes flash{0%{box-shadow:0 0 0 3px var(--accent)}100%{box-shadow:0 0 0 0 transparent}}
+  @media (prefers-reduced-motion:reduce){.flash{animation:none; outline:2px solid var(--accent)}}
+
+  /* editorial rail */
+  .ed-ctl{padding:6px 0 9px; border-bottom:1px solid var(--line); margin-bottom:9px}
+  .ed-counts{font-size:11px; color:var(--ink-soft)}
+  .ed-btns{display:flex; gap:7px; flex-wrap:wrap; align-items:center; margin-top:6px}
+  .icon-btn:disabled{opacity:.45; cursor:default; border-color:var(--line-strong); color:var(--ink-soft)}
+  .icon-btn.solid:disabled{color:var(--accent-ink)}
+  .ed-marks{font-size:11px; color:var(--ink-soft); display:inline-flex; gap:5px; align-items:center; cursor:pointer}
+  .ed-overall{background:var(--panel-2); border:1px solid var(--line); border-radius:10px; padding:8px 12px; margin-bottom:10px}
+  .ed-overall summary{font-family:var(--display); font-weight:700; font-size:12.5px; cursor:pointer}
+  .ed-ovs{display:block; font-family:var(--sans); font-weight:500; font-size:11.5px; color:var(--ink-soft); margin:2px 0 0 14px}
+  .ed-overall[open] .ed-ovs{display:none}
+  .ed-overall p,.ed-overall li{font-size:12.5px; line-height:1.6; color:var(--ink)}
+  .ed-overall ol{padding-left:20px; margin:4px 0}
+  .ed-group{margin-top:10px}
+  .ed-gh{appearance:none; border:none; background:none; padding:0 0 4px; font-family:var(--mono); font-size:10.5px;
+    color:var(--ink-faint); cursor:pointer; text-align:left}
+  .ed-gh:hover{color:var(--accent)}
+  .edc{border:1px solid var(--line); border-left:3px solid var(--line-strong); border-radius:4px 10px 10px 4px;
+    background:var(--panel-2); padding:8px 10px; margin-bottom:6px; cursor:pointer}
+  .edc.k-typo,.edc.k-light{border-left-color:var(--c-idea-ink)}
+  .edc.k-fact{border-left-color:var(--c-draft-ink)}
+  .edc.k-editorial,.edc.k-structure{border-left-color:var(--c-out-ink)}
+  .edc.k-image{border-left-color:var(--brass)}
+  .edc.k-strength{border-left-color:var(--c-done-ink)}
+  .edc.s-accept,.edc.s-applied{background:color-mix(in srgb,var(--c-done-bg) 45%,var(--panel-2))}
+  .edc.s-reject{opacity:.55}
+  .edc.is-applied{opacity:.72}
+  .edc-top{display:flex; gap:8px; align-items:center; margin-bottom:3px}
+  .edc-kind{font-size:10px; font-weight:750; letter-spacing:.05em; text-transform:uppercase; color:var(--ink-soft)}
+  .edc-status{font-size:10.5px; color:var(--c-done-ink); margin-left:auto}
+  .edc.is-stale .edc-status{color:var(--c-draft-ink)}
+  .edc-diff{font-size:12.5px; line-height:1.55; background:var(--panel); border:1px solid var(--line);
+    border-radius:7px; padding:5px 8px; margin:4px 0; overflow-wrap:anywhere}
+  .edc-diff .ctx{color:var(--ink-faint)}
+  .edc-diff del{color:var(--c-draft-ink); background:color-mix(in srgb,var(--c-draft-bg) 55%,transparent)}
+  .edc-diff ins{color:var(--c-done-ink); text-decoration:none; font-weight:650;
+    background:color-mix(in srgb,var(--c-done-bg) 70%,transparent)}
+  .pane .edc-why,.edc-why{margin:4px 0 6px; font-size:12px; line-height:1.55; color:var(--ink);
+    display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden}
+  .edc.open .edc-why{display:block; -webkit-line-clamp:unset}
+  .edc-more{display:none; appearance:none; border:none; background:none; padding:0; margin:-4px 0 6px;
+    font-size:11px; font-weight:650; color:var(--accent); cursor:pointer}
+  .edc.clamped .edc-more{display:inline-block}
+  .edc-act{display:flex; gap:5px; flex-wrap:wrap}
+  .edc-act button{appearance:none; border:1px solid var(--line-strong); background:var(--panel); color:var(--ink-soft);
+    font-size:11px; font-weight:650; padding:3px 10px; border-radius:100px; cursor:pointer}
+  .edc-act button:hover{border-color:var(--ink-soft); color:var(--ink)}
+  .edc-act button[data-act=accept].on{background:var(--c-done-ink); border-color:var(--c-done-ink); color:var(--c-done-bg)}
+  .edc-act button[data-act=reject].on{background:var(--c-draft-ink); border-color:var(--c-draft-ink); color:var(--c-draft-bg)}
+  .edc-act button[data-act=note].on{border-color:var(--c-out-ink); color:var(--c-out-ink)}
+  .edc-act button:disabled{opacity:.55; cursor:default}
+  .edfix{cursor:default; padding-bottom:5px}
+  .fx{border-top:1px solid var(--line); padding:3px 0}
+  .fx:first-of-type{border-top:none}
+  .fx-row{display:flex; align-items:center; gap:4px}
+  .fx-diff{flex:1; min-width:0; font-size:12px; line-height:1.45; overflow-wrap:anywhere}
+  .fx-diff .ctx{color:var(--ink-faint)}
+  .fx-diff del{color:var(--c-draft-ink); background:color-mix(in srgb,var(--c-draft-bg) 55%,transparent)}
+  .fx-diff ins{color:var(--c-done-ink); text-decoration:none; font-weight:650; background:color-mix(in srgb,var(--c-done-bg) 70%,transparent)}
+  .fx-row button{appearance:none; flex:none; width:22px; height:20px; padding:0; border:1px solid var(--line-strong);
+    background:var(--panel); color:var(--ink-soft); border-radius:6px; font-size:11px; cursor:pointer; line-height:1}
+  .fx-row button:hover{color:var(--ink); border-color:var(--ink-soft)}
+  .fx-row button[data-act=accept].on{background:var(--c-done-ink); border-color:var(--c-done-ink); color:var(--c-done-bg)}
+  .fx-row button[data-act=reject].on{background:var(--c-draft-ink); border-color:var(--c-draft-ink); color:var(--c-draft-bg)}
+  .fx.s-reject .fx-diff{opacity:.5}
+  .fx-done{flex:none; font-size:10.5px; color:var(--c-done-ink)}
+  .fx-done.stale{color:var(--c-draft-ink)}
+  .fx.is-applied .fx-diff{opacity:.6}
+  .fx-why{font-size:11.5px; line-height:1.5; color:var(--ink-soft); padding:2px 0 3px}
+  .pane textarea.edc-note,.edc-note{width:100%; min-height:0; margin-top:6px; resize:none; overflow:hidden; background:var(--panel);
+    border:1px solid var(--line-strong); border-radius:7px; color:var(--ink); padding:6px 8px;
+    font-family:var(--sans); font-size:12px; line-height:1.5}
+
+  /* page preview: the article as it will sit on Substack */
+  .pv-wrap{display:grid; grid-template-columns:minmax(0,760px) minmax(320px,460px); gap:28px;
+    justify-content:center; align-items:start}
+  @media (max-width:1150px){ .pv-wrap{grid-template-columns:minmax(0,1fr)} }
+  .pv-article{--pv-bg:#FFFFFF; --pv-ink:#1F1B18; --pv-soft:#6B6560; --pv-ins:#2E9E5B; --pv-del:#C2412D;
+    background:var(--pv-bg); color:var(--pv-ink); border:1px solid var(--line); border-radius:6px; box-shadow:var(--shadow);
+    padding:44px clamp(22px,5vw,64px) 64px; font-family:"Iowan Old Style","Palatino Linotype",Georgia,serif;
+    font-size:19px; line-height:1.62; min-width:0; overflow-wrap:break-word}
+  @media (prefers-color-scheme:dark){ :root:not([data-theme="light"]) .pv-article{--pv-bg:#1E1A17; --pv-ink:#EDE6DD; --pv-soft:#A99F94; --pv-ins:#6FD49B; --pv-del:#F08A73} }
+  :root[data-theme="dark"] .pv-article{--pv-bg:#1E1A17; --pv-ink:#EDE6DD; --pv-soft:#A99F94; --pv-ins:#6FD49B; --pv-del:#F08A73}
+  .pv-kicker{font-family:var(--sans); font-size:11.5px; letter-spacing:.07em; text-transform:uppercase; color:var(--pv-soft); margin-bottom:10px}
+  .pv-title{font-size:36px; line-height:1.16; margin:0 0 10px; font-weight:700; letter-spacing:-.01em}
+  .pv-sub{font-size:21px; color:var(--pv-soft); margin:0 0 20px; line-height:1.4}
+  .pv-sub.pv-suggested{font-style:italic; opacity:.6}
+  .pv-sub.pv-suggested::after{content:"  · suggested"; font-family:var(--sans); font-size:11px; font-style:normal}
+  .pv-byline{display:flex; gap:10px; align-items:center; font-family:var(--sans); font-size:13px; padding:12px 0;
+    border-top:1px solid color-mix(in srgb,var(--pv-soft) 25%,transparent); border-bottom:1px solid color-mix(in srgb,var(--pv-soft) 25%,transparent); margin-bottom:30px}
+  .pv-avatar{width:36px; height:36px; border-radius:50%; background:var(--accent); color:#fff; display:grid; place-items:center; font-weight:700; font-size:13px; flex:none}
+  .pv-byline small{display:block; color:var(--pv-soft); font-size:12px}
+  .pv-article p{margin:0 0 1.15em}
+  .pv-article b{font-weight:700}
+  .pv-h2{font-size:27px; line-height:1.25; margin:1.5em 0 .6em; font-weight:700; letter-spacing:-.005em}
+  .pv-article a{color:inherit; text-decoration:underline; text-decoration-color:color-mix(in srgb,var(--accent) 70%,transparent); text-underline-offset:3px}
+  .pv-article a.pv-rawlink{font-family:var(--sans); font-size:12px; padding:1px 8px; border:1px dashed var(--accent); border-radius:100px;
+    text-decoration:none; color:var(--accent); white-space:nowrap}
+  .pv-fig{margin:1.7em 0; text-align:center}
+  .pv-fig img{max-width:100%; height:auto; border-radius:3px; display:block; margin:0 auto}
+  .pv-fig figcaption{font-family:var(--sans); font-size:13px; color:var(--pv-soft); margin-top:8px; line-height:1.45}
+  .pv-fig.pv-suggested{opacity:.55; outline:2px dashed var(--line-strong); outline-offset:6px}
+  .pv-fig.pv-suggested figcaption::before{content:"Suggested · "; font-weight:700}
+  .pv-phbox{border:2px dashed color-mix(in srgb,var(--pv-soft) 45%,transparent); border-radius:8px; padding:46px 12px;
+    font-family:var(--sans); font-size:13px; color:var(--pv-soft)}
+  .pv-chunk{position:relative; border-radius:6px; outline:1px dashed transparent; outline-offset:10px; transition:outline-color .15s}
+  .pv-chunk:hover{outline-color:var(--line-strong)}
+  .pv-num{position:absolute; left:-46px; top:5px; font-family:var(--mono); font-size:10px; color:var(--ink-faint)}
+  @media (max-width:760px){ .pv-num{display:none} }
+  .pv-tag{position:absolute; top:-13px; right:0; z-index:2; opacity:0; appearance:none; border:1px solid var(--line-strong);
+    background:var(--panel); color:var(--ink-soft); font-family:var(--sans); font-size:11px; font-weight:650;
+    padding:2px 9px; border-radius:100px; cursor:pointer; max-width:60%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+  .pv-chunk:hover .pv-tag,.pv-tag:focus-visible{opacity:1}
+  .pv-tag:hover{color:var(--accent); border-color:var(--accent)}
+  @media (hover:none){ .pv-tag{opacity:.8} }
+  .pv-ghost{font-family:var(--sans); font-size:12px; color:var(--pv-soft); border:1px dashed color-mix(in srgb,var(--pv-soft) 45%,transparent);
+    border-radius:8px; padding:6px 10px; margin:0 0 1.15em; text-align:center}
+  .pv-ins{text-decoration:none; background:color-mix(in srgb,var(--pv-ins) 15%,transparent); border-bottom:2px solid var(--pv-ins)}
+  .pv-del{color:var(--pv-del); text-decoration:line-through; opacity:.8}
+  .pv-removing{opacity:.45}
+  .pv-remnote{font-family:var(--sans); font-size:11px; color:var(--pv-del); margin-bottom:4px}
+  .pv-rail{min-width:0}
+
   .rulebox{border:none; border-radius:var(--radius); background:linear-gradient(135deg,var(--c-out-bg),var(--c-done-bg));
     padding:13px 16px; margin-top:22px}
   .rulebox p{margin:3px 0; font-size:11.5px; color:var(--c-out-ink)}
@@ -667,14 +807,14 @@ async function renderPost(id){
     plan = round3 && round3.posts.find(x=>x.id===p.planId);
   }
 
-  const planPane = `<div class="pane">
+  const planPane = `<div class="pane planpane">
     <h4>My side — plan &amp; feedback</h4>
     <div id="fb-zone">${feedbackHTML(p)}</div>
     <details class="plan-fold" open><summary>The writing plan</summary>${planHTML(p, plan)}</details>
   </div>`;
 
   const isMacUI = /Mac/.test(navigator.platform);
-  const draftPane = `<div class="pane">
+  const draftPane = `<div class="pane" id="draftpane">
     <h4>Your side — the draft, block by block</h4>
     <p class="meta">${esc(p.gate||'')}</p>
     <div id="compsgate"></div>
@@ -693,8 +833,19 @@ async function renderPost(id){
     </div></div>
   </div>`;
 
-  content.innerHTML = `<div class="meterwrap"><div class="pane" id="wordmeter"></div></div><div class="split">${planPane}${draftPane}</div>`;
-  content.classList.add('wide');
+  const edPane = `<div class="pane edpane" id="edpane">
+    <h4>Agentic Feedback / Editorial</h4>
+    <p class="meta">suggestions only — nothing touches your words until you click apply</p>
+    <div id="ed-rail"><p class="fb-empty">Loading the editorial round…</p></div>
+  </div>`;
+
+  content.innerHTML = `<div class="meterwrap"><div class="pane" id="wordmeter"></div>
+      <div class="modebar" role="group" aria-label="view">
+        <button data-mode="write">✍ Write</button><button data-mode="preview">📰 Page preview</button>
+        <span class="modehint" id="modehint"></span></div></div>
+    <div class="split split3" id="split">${planPane}${draftPane}${edPane}</div>
+    <div class="pv-wrap" id="preview" hidden><article class="pv-article" id="pv-article"></article><aside class="pv-rail" id="pv-rail"></aside></div>`;
+  content.classList.add('wide','xwide');
 
   /* ---- the research gate: the writing desk stays locked until every comp
           has been opened AND marked reviewed. Reading the terrain first is
@@ -806,6 +957,7 @@ async function renderPost(id){
         _beaconPayload = {id:p.id, reason:'close', payload:blocks};
         el.querySelector('.wb-count').textContent = countWords(blocks[i].text).toLocaleString()+' w';
         renderMeter(p, blocks);
+        if(window._edOnInput) window._edOnInput();
       };
       ed.addEventListener('input', sync);
       ed.addEventListener('keydown', e=>{
@@ -844,6 +996,7 @@ async function renderPost(id){
       const lab = blocksEl.querySelector(`.wblock[data-i="${focusIdx}"] .wb-label-in`);
       if(lab) lab.focus();
     }
+    if(window._edRefresh) window._edRefresh();   // block indexes may have shifted
   }
   /* B / I buttons light up when the caret sits in bold / italic text */
   function paintTools(){
@@ -878,7 +1031,11 @@ async function renderPost(id){
       savedAt:new Date().toISOString(),
       // markdown carries his **bold** / *italic* exactly; text is the plain copy
       blocks: blocks.map(b=>({label:b.label, words:countWords(b.text), text:b.text,
-                              markdown: richToMarkdown(sanitizeRich(blockHtml(b)))})) };
+                              markdown: richToMarkdown(sanitizeRich(blockHtml(b)))})),
+      // images + subtitle as laid out in the page preview (his layout notes → real figures)
+      layout: ED.doc ? { figures: ED.doc.figures||[],
+        inserts: (ED.doc.inserts||[]).filter(x=>!x.placeholder && (!x.item || edState(edItems().find(i=>i.id===x.item)||{})==='accept')),
+        subtitle: ED.doc.subtitle && edState(edItems().find(i=>i.id==='subtitle'))==='accept' ? ED.doc.subtitle.suggestion : null } : null };
   }
   $('#copy-feedback').onclick = ()=>{
     navigator.clipboard.writeText('DRAFT FOR FEEDBACK ROUND ('+p.id+' — '+p.title+'). Protocol: 99_project_skills/01_substack_drafting_flow.md — per-block recommendations in full prose, never rewrite my text.\n'+JSON.stringify(exportPayload('feedback'),null,2))
@@ -888,6 +1045,426 @@ async function renderPost(id){
     navigator.clipboard.writeText('GRIM — THE GREAT RE-ENCODE INTO MARKDOWN ('+p.id+' — '+p.title+'). Protocol: 99_project_skills/02_grim_reencode.md — verbatim port of my prose into Substack-ready markdown, formatting only, no rewriting.\n'+JSON.stringify(exportPayload('grim'),null,2))
       .then(()=>toast('Copied — paste it to me (or any agent) to run GRIM'));
   };
+
+  /* ================= EDITORIAL ROUND + PAGE PREVIEW =================
+     My suggestions: ~/PodcastDraftBackups/editorial/<id>.json (they quote his
+     unpublished text, so never in the repo). His accept/reject/notes:
+     <id>.decisions.json via /editorial-save, mirrored in localStorage.
+     Nothing here edits his blocks until he clicks "Apply accepted edits",
+     which snapshots the draft to disk first. Typo + light edits ship
+     pre-accepted (his call, 2026-10-31); editorial/fact notes start open. */
+  const ED = { doc:null, dec:{},
+    mode: localStorage.getItem('machine.mode.'+p.id) || '',
+    marks: localStorage.getItem('machine.edmarks')!=='0' };
+  const KIND_LABEL = {typo:'Typo', light:'Light edit', fact:'Fact check', editorial:'Editorial',
+    structure:'Structure', image:'Image', strength:'Working well'};
+  const escH = s => String(s).replace(/[&<>]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+  let _edItems = null;
+  function edItems(){
+    if(!ED.doc) return [];
+    if(_edItems) return _edItems;
+    _edItems = ED.doc.items.slice();
+    if(ED.doc.subtitle) _edItems.unshift({id:'subtitle', block:0, label:'Title', kind:'editorial', default:'open',
+      why:'Suggested subtitle: “'+ED.doc.subtitle.suggestion+'”. '+ED.doc.subtitle.why});
+    return _edItems;
+  }
+  function edState(it){ const d = it && ED.dec[it.id]; return (d && d.state) || (it && it.default) || 'open'; }
+  function labelIndex(it){
+    const fits = k => blocks[k] && (blocks[k].label||'')===(it.label||'') &&
+      (it.op!=='deleteBlock' || (it.expect ? (blocks[k].text||'').includes(it.expect) : !(blocks[k].text||'').trim()));
+    if(fits(it.block)) return it.block;
+    const k = blocks.findIndex((b,j)=>fits(j));
+    if(k>=0) return k;
+    if(it.op==='deleteBlock') return -1;
+    return blocks[it.block] ? it.block : -1;   // relabelled block → fall back to its position
+  }
+  /* where an item lives now: {bi, status} — live (can apply) · applied · stale · info */
+  function edResolve(it){
+    if(it.edits && it.edits.length){
+      const f = it.edits[0].find, r = it.edits[0].replace;
+      const order = [it.block, ...blocks.map((_,k)=>k).filter(k=>k!==it.block)];
+      const has = s => order.find(k=>blocks[k] && (blocks[k].text||'').includes(s));
+      if(edState(it)==='applied'){ const k = has(r); return {bi: k!=null ? k : labelIndex(it), status:'applied'}; }
+      let k = has(f); if(k!=null) return {bi:k, status:'live'};
+      k = has(r);     if(k!=null) return {bi:k, status:'applied'};
+      return {bi:labelIndex(it), status:'stale'};
+    }
+    const bi = labelIndex(it);
+    if(it.op==='deleteBlock'){
+      if(edState(it)==='applied') return {bi:-1, status:'applied'};
+      return {bi, status: bi<0 ? 'stale' : 'live'};
+    }
+    return {bi, status:'info'};
+  }
+  function applicable(){
+    return edItems().filter(it=>edState(it)==='accept' && ((it.edits&&it.edits.length) || it.op==='deleteBlock')
+                              && edResolve(it).status==='live');
+  }
+  let _edSaveT;
+  function edSetDec(id, patch){
+    ED.dec[id] = Object.assign({}, ED.dec[id]||{}, patch, {at:new Date().toISOString()});
+    try{ localStorage.setItem('machine.editorial.'+p.id, JSON.stringify(ED.dec)); }catch(e){}
+    clearTimeout(_edSaveT);
+    _edSaveT = setTimeout(()=>fetch('/editorial-save', {method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({id:p.id, decisions:ED.dec})}).catch(()=>{}), 500);
+  }
+  async function edLoad(){
+    const r = await fetch('/editorial?id='+encodeURIComponent(p.id)).then(r=>r.ok?r.json():null).catch(()=>null);
+    if(!r || !r.ok) return false;
+    ED.doc = r.doc; _edItems = null;
+    let local = {}; try{ local = JSON.parse(localStorage.getItem('machine.editorial.'+p.id)||'{}'); }catch(e){}
+    const disk = r.decisions || {};
+    ED.dec = Object.assign({}, disk);
+    for(const [k,v] of Object.entries(local)) if(!disk[k] || (v.at||'') > (disk[k].at||'')) ED.dec[k] = v;
+    return true;
+  }
+
+  /* ---- cards ---- */
+  // shared prefix/suffix of two strings, widened to whole words → [prefixLen, suffixLen]
+  function commonEdges(a, b){
+    let s = 0; while(s<a.length && s<b.length && a[s]===b[s]) s++;
+    let e = 0; while(e<a.length-s && e<b.length-s && a[a.length-1-e]===b[b.length-1-e]) e++;
+    while(s>0 && /\S/.test(a[s-1])) s--;
+    while(e>0 && /\S/.test(a[a.length-e])) e--;
+    return [s, e];
+  }
+  function diffHtml(a, b, ctx){
+    const [s, e] = commonEdges(a, b), n = ctx || 48;
+    const pre = a.slice(0,s), suf = a.slice(a.length-e), x = a.slice(s,a.length-e), y = b.slice(s,b.length-e);
+    const clip = (t,head) => t.length>n ? (head ? t.slice(0,n)+'…' : '…'+t.slice(-n)) : t;
+    const squeeze = t => t.replace(/\S{48,}/g, w=>w.slice(0,30)+'…'+w.slice(-10));   // long URLs, display only
+    return `<span class="ctx">${escH(clip(pre,false))}</span>${x?`<del>${escH(squeeze(x))}</del>`:''}${y?`<ins>${escH(squeeze(y))}</ins>`:''}<span class="ctx">${escH(clip(suf,true))}</span>`;
+  }
+  function cardHtml(it){
+    const st = edState(it), rs = edResolve(it), d = ED.dec[it.id] || {};
+    const isEdit = !!(it.edits && it.edits.length), isDel = it.op==='deleteBlock';
+    const [yes,no] = it.kind==='strength' ? ['✓ Keep',''] : isEdit ? ['✓ Accept','✕ Reject']
+                   : isDel ? ['✓ Remove block','✕ Keep it'] : ['✓ Agree','✕ Disagree'];
+    const done = rs.status==='applied';
+    const statusTxt = done ? (isDel ? 'block removed ✓' : 'in your draft ✓')
+                    : rs.status==='stale' ? 'text changed — can’t auto-apply' : '';
+    return `<div class="edc k-${it.kind} s-${st} ${done?'is-applied':''} ${rs.status==='stale'?'is-stale':''}" data-id="${esc(it.id)}">
+      <div class="edc-top"><span class="edc-kind">${KIND_LABEL[it.kind]||esc(it.kind)}</span>${statusTxt?`<span class="edc-status">${statusTxt}</span>`:''}</div>
+      ${isEdit ? it.edits.map(e=>`<div class="edc-diff">${diffHtml(e.find, e.replace)}</div>`).join('') : ''}
+      <p class="edc-why">${esc(it.why)}</p>
+      <button class="edc-more" data-act="more">${'more ▾'}</button>
+      <div class="edc-act">
+        <button data-act="accept" class="${st==='accept'||done?'on':''}" ${done?'disabled':''}>${yes}</button>
+        ${no?`<button data-act="reject" class="${st==='reject'?'on':''}" ${done?'disabled':''}>${no}</button>`:''}
+        <button data-act="note" class="${d.note?'on':''}" title="Add your take — I read these next round">💬${d.note?' note':''}</button>
+      </div>
+      <textarea class="edc-note" rows="1" ${d.note?'':'hidden'} placeholder="Your take — I read these next round…">${esc(d.note||'')}</textarea>
+    </div>`;
+  }
+  /* typos + light edits: one compact card per block, a line per fix (the why is one click away) */
+  function fixCard(list){
+    const acc = list.filter(it=>edState(it)==='accept' || edResolve(it).status==='applied').length;
+    return `<div class="edc edfix k-typo">
+      <div class="edc-top"><span class="edc-kind">Typos &amp; light edits · ${list.length}</span><span class="edc-status">${acc} accepted</span></div>
+      ${list.map(it=>{
+        const st = edState(it), rs = edResolve(it), done = rs.status==='applied';
+        return `<div class="fx s-${st} ${done?'is-applied':''} ${rs.status==='stale'?'is-stale':''}" data-id="${esc(it.id)}">
+          <div class="fx-row"><span class="fx-diff">${it.edits.map(e=>diffHtml(e.find, e.replace, 16)).join(' · ')}</span>
+          ${done ? '<span class="fx-done">✓ in draft</span>'
+                 : rs.status==='stale' ? '<span class="fx-done stale">text changed</span>'
+                 : `<button data-act="accept" class="${st==='accept'?'on':''}" title="Accept">✓</button><button data-act="reject" class="${st==='reject'?'on':''}" title="Reject — keep your wording">✕</button>`}
+          <button data-act="why" title="Why this edit">?</button></div>
+          <div class="fx-why" hidden>${it.kind==='light'?'<b>Light edit.</b> ':''}${esc(it.why)}</div></div>`;
+      }).join('')}</div>`;
+  }
+  function autoGrow(ta){ if(ta.hidden) return; ta.style.height = 'auto'; ta.style.height = ta.scrollHeight+'px'; }
+
+  /* ---- the rail: one group per block, aligned beside it ---- */
+  function railHost(){ return ED.mode==='preview' ? $('#pv-rail') : $('#ed-rail'); }
+  function renderRail(){
+    const host = railHost(); if(!host) return;
+    if(!ED.doc){
+      host.innerHTML = `<p class="fb-empty">No editorial round for this post yet. Hit <b>Send draft for feedback</b> and paste it to me; the next round lands here, beside each block.</p>`;
+      return;
+    }
+    const items = edItems(), groups = new Map(), removed = [], lost = [];
+    items.forEach(it=>{
+      const rs = edResolve(it);
+      if(rs.bi<0) (rs.status==='applied' ? removed : lost).push(it);
+      else { if(!groups.has(rs.bi)) groups.set(rs.bi, []); groups.get(rs.bi).push(it); }
+    });
+    const count = s => items.filter(it=>it.kind!=='strength' && edState(it)===s).length;
+    const nApply = applicable().length;
+    let h = `<div class="ed-ctl">
+        <div class="ed-counts">Round ${ED.doc.round} · ${items.length} notes · <b>${count('accept')}</b> accepted · ${count('reject')} rejected · ${count('open')} open${count('applied')?` · ${count('applied')} applied`:''}</div>
+        <div class="ed-btns">
+          <button class="icon-btn solid" id="ed-apply" ${nApply?'':'disabled'}>✎ Apply accepted edits to my draft (${nApply})</button>
+          <button class="icon-btn" id="ed-copy">📤 Copy my decisions</button>
+          ${ED.mode==='preview'?`<label class="ed-marks"><input type="checkbox" id="ed-marks" ${ED.marks?'checked':''}> show edit marks</label>`:''}
+        </div></div>
+      <details class="ed-overall" ${localStorage.getItem('machine.edoverall')==='1'?'open':''}><summary>Editor’s overview — round ${ED.doc.round}${ED.doc.overallShort?`<span class="ed-ovs">${esc(ED.doc.overallShort)}</span>`:''}</summary>${ED.doc.overall||''}</details>`;
+    const isFix = it => (it.kind==='typo' || it.kind==='light') && it.edits && it.edits.length;
+    [...groups.keys()].sort((a,b)=>a-b).forEach(bi=>{
+      const g = groups.get(bi), fixes = g.filter(isFix);
+      h += `<div class="ed-group" data-bi="${bi}"><button class="ed-gh" data-goto="${bi}">§${bi} · ${esc(blocks[bi].label||'(unlabelled block)')}</button>${fixes.length?fixCard(fixes):''}${g.filter(it=>!isFix(it)).map(cardHtml).join('')}</div>`;
+    });
+    if(removed.length) h += `<div class="ed-group" data-bi="-1"><div class="ed-gh">Removed blocks</div>${removed.map(cardHtml).join('')}</div>`;
+    if(lost.length) h += `<div class="ed-group" data-bi="-1"><div class="ed-gh">Couldn’t place — that text changed or its block is gone</div>${lost.map(cardHtml).join('')}</div>`;
+    host.innerHTML = h;
+    // long notes fold to three lines; "more" appears only where something is hidden
+    host.querySelectorAll('.edc').forEach(c=>{ const w = c.querySelector('.edc-why');
+      if(w && w.scrollHeight > w.clientHeight + 2) c.classList.add('clamped'); });
+    wireRail(host);
+    alignRail();
+  }
+  function wireRail(host){
+    host.onclick = e=>{
+      const holder = e.target.closest('[data-id]'), act = e.target.closest('[data-act]');
+      const it = holder && edItems().find(x=>x.id===holder.dataset.id);
+      if(act && it){
+        const a = act.dataset.act;
+        if(a==='why'){ const w = holder.querySelector('.fx-why'); w.hidden = !w.hidden; alignRail(); return; }
+        if(a==='more'){ const o = holder.classList.toggle('open'); act.textContent = o ? 'less ▴' : 'more ▾'; alignRail(); return; }
+        if(a==='note'){
+          const ta = holder.querySelector('.edc-note'); ta.hidden = !ta.hidden;
+          if(!ta.hidden){ autoGrow(ta); ta.focus(); }
+          alignRail(); return;
+        }
+        edSetDec(it.id, {state: edState(it)===a ? 'open' : a});
+        if(ED.mode==='preview') renderPreview();
+        renderRail(); return;
+      }
+      const go = e.target.closest('[data-goto]');
+      if(go){ focusBlock(+go.dataset.goto); return; }
+      if(it && !e.target.closest('button,textarea,a,input,label')){ const bi = edResolve(it).bi; if(bi>=0) focusBlock(bi); }
+    };
+    host.querySelectorAll('.edc-note').forEach(ta=>{
+      const id = ta.closest('[data-id]').dataset.id;
+      ta.addEventListener('input', ()=>{ edSetDec(id, {note: ta.value}); autoGrow(ta); alignRail(); });
+      autoGrow(ta);
+    });
+    const ap = host.querySelector('#ed-apply'); if(ap) ap.onclick = applyAccepted;
+    host.querySelector('#ed-copy').onclick = copyDecisions;
+    const mk = host.querySelector('#ed-marks');
+    if(mk) mk.onchange = ()=>{ ED.marks = mk.checked; localStorage.setItem('machine.edmarks', mk.checked?'1':'0'); renderPreview(); };
+    const ov = host.querySelector('.ed-overall');
+    ov.addEventListener('toggle', ()=>{ localStorage.setItem('machine.edoverall', ov.open?'1':'0'); alignRail(); });
+  }
+  function anchorFor(bi){
+    return ED.mode==='preview' ? document.querySelector(`#pv-article .pv-chunk[data-bi="${bi}"]`)
+                               : blocksEl.querySelector(`.wblock[data-i="${bi}"]`);
+  }
+  /* push each group down to sit level with its block (never up — groups stack) */
+  let _alignRaf = 0;
+  function alignRail(){
+    cancelAnimationFrame(_alignRaf);
+    _alignRaf = requestAnimationFrame(()=>{
+      const host = railHost(); if(!host) return;
+      const groups = [...host.querySelectorAll('.ed-group')];
+      groups.forEach(g=>g.style.marginTop = '');
+      const first = anchorFor(0) || anchorFor(1);
+      // stacked layout (narrow pane): rail sits under the writing, so no alignment
+      if(!first || host.getBoundingClientRect().left < first.getBoundingClientRect().right - 4) return;
+      groups.forEach(g=>{
+        const bi = +g.dataset.bi, a = bi>=0 ? anchorFor(bi) : null; if(!a) return;
+        const gap = a.getBoundingClientRect().top - g.getBoundingClientRect().top;
+        if(gap > 0) g.style.marginTop = (10 + gap) + 'px';
+      });
+    });
+  }
+  function focusBlock(bi){
+    const el = anchorFor(bi); if(!el) return;
+    el.scrollIntoView({behavior:'smooth', block:'center'});
+    el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash');
+  }
+
+  /* ---- page preview ---- */
+  // apply an edit while remembering what it replaced: … = removed, … = inserted.
+  // Finds match against the text with removed runs skipped, so edits stack like they will in the draft.
+  function markedApply(S, find, rep){
+    let clean = '', map = [], depth = 0;
+    for(let k=0; k<S.length; k++){
+      const ch = S[k];
+      if(ch===''){ depth++; continue; } if(ch===''){ depth--; continue; }
+      if(depth>0 || ch==='' || ch==='') continue;
+      map.push(k); clean += ch;
+    }
+    const i = clean.indexOf(find); if(i<0 || !find) return null;
+    // mark only the words that change, not the whole matched phrase
+    const [pre, suf] = commonEdges(find, rep);
+    const a = i + pre, b = i + find.length - suf;           // changed span in clean coords
+    const s = a < b ? map[a] : (a < map.length ? map[a] : S.length);
+    const e = a < b ? map[b-1]+1 : s;
+    return S.slice(0,s)+''+S.slice(s,e)+''+rep.slice(pre, rep.length-suf)+''+S.slice(e);
+  }
+  function markersToTags(S, marks){
+    if(marks) return S.replace(//g,'<ins class="pv-ins">').replace(//g,'</ins>')
+                      .replace(//g,'<del class="pv-del">').replace(//g,'</del>');
+    let out = '', depth = 0;
+    for(const ch of S){
+      if(ch===''){ depth++; continue; } if(ch===''){ depth--; continue; }
+      if(depth>0 || ch==='' || ch==='') continue;
+      out += ch;
+    }
+    return out;
+  }
+  // block html → paragraphs (any line break = new paragraph, like a Substack paste); inline tags reopen across breaks
+  function splitParas(html){
+    const box = document.createElement('div'); box.innerHTML = html;
+    const paras = [], stack = []; let cur = '';
+    const open = () => stack.map(t=>`<${t.tag}${t.attrs}>`).join('');
+    const close = () => stack.slice().reverse().map(t=>`</${t.tag}>`).join('');
+    const brk = () => { paras.push(cur + close()); cur = open(); };
+    (function walk(node){
+      node.childNodes.forEach(n=>{
+        if(n.nodeType===3){ n.nodeValue.split('\n').forEach((s,k)=>{ if(k) brk(); cur += esc(s); }); return; }
+        if(n.nodeType!==1) return;
+        const tag = n.tagName.toLowerCase();
+        if(tag==='br'){ brk(); return; }
+        if(tag==='div' || tag==='p'){ brk(); walk(n); brk(); return; }
+        if(['b','i','ins','del'].includes(tag)){
+          const attrs = n.className ? ` class="${n.className}"` : '';
+          stack.push({tag, attrs}); cur += `<${tag}${attrs}>`; walk(n); stack.pop(); cur += `</${tag}>`; return;
+        }
+        walk(n);
+      });
+    })(box);
+    paras.push(cur + close());
+    return paras.filter(ph=>ph.replace(/<[^>]+>/g,'').trim());
+  }
+  function linkify(h){
+    const href = u => u.replace(/"/g,'%22');
+    return h.replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, (m,t,u)=>`<a href="${href(u)}" target="_blank" rel="noopener">${t}</a>`)
+            .replace(/\[(?:link\s*-\s*)?(https?:\/\/[^\]\s]+)\]/g, (m,u)=>`<a class="pv-rawlink" href="${href(u)}" target="_blank" rel="noopener" title="Bare link — inline it on your own words">🔗 link</a>`);
+  }
+  function figureHtml(f, cls){
+    if(f.placeholder || !f.src) return `<figure class="pv-fig ${cls||''}"><div class="pv-phbox">🖼 image slot</div>${f.caption?`<figcaption>${esc(f.caption)}</figcaption>`:''}</figure>`;
+    return `<figure class="pv-fig ${cls||''}"><img src="${esc(f.src)}" alt="${esc(f.alt||'')}">${f.caption?`<figcaption>${f.caption}</figcaption>`:''}</figure>`;
+  }
+  const HEAD_RE = /^\s*(?:(?:Bolded section title|Section Header|Bolded Heading)\s*:\s*)+/i;
+  const IMG_RE = /^\s*(?:\(\s*At this point, I want you to|Section image should|\[\s*Here, I want this image)/i;
+  function renderPreview(){
+    const art = $('#pv-article'); if(!art) return;
+    const figs = (ED.doc && ED.doc.figures) || [], ins = (ED.doc && ED.doc.inserts) || [];
+    const items = edItems();
+    let h = p.series ? `<div class="pv-kicker">Part ${p.series.part} of ${p.series.of} · draft preview</div>` : `<div class="pv-kicker">Draft preview</div>`;
+    blocks.forEach((b,bi)=>{
+      let S = sanitizeRich(blockHtml(b));
+      items.filter(it=>it.edits && edState(it)==='accept').forEach(it=>{
+        const rs = edResolve(it); if(rs.bi!==bi || rs.status!=='live') return;
+        let T = S;
+        for(const e of it.edits){ T = markedApply(T, escH(e.find), escH(e.replace)); if(T==null) return; }
+        S = T;
+      });
+      const html = markersToTags(S, ED.marks);
+      const del = items.find(it=>it.op==='deleteBlock' && edState(it)==='accept' && edResolve(it).bi===bi);
+      if(del && !ED.marks) return;
+      const tag = `<span class="pv-num">§${bi}</span><button class="pv-tag" data-edit="${bi}" title="Edit this block">✎ ${esc(b.label||'block')}</button>`;
+      if(b.fixed && b.label==='Title'){
+        const sub = items.find(x=>x.id==='subtitle'), subSt = sub ? edState(sub) : 'reject';
+        h += `<section class="pv-chunk" data-bi="${bi}">${tag}<h1 class="pv-title">${html.trim() ? html : '<span class="pv-ghost">Untitled</span>'}</h1>
+          ${ED.doc && ED.doc.subtitle && subSt!=='reject' ? `<p class="pv-sub ${subSt==='accept'?'':'pv-suggested'}">${esc(ED.doc.subtitle.suggestion)}</p>` : ''}
+          <div class="pv-byline"><span class="pv-avatar">TT</span><span><b>Turner Tomlinson</b><small>Draft · not published</small></span></div></section>`;
+        return;
+      }
+      const paras = splitParas(html);
+      if(!paras.length){
+        h += `<section class="pv-chunk" data-bi="${bi}">${tag}<div class="pv-ghost">empty block · ${esc(b.label||'unlabelled')} — won’t appear on the page</div></section>`;
+        return;
+      }
+      let body = '';
+      paras.forEach(ph=>{
+        const tmp = document.createElement('div'); tmp.innerHTML = ph;
+        tmp.querySelectorAll('del').forEach(d=>d.remove());
+        const plain = tmp.textContent.trim();
+        if(!plain){ body += `<p>${ph}</p>`; return; }
+        if(HEAD_RE.test(plain)){
+          const hh = ph.replace(HEAD_RE,'').replace(/^\s*(&quot;|")/,'').replace(/(&quot;|")\s*$/,'');
+          body += `<h2 class="pv-h2">${linkify(hh)}</h2>`;
+        } else if(IMG_RE.test(plain)){
+          const f = figs.find(f=>f.block===bi && plain.includes(f.match)) || figs.find(f=>plain.includes(f.match));
+          body += f ? figureHtml(f) : figureHtml({placeholder:true, caption:'Your note: '+plain});
+        } else body += `<p>${linkify(ph)}</p>`;
+        ins.filter(x=>x.block===bi && plain.includes(x.after)).forEach(x=>{
+          if(!x.item){ body += figureHtml(x); return; }
+          const s = edState(items.find(i=>i.id===x.item));
+          if(s!=='reject') body += figureHtml(x, s==='accept' ? '' : 'pv-suggested');
+        });
+      });
+      h += `<section class="pv-chunk ${del?'pv-removing':''}" data-bi="${bi}">${tag}${del?'<div class="pv-remnote">this block will be removed when you apply</div>':''}${body}</section>`;
+    });
+    art.innerHTML = h;
+    art.querySelectorAll('[data-edit]').forEach(b=>b.onclick = ()=>{ setMode('write'); focusBlock(+b.dataset.edit); });
+    art.querySelectorAll('img').forEach(im=>im.addEventListener('load', alignRail));
+    alignRail();
+  }
+
+  /* ---- applying accepted edits to HIS blocks (snapshot first, re-verify every find) ---- */
+  async function applyAccepted(){
+    const list = applicable(); if(!list.length) return;
+    const nE = list.filter(it=>it.edits).length, nD = list.filter(it=>it.op==='deleteBlock').length;
+    if(!confirm(`Apply ${nE} accepted edit${nE===1?'':'s'}${nD?` and remove ${nD} block${nD===1?'':'s'}`:''} to your draft?\n\nThe draft as it is right now is saved to disk first (~/PodcastDraftBackups/history/${p.id}/…-before-edits.json) and kept in this browser.`)) return;
+    const snap = JSON.parse(JSON.stringify(blocks));
+    try{ localStorage.setItem('machine.blocks.'+p.id+'.before-edits', JSON.stringify(snap)); }catch(e){}
+    try{ await diskSave(p.id, snap, 'before-edits', true); }catch(e){}
+    const skipped = []; let done = 0;
+    list.filter(it=>it.edits).forEach(it=>{
+      const b = blocks[edResolve(it).bi];
+      let text = b.text || '', html = b.html!=null ? sanitizeRich(b.html) : null;
+      for(const e of it.edits){
+        if(!text.includes(e.find) || (html!=null && !html.includes(escH(e.find)))){ skipped.push(it.id); return; }
+        text = text.replace(e.find, ()=>e.replace);
+        if(html!=null) html = html.replace(escH(e.find), ()=>escH(e.replace));
+      }
+      b.text = text; if(html!=null) b.html = html;
+      edSetDec(it.id, {state:'applied'}); done++;
+    });
+    list.filter(it=>it.op==='deleteBlock').map(it=>({it, bi:edResolve(it).bi}))
+      .sort((a,b)=>b.bi-a.bi).forEach(({it,bi})=>{
+        if(bi<0 || edResolve(it).status!=='live'){ skipped.push(it.id); return; }
+        blocks.splice(bi, 1); edSetDec(it.id, {state:'applied'}); done++;
+      });
+    saveBlocks(p, blocks);
+    _beaconPayload = {id:p.id, reason:'close', payload:blocks};
+    drawBlocks(); renderMeter(p, blocks);
+    if(ED.mode==='preview') renderPreview();
+    renderRail();
+    toast(`Applied ${done}${skipped.length?` · ${skipped.length} skipped (that text had changed)`:''} · snapshot saved first`);
+  }
+  function copyDecisions(){
+    const lines = edItems().map(it=>{ const d = ED.dec[it.id] || {};
+      return `${it.id} [${it.kind}] ${edState(it)}${d.note ? ' — note: '+d.note : ''}`; });
+    navigator.clipboard.writeText(`EDITORIAL DECISIONS (${p.id}, round ${ED.doc.round}) — also saved to ~/PodcastDraftBackups/editorial/${p.id}.decisions.json\n`+lines.join('\n'))
+      .then(()=>toast('Copied — or just tell me "read my editorial decisions"'));
+  }
+
+  function setMode(m){
+    ED.mode = m; try{ localStorage.setItem('machine.mode.'+p.id, m); }catch(e){}
+    $('#split').hidden = m!=='write'; $('#preview').hidden = m!=='preview';
+    content.querySelectorAll('.modebar [data-mode]').forEach(b=>b.classList.toggle('on', b.dataset.mode===m));
+    $('#modehint').textContent = m==='preview'
+      ? 'how it will sit on Substack · hover a chunk and hit ✎ to edit it · notes on the right'
+      : 'your blocks · editorial notes sit beside each one on the right';
+    const other = m==='preview' ? $('#ed-rail') : $('#pv-rail');   // one live rail at a time
+    if(other) other.innerHTML = '';
+    if(m==='preview') renderPreview();
+    renderRail();
+  }
+  content.querySelectorAll('.modebar [data-mode]').forEach(b=>b.onclick = ()=>setMode(b.dataset.mode));
+
+  let _edInT;
+  window._edOnInput = ()=>{
+    alignRail();
+    clearTimeout(_edInT);   // statuses (applied / stale) refresh once he pauses
+    _edInT = setTimeout(()=>{ const host = railHost();
+      if(ED.doc && host && !host.contains(document.activeElement)) renderRail(); }, 900);
+  };
+  window._edRefresh = ()=>{ if(ED.doc) renderRail(); };
+  window._edAlign = alignRail;
+  if(!window._edResizeBound){ window._edResizeBound = true;
+    window.addEventListener('resize', ()=>window._edAlign && window._edAlign()); }
+  try{ new ResizeObserver(()=>alignRail()).observe(blocksEl); }catch(e){}
+
+  const haveEd = await edLoad();
+  if(haveEd){
+    $('#fb-zone').innerHTML = `<div class="fb-item"><b>Round ${ED.doc.round} editorial is in</b><p>Per-block notes sit in the <b>Agentic Feedback / Editorial</b> rail, level with each block. Flip to <b>📰 Page preview</b> to see the article as it will sit on the page. Typo fixes and light edits are pre-accepted, and none of them touches your draft until you click apply.</p></div>`;
+  }
+  setMode(ED.mode || (haveEd ? 'preview' : 'write'));
 }
 
 /* ================= RIVERSIDE WALKTHROUGH (s8) ================= */

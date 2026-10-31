@@ -29,3 +29,5 @@
 ## What GRIM is not
 
 Not a copy-editor, not a fact-checker, not a feedback round (that's `01_substack_drafting_flow.md`), and not a publisher. If the input draft violates the audience checklist, GRIM still re-encodes faithfully and notes the concern in the report — the operator decides.
+
+**Layout (exports from 2026-10-31 on):** the payload may carry `layout: {figures, inserts, subtitle}` from the editorial page preview. His layout notes in the blocks (`Section Header:`, `Bolded Heading:`, image instructions) become markdown headings and image embeds per `layout.figures` (src, alt, caption with credit); the notes themselves never appear as prose. Images must be uploaded to Substack, never hotlinked.

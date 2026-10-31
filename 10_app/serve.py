@@ -53,6 +53,13 @@ def save_draft(draft_id, payload, reason):
         snapped = True
     return stamp, snapped
 
+# Editorial rounds (my suggestions + his accept/reject/notes) quote unpublished
+# writing, so they live beside the drafts: editorial/<id>.json (mine, read-only
+# here) and editorial/<id>.decisions.json (his). Article images: media/<id>/.
+ID_RE = r"[A-Za-z0-9_\-]{1,40}"
+MEDIA_TYPES = {".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg",
+               ".webp": "image/webp", ".gif": "image/gif"}
+
 class NoCacheHandler(http.server.SimpleHTTPRequestHandler):
     def _json(self, obj, code=200):
         body = json.dumps(obj).encode()
@@ -78,6 +85,25 @@ class NoCacheHandler(http.server.SimpleHTTPRequestHandler):
                 return self._json({"ok": True, "savedAt": stamp, "snapshot": snapped})
             except Exception as e:
                 return self._json({"ok": False, "error": str(e)}, 500)
+        # /editorial-save — body {id, decisions}; previous copy kept as .prev
+        if self.path.startswith("/editorial-save"):
+            try:
+                n = int(self.headers.get("Content-Length") or 0)
+                if n <= 0 or n > 2_000_000:
+                    return self._json({"ok": False, "error": "bad size"}, 400)
+                data = json.loads(self.rfile.read(n).decode("utf-8"))
+                draft_id = str(data.get("id", ""))
+                if not re.fullmatch(ID_RE, draft_id) or not isinstance(data.get("decisions"), dict):
+                    return self._json({"ok": False, "error": "bad request"}, 400)
+                path = os.path.join(BACKUP_ROOT, "editorial", draft_id + ".decisions.json")
+                if os.path.exists(path):
+                    os.replace(path, path + ".prev")
+                stamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+                _atomic_write(path, json.dumps({"id": draft_id, "savedAt": stamp,
+                    "decisions": data["decisions"]}, ensure_ascii=False, indent=1))
+                return self._json({"ok": True, "savedAt": stamp})
+            except Exception as e:
+                return self._json({"ok": False, "error": str(e)}, 500)
         self.send_error(404)
 
     def do_GET(self):
@@ -92,6 +118,37 @@ class NoCacheHandler(http.server.SimpleHTTPRequestHandler):
                 return self._json({"ok": False, "error": "none"}, 404)
             with open(path, encoding="utf-8") as f:
                 return self._json({"ok": True, "doc": json.load(f)})
+        # /editorial?id=p4 — my round of suggestions + his saved decisions
+        if self.path.startswith("/editorial?"):
+            qs = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+            draft_id = (qs.get("id") or [""])[0]
+            if not re.fullmatch(ID_RE, draft_id):
+                return self._json({"ok": False, "error": "bad id"}, 400)
+            base = os.path.join(BACKUP_ROOT, "editorial", draft_id)
+            if not os.path.exists(base + ".json"):
+                return self._json({"ok": False, "error": "none"}, 404)
+            with open(base + ".json", encoding="utf-8") as f:
+                doc = json.load(f)
+            decisions = {}
+            if os.path.exists(base + ".decisions.json"):
+                with open(base + ".decisions.json", encoding="utf-8") as f:
+                    decisions = json.load(f).get("decisions", {})
+            return self._json({"ok": True, "doc": doc, "decisions": decisions})
+        # /media/<id>/<file> — article images kept outside the repo
+        m = re.fullmatch(r"/media/(" + ID_RE + r")/([A-Za-z0-9_\-]{1,80}\.[a-z]{3,4})", self.path.split("?")[0])
+        if m:
+            path = os.path.join(BACKUP_ROOT, "media", m.group(1), m.group(2))
+            ctype = MEDIA_TYPES.get(os.path.splitext(path)[1].lower())
+            if not ctype or not os.path.isfile(path):
+                return self.send_error(404)
+            with open(path, "rb") as f:
+                body = f.read()
+            self.send_response(200)
+            self.send_header("Content-Type", ctype)
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+            return
         # /open?u=<url>&u=<url>... — launch URLs in the default macOS browser
         # (real Chrome/Safari window, not the webview). http/https only.
         if self.path.startswith("/open?"):

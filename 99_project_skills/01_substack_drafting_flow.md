@@ -44,6 +44,14 @@ The agent:
 3. May flag checklist violations (AI-cadence, snowclone titles, missing receipts, scene-less opens) and word-band position. May quote his sentences to discuss them; may NOT hand back rewritten prose as "the fix."
 4. Multiple rounds are normal. The final decision on every word is the operator's.
 
+### Editorial rounds + page preview (added 2026-10-31, operator request)
+The post view has two modes. **✍ Write** = plan | his blocks | **Agentic Feedback / Editorial** rail (notes level with each block). **📰 Page preview** = the article as it will sit on Substack (his layout notes like `Section Header:` / image instructions render as real headings and figures), with the same rail beside it.
+- A round lives OUTSIDE the repo (it quotes unpublished text): `~/PodcastDraftBackups/editorial/<id>.json` = `{round, overall, overallShort, subtitle, figures[], inserts[], items[]}`; each item `{id, block, label, kind: typo|light|fact|editorial|structure|image|strength, default: accept|open, edits:[{find, replace}], op?: "deleteBlock", expect?, why}`. Images: `~/PodcastDraftBackups/media/<id>/` (served at `/media/<id>/<file>`).
+- Every `find` must be an exact, unique substring of the block's text AND its html (validate before writing — script it). Edits apply in item order, so a later find must survive earlier replacements.
+- The operator allowed **typo fixes and light edits** (pre-accepted, his veto). Facts start accepted only when certain; editorial/structure notes start open and argue in full prose. Never rewrite a passage wholesale; a sentence-level fix is offered as an optional edit, his call.
+- Nothing touches his blocks until he clicks **Apply accepted edits** (snapshot `before-edits` to disk first; each find re-verified). His decisions + notes: `editorial/<id>.decisions.json` — read them before writing the next round.
+- Testing this view: block `navigator.sendBeacon` and mock `/save` + `/editorial-save`, or a test page can overwrite the real disk draft.
+
 ### After the final decision → GRIM
 See `99_project_skills/02_grim_reencode.md`. GRIM ports his final blocks verbatim into Substack-ready markdown. Then the publish checklist: cover image from the actual session, 2–3 pull-quotes marked, excerpt chapter deep link after the scene-opener, tags `Podcast`/`AI` conventions per the publication, and the episode↔post cross-links updated both ways (`machine_data.js` episodes[].posts and the episode show notes).
 
