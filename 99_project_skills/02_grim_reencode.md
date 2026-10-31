@@ -11,7 +11,8 @@
 ## Preconditions
 
 - The post's feedback round(s) are done and the operator has declared the draft **final**. GRIM on a non-final draft is fine for preview, but say so in the output filename (`_preview`).
-- Input is the block export JSON: `{post, title, stage, target, words, blocks:[{label, words, text}]}`.
+- Input is the block export JSON: `{post, title, stage, target, words, blocks:[{label, words, text, markdown}]}`.
+- **Formatting is his:** each block's `markdown` field carries the bold/italic he applied in the editor (`**bold**`, `*italic*`). Port `markdown`, not `text`, so his emphasis survives exactly — never add, remove, or move emphasis. (Exports from before 2026-10-31 have only `text`; use it.)
 
 ## The re-encode, exactly
 

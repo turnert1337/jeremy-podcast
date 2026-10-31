@@ -255,6 +255,26 @@
   .wb-text{width:100%; resize:vertical; background:var(--panel); border:1px solid var(--line);
     border-radius:8px; color:var(--ink); padding:9px 11px; font-family:var(--sans); font-size:13px; line-height:1.65}
   .wb-text:focus-visible{outline:2px solid var(--accent); outline-offset:1px}
+  /* rich block: contenteditable grows with the writing — no inner scroll, ever */
+  .wb-rich{min-height:4.9em; height:auto; overflow:visible; resize:none; white-space:pre-wrap;
+    overflow-wrap:anywhere; cursor:text}
+  .wb-rich.title{min-height:1.65em; font-family:var(--display); font-size:15px; font-weight:650}
+  .wb-rich:empty::before{content:attr(data-ph); color:var(--ink-faint); pointer-events:none}
+  .wb-rich b,.wb-rich strong{font-weight:750}
+  .wb-tools{display:flex; gap:4px}
+  .wb-tool{appearance:none; border:1px solid var(--line-strong); background:var(--panel); color:var(--ink-soft);
+    width:24px; height:22px; border-radius:6px; cursor:pointer; font-size:12px; line-height:1; padding:0}
+  .wb-tool:hover{color:var(--ink); border-color:var(--ink-soft)}
+  .wb-tool.on{background:var(--ink); color:var(--panel); border-color:var(--ink)}
+  /* + between blocks */
+  .wb-insert{display:flex; align-items:center; gap:8px; height:18px; margin:-4px 0 6px; opacity:.45; transition:opacity .15s}
+  .wb-insert:hover,.wb-insert:focus-within{opacity:1}
+  .wb-insert::before,.wb-insert::after{content:""; flex:1; border-top:1px dashed var(--line-strong)}
+  .wb-insert button{appearance:none; border:1px solid var(--line-strong); background:var(--panel); color:var(--ink-soft);
+    height:18px; padding:0 9px; border-radius:100px; cursor:pointer; font-size:11px; line-height:1}
+  .wb-insert button:hover{color:var(--accent); border-color:var(--accent)}
+  .disksave{font-size:11px; color:var(--ink-faint)}
+  .disksave.err{color:var(--c-draft-ink); font-weight:650}
 
   /* feedback + plan fold */
   .fb-empty{font-size:12.5px; color:var(--ink-soft); line-height:1.6; background:var(--panel-2);
@@ -442,7 +462,10 @@ function renderDesk(){
 
 /* ================= POST DRAFTING VIEW =================
    Left → right: YOUR writing (blocks) → my plan + feedback.
-   Blocks persist in localStorage ('machine.blocks.<id>' as JSON [{label,text,fixed}]).
+   Blocks persist in localStorage ('machine.blocks.<id>' as JSON [{label,text,html,fixed}])
+   AND on disk via serve.py /save → ~/PodcastDraftBackups (latest + timestamped
+   history, outside the public repo). 'machine.blocks.<id>.pre-richtext' is a
+   frozen copy from before bold/italic existed.
    Word meter at top; target per post from machine_data targetWords (comps-informed).
    Flow doc: 99_project_skills/01_substack_drafting_flow.md · GRIM: 02_grim_reencode.md */
 
@@ -480,7 +503,90 @@ function loadBlocks(p, plan){
   if(old && old.trim()) seed.push({label:'Notes (migrated from the old box)', text:old, fixed:false});
   return seed;
 }
-function saveBlocks(p, blocks){ localStorage.setItem('machine.blocks.'+p.id, JSON.stringify(blocks)); }
+function saveBlocks(p, blocks){
+  localStorage.setItem('machine.blocks.'+p.id, JSON.stringify(blocks));
+  diskSave(p.id, blocks, 'typing');
+}
+
+/* ---- rich text (bold/italic) ----
+   Each block keeps `html` (only <b>, <i>, <br>, <div> survive sanitizing) and
+   `text` (plain, for word counts and older readers). Blocks written before rich
+   text have only `text`; they're upgraded on display, never rewritten. */
+function textToHtml(t){ return esc(t||'').replace(/\n/g,'<br>'); }
+function sanitizeRich(html){
+  const src = document.createElement('div'); src.innerHTML = html||'';
+  const out = document.createElement('div');
+  (function walk(from, to){
+    from.childNodes.forEach(n=>{
+      if(n.nodeType===3){ to.appendChild(document.createTextNode(n.nodeValue)); return; }
+      if(n.nodeType!==1) return;
+      const tag = n.tagName;
+      if(tag==='BR'){ to.appendChild(document.createElement('br')); return; }
+      let el = null;
+      if(tag==='B'||tag==='STRONG') el = document.createElement('b');
+      else if(tag==='I'||tag==='EM') el = document.createElement('i');
+      else if(tag==='DIV'||tag==='P') el = document.createElement('div');
+      else if(tag==='SPAN'){   // Chrome's style spans: keep weight/slant, drop the rest
+        const st = n.getAttribute('style')||'';
+        if(/font-weight:\s*(bold|[6-9]00)/.test(st)) el = document.createElement('b');
+        else if(/font-style:\s*italic/.test(st)) el = document.createElement('i');
+      }
+      if(el){ walk(n, el); to.appendChild(el); } else walk(n, to);
+    });
+  })(src, out);
+  return out.innerHTML;
+}
+/* html → Substack markdown (**bold**, *italic*), for feedback + GRIM exports */
+function richToMarkdown(html){
+  const box = document.createElement('div'); box.innerHTML = html||'';
+  function md(node){
+    let s = '';
+    node.childNodes.forEach((n,k)=>{
+      if(n.nodeType===3){ s += n.nodeValue; return; }
+      if(n.nodeType!==1) return;
+      const inner = md(n);
+      if(n.tagName==='BR') s += '\n';
+      else if(n.tagName==='B') s += inner.trim() ? '**'+inner+'**' : inner;
+      else if(n.tagName==='I') s += inner.trim() ? '*'+inner+'*' : inner;
+      else if(n.tagName==='DIV') s += (s && !s.endsWith('\n') ? '\n' : '') + inner + '\n';
+      else s += inner;
+    });
+    return s;
+  }
+  return md(box).replace(/\n{3,}/g,'\n\n').replace(/\s+$/,'');
+}
+function blockHtml(b){ return b.html!=null ? b.html : textToHtml(b.text); }
+
+/* ---- disk backup (serve.py /save → ~/PodcastDraftBackups, outside the repo) ---- */
+const _diskTimers = {};
+function diskStatus(msg, err){
+  const el = document.getElementById('disksave');
+  if(el){ el.textContent = msg; el.classList.toggle('err', !!err); }
+}
+function diskSave(id, payload, reason, now){
+  const send = ()=>fetch('/save', {method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({id, reason, payload})})
+    .then(r=>r.json())
+    .then(r=>{ if(r.ok) diskStatus('💾 saved to disk '+r.savedAt.slice(9,11)+':'+r.savedAt.slice(11,13)+':'+r.savedAt.slice(13,15));
+               else diskStatus('⚠ disk save failed: '+r.error+' (still saved in this browser)', true); })
+    .catch(()=>diskStatus('⚠ disk save unavailable — server down? (still saved in this browser)', true));
+  clearTimeout(_diskTimers[id+reason]);
+  if(now) return send();
+  _diskTimers[id+reason] = setTimeout(send, 1200);
+}
+/* last-chance flush when the pane closes or reloads */
+let _beaconPayload = null;
+window.addEventListener('pagehide', ()=>{
+  if(_beaconPayload && Array.isArray(_beaconPayload.payload) &&
+     _beaconPayload.payload.some(b=>(b.text||'').trim()))
+    navigator.sendBeacon('/save', JSON.stringify(_beaconPayload));
+});
+/* one-time frozen copy of the pre-rich-text draft, kept in this browser forever */
+function freezePreRich(id){
+  const k = 'machine.blocks.'+id, f = k+'.pre-richtext';
+  const raw = localStorage.getItem(k);
+  if(raw && !localStorage.getItem(f)) localStorage.setItem(f, raw);
+}
 
 function renderMeter(p, blocks){
   const el = document.getElementById('wordmeter');
@@ -550,7 +656,8 @@ async function renderPost(id){
   const p = M.posts.find(x=>x.id===id);
   if(!p){ renderDesk(); return; }
   $('#bar-title').textContent = p.title;
-  $('#bar-sub').textContent = (p.source==='ep3'?'from episode 3':p.source==='ep2'?'idea bank · from episode 2 (lost)':'standalone');
+  $('#bar-sub').textContent = (p.source==='ep3'?'from episode 3':p.source==='ep2'?'idea bank · from episode 2 (lost)':'standalone')
+    + (p.series ? ` · part ${p.series.part} of ${p.series.of}: ${p.series.role}` : '');
   const st = postStage(p);
 
   let plan = null;
@@ -566,6 +673,7 @@ async function renderPost(id){
     <details class="plan-fold" open><summary>The writing plan</summary>${planHTML(p, plan)}</details>
   </div>`;
 
+  const isMacUI = /Mac/.test(navigator.platform);
   const draftPane = `<div class="pane">
     <h4>Your side — the draft, block by block</h4>
     <p class="meta">${esc(p.gate||'')}</p>
@@ -580,7 +688,8 @@ async function renderPost(id){
     <div class="savebar">
       <button class="icon-btn solid" id="copy-feedback">📤 Send draft for feedback (copy)</button>
       <button class="icon-btn" id="copy-grim">⚙ Send to GRIM (copy)</button>
-      <span class="hint">autosaves every keystroke</span>
+      <span class="hint">autosaves every keystroke · ${isMacUI?'⌘':'Ctrl+'}B bold · ${isMacUI?'⌘':'Ctrl+'}I italic</span>
+      <span class="disksave" id="disksave">💾 disk backup: waiting for first save…</span>
     </div></div>
   </div>`;
 
@@ -642,44 +751,120 @@ async function renderPost(id){
     z.classList.toggle('locked', comps.length>0 && !gateDone());
   }
 
+  /* ---- safety first: freeze the pre-rich-text copy, restore from disk if this
+          browser lost its copy, and snapshot whatever is here on every open ---- */
+  freezePreRich(p.id);
+  try{
+    const raw = localStorage.getItem('machine.blocks.'+p.id);
+    const local = raw ? JSON.parse(raw) : null;
+    const hasLocal = Array.isArray(local) && local.some(b=>(b.text||'').trim());
+    if(!hasLocal){
+      const r = await fetch('/draft?id='+encodeURIComponent(p.id)).then(r=>r.ok?r.json():null).catch(()=>null);
+      const disk = r && r.ok && r.doc && r.doc.payload;
+      if(Array.isArray(disk) && disk.some(b=>(b.text||'').trim())){
+        localStorage.setItem('machine.blocks.'+p.id, JSON.stringify(disk));
+        toast('Restored your draft from the disk backup ('+r.doc.savedAt+')');
+      }
+    }
+  }catch(e){}
+
   let blocks = loadBlocks(p, plan);
   const blocksEl = $('#blocks');
+  _beaconPayload = {id:p.id, reason:'close', payload:blocks};
+  if(blocks.some(b=>(b.text||'').trim())) diskSave(p.id, blocks, 'open', true);
 
-  function drawBlocks(){
+  const isMac = /Mac/.test(navigator.platform);
+  function drawBlocks(focusIdx){
+    const insertRow = i => `<div class="wb-insert"><button data-ins="${i}" title="Insert a new block here">＋ block</button></div>`;
     blocksEl.innerHTML = blocks.map((b,i)=>`
+      ${i>0 ? insertRow(i) : ''}
       <div class="wblock" data-i="${i}">
         <div class="wb-head">
           ${b.fixed ? `<span class="wb-label">${esc(b.label)}</span>`
                     : `<input class="wb-label-in" value="${esc(b.label)}" aria-label="section label" placeholder="Section label…">`}
+          <span class="wb-tools" role="toolbar" aria-label="formatting">
+            <button class="wb-tool" data-cmd="bold" title="Bold (${isMac?'⌘':'Ctrl+'}B)"><b>B</b></button>
+            <button class="wb-tool" data-cmd="italic" title="Italic (${isMac?'⌘':'Ctrl+'}I)"><i>I</i></button>
+          </span>
           <span class="wb-count">${countWords(b.text).toLocaleString()} w</span>
           ${b.fixed ? '' : `<button class="wb-del" title="Remove section">−</button>`}
         </div>
-        <textarea class="wb-text" style="min-height:${b.label==='Title'?'44':'110'}px"
-          placeholder="${b.hint ? esc(b.hint) : (b.label==='Title'?'The title — 5–13 words, concrete noun, no snowclone, no question mark…':'Your words. The plan is on the left; the writing is yours…')}">${esc(b.text)}</textarea>
-      </div>`).join('');
+        <div class="wb-text wb-rich ${b.label==='Title'?'title':''}" contenteditable="true" spellcheck="true"
+          role="textbox" aria-multiline="${b.label==='Title'?'false':'true'}" aria-label="${esc(b.label||'section')}"
+          data-ph="${b.hint ? esc(b.hint) : (b.label==='Title'?'The title — 5–13 words, concrete noun, no snowclone, no question mark…':'Your words. The plan is on the left; the writing is yours…')}">${sanitizeRich(blockHtml(b))}</div>
+      </div>`).join('') + insertRow(blocks.length);
+
     blocksEl.querySelectorAll('.wblock').forEach(el=>{
       const i = +el.dataset.i;
-      el.querySelector('.wb-text').addEventListener('input', e=>{
-        blocks[i].text = e.target.value; saveBlocks(p, blocks);
+      const ed = el.querySelector('.wb-rich');
+      const sync = ()=>{
+        // an editor emptied by deletes can keep a stray <br>; treat it as empty
+        if(!ed.innerText.trim() && !ed.querySelector('b,i')) ed.innerHTML = '';
+        blocks[i].html = sanitizeRich(ed.innerHTML);
+        blocks[i].text = ed.innerText.replace(/ /g,' ').replace(/\n$/,'');
+        saveBlocks(p, blocks);
+        _beaconPayload = {id:p.id, reason:'close', payload:blocks};
         el.querySelector('.wb-count').textContent = countWords(blocks[i].text).toLocaleString()+' w';
         renderMeter(p, blocks);
+      };
+      ed.addEventListener('input', sync);
+      ed.addEventListener('keydown', e=>{
+        if(blocks[i].label==='Title' && e.key==='Enter'){ e.preventDefault(); return; }
+        const mod = isMac ? e.metaKey : e.ctrlKey;
+        if(mod && !e.shiftKey && !e.altKey && (e.key==='b'||e.key==='i')){
+          e.preventDefault();
+          document.execCommand(e.key==='b'?'bold':'italic');
+          sync(); paintTools();
+        }
+      });
+      // paste as plain text: no fonts/colors/links smuggled in from other apps
+      ed.addEventListener('paste', e=>{
+        e.preventDefault();
+        const t = (e.clipboardData||window.clipboardData).getData('text/plain');
+        document.execCommand('insertText', false, blocks[i].label==='Title' ? t.replace(/\s*\n+\s*/g,' ') : t);
+      });
+      el.querySelectorAll('.wb-tool').forEach(btn=>{
+        btn.addEventListener('mousedown', e=>e.preventDefault());   // keep the selection
+        btn.addEventListener('click', ()=>{
+          if(!ed.contains(document.getSelection().anchorNode)) ed.focus();
+          document.execCommand(btn.dataset.cmd); sync(); paintTools();
+        });
       });
       const lab = el.querySelector('.wb-label-in');
       if(lab) lab.addEventListener('input', e=>{ blocks[i].label = e.target.value; saveBlocks(p, blocks); });
       const del = el.querySelector('.wb-del');
       if(del) del.onclick = ()=>{
-        if(blocks[i].text.trim() && !confirm(`Remove "${blocks[i].label||'this section'}" and its ${countWords(blocks[i].text)} words?`)) return;
+        if((blocks[i].text||'').trim() && !confirm(`Remove "${blocks[i].label||'this section'}" and its ${countWords(blocks[i].text)} words?`)) return;
+        diskSave(p.id, blocks, 'before-delete', true);   // snapshot before any removal
         blocks.splice(i,1); saveBlocks(p, blocks); drawBlocks(); renderMeter(p, blocks);
       };
     });
+    blocksEl.querySelectorAll('[data-ins]').forEach(btn=>btn.onclick = ()=>addBlockAt(+btn.dataset.ins));
+    if(focusIdx!=null){
+      const lab = blocksEl.querySelector(`.wblock[data-i="${focusIdx}"] .wb-label-in`);
+      if(lab) lab.focus();
+    }
+  }
+  /* B / I buttons light up when the caret sits in bold / italic text */
+  function paintTools(){
+    const sel = document.getSelection();
+    blocksEl.querySelectorAll('.wblock').forEach(el=>{
+      const inside = sel && sel.anchorNode && el.querySelector('.wb-rich').contains(sel.anchorNode);
+      el.querySelectorAll('.wb-tool').forEach(t=>t.classList.toggle('on',
+        !!inside && document.queryCommandState(t.dataset.cmd)));
+    });
+  }
+  // one listener for the page's lifetime; it always points at the current view
+  window._paintTools = paintTools;
+  if(!window._paintBound){ window._paintBound = true;
+    document.addEventListener('selectionchange', ()=>window._paintTools && window._paintTools()); }
+  function addBlockAt(i){
+    blocks.splice(i, 0, {label:'', text:'', html:'', fixed:false});
+    saveBlocks(p, blocks); drawBlocks(i); renderMeter(p, blocks);
   }
   drawBlocks(); renderMeter(p, blocks); renderGate();
 
-  $('#add-block').onclick = ()=>{
-    blocks.push({label:'', text:'', fixed:false});
-    saveBlocks(p, blocks); drawBlocks(); renderMeter(p, blocks);
-    const last = blocksEl.querySelector('.wblock:last-child .wb-label-in'); if(last) last.focus();
-  };
+  $('#add-block').onclick = ()=>addBlockAt(blocks.length);
 
   content.querySelectorAll('.stagectl button').forEach(b=>{
     b.onclick = ()=>{ setStage(p.id, b.dataset.s);
@@ -691,7 +876,9 @@ async function renderPost(id){
     return { purpose, post:p.id, title:p.title, stage:postStage(p),
       target:p.targetWords||null, words: blocks.reduce((n,b)=>n+countWords(b.text),0),
       savedAt:new Date().toISOString(),
-      blocks: blocks.map(b=>({label:b.label, words:countWords(b.text), text:b.text})) };
+      // markdown carries his **bold** / *italic* exactly; text is the plain copy
+      blocks: blocks.map(b=>({label:b.label, words:countWords(b.text), text:b.text,
+                              markdown: richToMarkdown(sanitizeRich(blockHtml(b)))})) };
   }
   $('#copy-feedback').onclick = ()=>{
     navigator.clipboard.writeText('DRAFT FOR FEEDBACK ROUND ('+p.id+' — '+p.title+'). Protocol: 99_project_skills/01_substack_drafting_flow.md — per-block recommendations in full prose, never rewrite my text.\n'+JSON.stringify(exportPayload('feedback'),null,2))

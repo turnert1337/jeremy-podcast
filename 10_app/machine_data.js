@@ -120,6 +120,7 @@ window.MACHINE = {
     {
       id: "p4", title: "The Vanishing Point",
       stage: "outlining", source: "standalone",
+      series: { part: 1, of: 2, role: "where we're going", pair: "p5" },
       gate: "Outline staged from the comps research with the three DCC rulings folded in. One blocking decision before lock: the attribution gate on \"the great reencode\" (see crafting direction).",
       planInline: {
         size_words: "1,100–1,500",
@@ -171,6 +172,15 @@ window.MACHINE = {
           why: "The template for handling Karpathy: open by citing him, add one clearly-labeled increment (vibeworking) instead of pretending the lane is empty. Your increment is the physical/perceptual symptom framing — the one axis the whole comp set leaves unclaimed." }
       ],
       summary: "Natural language as the vanishing point software converges toward; visible code as a diagnostic symptom (the breathing analogy). Differentiated from Karpathy on the perceptibility axis — the one claim the comp set leaves unclaimed. Full dissection: 20_research/04."
+    },
+
+    /* ---- part 2 of the series Vanishing Point opens (Turner, 2026-10-31):
+            p4 = where we're going, p5 = how we'll get there. p4 references it. ---- */
+    {
+      id: "p5", title: "The Fast Takeoff Is Here (It's Just Not Evenly Distributed)",
+      stage: "idea", source: "standalone",
+      series: { part: 2, of: 2, role: "how we'll get there", pair: "p4" },
+      summary: "Part two of the series The Vanishing Point opens: Vanishing Point is where we're going; this one is how we'll get there. Referenced from inside Vanishing Point. Title only so far, no plan yet. Before it locks: the title riffs on the line usually credited to William Gibson (\"the future is already here, it's just not very evenly distributed\"), whose origin is disputed, so verify how to credit it during research."
     },
 
     /* ---- idea bank: ep2 orphans (Jeremy's surviving track). Reusable ideas,
